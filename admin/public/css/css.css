@@ -112,6 +112,7 @@
   }
   
   .nav-menu {
+    
     padding: 10px 0;
   }
   
@@ -122,6 +123,7 @@
     letter-spacing: 1.2px;
     color: rgba(255, 255, 255, 0.5);
     font-weight: 500;
+   
   }
   
   .nav-item {
@@ -759,11 +761,14 @@
   
   @media (max-width: 576px) {
     .header-actions {
+      float: right;
       margin-left: auto;
     }
   
     .notification {
-      margin: 0 8px;
+      display: flex;
+      justify-content: flex-end
+      
     }
   
     .user-info {
@@ -786,4 +791,27 @@
   .fas {
     font-size: 18px;
   }
-  
+/* Định dạng lại thẻ <a> trong sidebar */
+.sidebar .nav-item a {
+  text-decoration: none !important; /* Loại bỏ gạch chân */
+  color: white !important; /* Giữ nguyên màu chữ */
+  display: flex;
+  align-items: center;
+  width: 100%;
+  padding: 12px 25px;
+  transition: var(--transition);
+}
+
+/* Khi hover, không đổi màu */
+.sidebar .nav-item a:hover {
+  color: white !important;
+  text-decoration: none !important;
+}
+
+/* Khi mục menu đang active */
+.sidebar .nav-item.active a {
+  font-weight: bold !important;
+  color: var(--primary-light) !important;
+}
+
+

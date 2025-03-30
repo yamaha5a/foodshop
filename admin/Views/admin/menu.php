@@ -1,8 +1,9 @@
+<style></style>
 <div class="sidebar">
     <div class="logo">
         <h1>Quản trị<span>Viên</span></h1>
     </div>
-    <div class="nav-menu">
+    <div class="nav-menu" style="height: 2000px" >
         <div class="menu-heading">Chính</div>
         <div class="nav-item active">
             <i class="fas fa-chart-pie"></i>
@@ -10,11 +11,15 @@
         </div>
         <div class="nav-item">
             <i class="fas fa-users"></i>
-            <span>Người dùng</span>
+            <a href="index.php?act=nguoidung"><span>Người dùng</span></a>
         </div>
         <div class="nav-item">
             <i class="fas fa-box"></i>
-            <span>Sản phẩm</span>
+            <a href="index.php?act=Loai_sanPham"><span>Loại Sản phẩm</span></a>
+        </div>
+        <div class="nav-item">
+            <i class="fas fa-box"></i>
+            <a href="index.php?act=sanpham"><span>Sản phẩm</span></a>
         </div>
         <div class="nav-item">
             <i class="fas fa-th-list"></i>
