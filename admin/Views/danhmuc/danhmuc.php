@@ -28,10 +28,11 @@
     <div class="alert alert-success" role="alert">
         <?php 
             echo $_SESSION['thongbao']; 
-            unset($_SESSION['thongbao']); 
+            unset($_SESSION['thongbao']); // Xóa thông báo sau khi hiển thị
         ?>
     </div>
 <?php endif; ?>
+
 
                 <?php
                 

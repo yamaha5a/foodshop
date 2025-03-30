@@ -786,4 +786,27 @@
   .fas {
     font-size: 18px;
   }
-  
+/* Định dạng lại thẻ <a> trong sidebar */
+.sidebar .nav-item a {
+  text-decoration: none !important; /* Loại bỏ gạch chân */
+  color: white !important; /* Giữ nguyên màu chữ */
+  display: flex;
+  align-items: center;
+  width: 100%;
+  padding: 12px 25px;
+  transition: var(--transition);
+}
+
+/* Khi hover, không đổi màu */
+.sidebar .nav-item a:hover {
+  color: white !important;
+  text-decoration: none !important;
+}
+
+/* Khi mục menu đang active */
+.sidebar .nav-item.active a {
+  font-weight: bold !important;
+  color: var(--primary-light) !important;
+}
+
+

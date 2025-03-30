@@ -118,22 +118,6 @@
         </td>
       </tr>
       <tr>
-        <td>#ORD-003</td>
-        <td>Michael Brown</td>
-        <td>13 Tháng 3, 2025</td>
-        <td>$79.50</td>
-        <td>
-          <span class="status active">
-            <i class="fas fa-check-circle"></i> Hoàn thành
-          </span>
-        </td>
-        <td>
-          <button class="btn btn-outline btn-sm">
-            <i class="fas fa-eye"></i> Xem
-          </button>
-        </td>
-      </tr>
-      <tr>
         <td>#ORD-004</td>
         <td>Sarah Davis</td>
         <td>12 Tháng 3, 2025</td>

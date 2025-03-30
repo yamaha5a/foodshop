@@ -9,44 +9,49 @@
             <a href="index.php?act=thongke"><span>Bảng điều khiển</span></a>
         </div>
         <div class="nav-item">
+        <i class="fas fa-image"></i> 
+        <a href="index.php?act=banner"><span>Banner</span></a>
+    </div>
+        <div class="nav-item">
             <i class="fas fa-users"></i>
-            <span>Người dùng</span>
+            <a href="index.php?act=nguoidung"><span>Người dùng</span></a>
         </div>
         <div class="nav-item">
             <i class="fas fa-box"></i>
-            <span>Sản phẩm</span>
+            <a href="index.php?act=sanpham"><span>Sản phẩm</span></a>
         </div>
         <div class="nav-item">
             <i class="fas fa-th-list"></i>
             <a href="index.php?act=danhmuc"><span>Danh mục</span></a>
         </div>
         <div class="nav-item">
-            <i class="fas fa-shopping-cart"></i>
-            <span>Đơn hàng</span>
-        </div>
-
-        <div class="menu-heading">Báo cáo</div>
-        <div class="nav-item">
-            <i class="fas fa-chart-line"></i>
-            <span>Phân tích</span>
+            <i class="fas fa-tags"></i>
+            <a href="index.php?act=magiamgia"><span>Mã giảm giá</span></a>
         </div>
         <div class="nav-item">
-            <i class="fas fa-coins"></i>
-            <span>Doanh số</span>
-        </div>
-
-        <div class="menu-heading">Quản trị</div>
-        <div class="nav-item">
-            <i class="fas fa-cog"></i>
-            <span>Cài đặt</span>
+            <i class="fas fa-file-invoice"></i>
+            <a href="index.php?act=hoadon"><span>Hóa đơn</span></a>
         </div>
         <div class="nav-item">
-            <i class="fas fa-bell"></i>
-            <span>Thông báo</span>
+            <i class="fas fa-money-check-alt"></i>
+            <a href="index.php?act=thanhtoan"><span>Quản lý thanh toán</span></a>
         </div>
         <div class="nav-item">
-            <i class="fas fa-shield-alt"></i>
-            <span>Bảo mật</span>
+            <i class="fas fa-shipping-fast"></i>
+            <a href="index.php?act=vanchuyen"><span>Trạng thái vận chuyển</span></a>
+        </div>
+        <div class="nav-item">
+            <i class="fas fa-utensils"></i>
+            <a href="index.php?act=topping"><span>Quản lý Topping</span></a>
+        </div>
+        <div class="menu-heading">Hỗ trợ</div>
+        <div class="nav-item">
+            <i class="fas fa-star"></i>
+            <a href="index.php?act=danhgia"><span>Đánh giá</span></a>
+        </div>
+        <div class="nav-item">
+            <i class="fas fa-envelope"></i>
+            <a href="index.php?act=lienhe"><span>Liên hệ</span></a>
         </div>
     </div>
 </div>

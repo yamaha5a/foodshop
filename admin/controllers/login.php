@@ -13,8 +13,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
     $user = pdo_query_one($sql, $email);
 
-    // Kiểm tra tài khoản tồn tại và so sánh trực tiếp mật khẩu
-    if ($user && $password == $user['matkhau']) { 
+    // Kiểm tra tài khoản tồn tại và kiểm tra mật khẩu hash
+    if ($user && password_verify($password, $user['matkhau'])) { 
         // Lưu thông tin vào SESSION
         $_SESSION['user_id'] = $user['id'];
         $_SESSION['ten'] = $user['ten'];
@@ -26,7 +26,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         if ($user['tenquyen'] === 'admin') {
             header("Location: /shopfood/admin/index.php");
         } else {
-            header("Location: /shopfood/user/index.php"); // Chuyển hướng nhân viên
+            header("Location: /shopfood/user/index.php");
         }
         exit();
     } else {
@@ -36,4 +36,3 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     }
 }
 ?>
-
