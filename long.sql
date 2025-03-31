@@ -120,9 +120,9 @@ CREATE TABLE chitiethoadon (
 ) ENGINE=InnoDB;
 
 -- 12. Bảng banner
-CREATE TABLE banner (
-    id INT AUTO_INCREMENT PRIMARY KEY,
-    hinhanh VARCHAR(255) NOT NULL,
+    CREATE TABLE banner (
+        id INT AUTO_INCREMENT PRIMARY KEY,
+        hinhanh VARCHAR(255) NOT NULL,
     lienket VARCHAR(255)
 ) ENGINE=InnoDB;
 

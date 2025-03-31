@@ -20,19 +20,15 @@ class NguoiDungController {
 
     public function addUser() {
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-            // Lấy dữ liệu từ form
             $ten = trim($_POST['ten']);
             $email = trim($_POST['email']);
             $matkhau = trim($_POST['matkhau']);
             $id_phanquyen = $_POST['id_phanquyen'];
 
-            // Kiểm tra dữ liệu hợp lệ
             if (empty($ten) || empty($email) || empty($matkhau) || empty($id_phanquyen)) {
                 error_log("Một trong các trường nhập không hợp lệ.");
                 return;
             }
-
-            // Xử lý hình ảnh
             $hinhanh = '';
             if (isset($_FILES['hinhanh']) && $_FILES['hinhanh']['error'] == 0) {
                 $uploadDir = __DIR__ . '/../public/img/nguoidung/';
@@ -44,13 +40,10 @@ class NguoiDungController {
                     error_log("Lỗi upload hình ảnh.");
                 }
             }
-
-            // Thêm người dùng vào cơ sở dữ liệu (BỎ SỐ ĐIỆN THOẠI & GIỚI TÍNH)
             $this->nguoiDungModel->themNguoiDung($ten, $email, $matkhau, $hinhanh, $id_phanquyen);
             if (ob_get_length()) {
-                ob_clean(); // Xóa toàn bộ dữ liệu đã xuất ra trước đó
+                ob_clean(); 
             }
-            // Chuyển hướng về danh sách người dùng
             header("Location: index.php?act=nguoidung");
             exit();
         }
@@ -58,11 +51,10 @@ class NguoiDungController {
     }
 
     public function chiTietNguoiDung($id) {
-        // Lấy thông tin chi tiết người dùng theo ID
         $nguoiDung = $this->nguoiDungModel->layNguoiDungTheoID($id);
         
         if (!$nguoiDung) {
-            die("Không tìm thấy người dùng!"); // Kiểm tra nếu không có dữ liệu
+            die("Không tìm thấy người dùng!"); 
         }
         
         include __DIR__ . '/../views/nguoidung/detail.php'; 

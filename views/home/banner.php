@@ -32,17 +32,22 @@
                     </div>
                     <div class="col-md-12 col-lg-5">
                         <div id="carouselId" class="carousel slide position-relative" data-bs-ride="carousel">
-                            <div class="carousel-inner" role="listbox">
-                                <div class="carousel-item active rounded">
-                                <img src="public/img/hero-img-1.png" class="img-fluid w-100 h-100 bg-secondary rounded" alt="First slide">
+                        <div class="carousel-inner" role="listbox">
+                        <?php
+                        $first = true;
+                        foreach ($banners as $banner) :
+                            $imagePath = '/shopfood/admin/public/' . $banner['hinhanh'];
+                        ?>
+                            <div class="carousel-item <?= $first ? 'active' : ''; ?> rounded">
+                                <img src="<?= $imagePath; ?>" class="img-fluid w-100 h-100 rounded" style="background: none;" alt="Slide">
 
-                                    <a href="#" class="btn px-4 py-2 text-white rounded">Fruites</a>
-                                </div>
-                                <div class="carousel-item rounded">
-                                    <img src="img/hero-img-2.jpg" class="img-fluid w-100 h-100 rounded" alt="Second slide">
-                                    <a href="#" class="btn px-4 py-2 text-white rounded">Vesitables</a>
-                                </div>
+                                <a href="#" class="btn px-4 py-2 text-white rounded">Xem ngay</a>
                             </div>
+                        <?php
+                            $first = false;
+                        endforeach;
+                        ?>
+                                                </div>
                             <button class="carousel-control-prev" type="button" data-bs-target="#carouselId" data-bs-slide="prev">
                                 <span class="carousel-control-prev-icon" aria-hidden="true"></span>
                                 <span class="visually-hidden">Previous</span>

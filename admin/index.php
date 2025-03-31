@@ -42,12 +42,8 @@ if (!isset($_SESSION['user_id']) || $_SESSION['tenquyen'] !== 'admin') {
 
                             case 'delete':
                                 $id = intval($_GET['id']); 
-                            
-                                // Kiểm tra danh mục có tồn tại không
                                 $check = pdo_query_one("SELECT * FROM danhmuc WHERE id = ?", $id);
-                            
                                 if ($check) {
-                                    // Xóa danh mục trong database
                                     pdo_execute("DELETE FROM danhmuc WHERE id = ?", $id);
                                     $_SESSION['thongbao'] = "Xóa danh mục thành công!";
                                 } else {
@@ -55,7 +51,6 @@ if (!isset($_SESSION['user_id']) || $_SESSION['tenquyen'] !== 'admin') {
                                 }
                                 echo '<meta http-equiv="refresh" content="0;url=index.php?act=danhmuc">';
                                 exit();
-
                                 break;
                                                      
                             case 'addDM':
@@ -63,8 +58,6 @@ if (!isset($_SESSION['user_id']) || $_SESSION['tenquyen'] !== 'admin') {
                                     $tenloai = trim($_POST['tenDM']);
                                     $sql = "INSERT INTO danhmuc (tendanhmuc) VALUES (?)";
                                     pdo_execute($sql, $tenloai);
-                            
-                                    // Gán thông báo và chuyển hướng để tránh reload gây lỗi
                                     $_SESSION['thongbao'] = "Thêm danh mục thành công!";
                                     header("Location: index.php?act=danhmuc");
                                     exit();
@@ -86,35 +79,33 @@ if (!isset($_SESSION['user_id']) || $_SESSION['tenquyen'] !== 'admin') {
                             include "Views/danhmuc/update.php";
                             break;
                             case 'nguoidung':
-                                require_once 'controllers/nguoidung.php'; // Đảm bảo đường dẫn đúng
-                                $nguoiDungController = new NguoiDungController(); // Tạo đối tượng controller
-                                $nguoiDungController->danhSach(); // Gọi phương thức để hiển thị danh sách người dùng
+                                require_once 'controllers/nguoidung.php'; 
+                                $nguoiDungController = new NguoiDungController(); 
+                                $nguoiDungController->danhSach();
                                 break;
-                                case 'addnguoidung': // Xử lý thêm người dùng
+                                case 'addnguoidung':
                                     require_once 'controllers/nguoidung.php';
                                     $nguoiDungController = new NguoiDungController();
-                                    $nguoiDungController->addUser(); // Gọi phương thức để thêm người dùng
+                                    $nguoiDungController->addUser(); 
                                     break;
-                                case 'detailnguoidung': // Hiển thị chi tiết người dùng
+                                case 'detailnguoidung':
                                         require_once 'controllers/nguoidung.php';
                                         $nguoiDungController = new NguoiDungController();
                                     
                                         if (isset($_GET['id']) && is_numeric($_GET['id'])) {
                                             $id = $_GET['id'];
-                                            $nguoiDungController->chiTietNguoiDung($id); // Gọi phương thức lấy chi tiết người dùng
+                                            $nguoiDungController->chiTietNguoiDung($id); 
                                         } else {
                                             echo "ID người dùng không hợp lệ!";
                                         }
                                         break;
                                             case 'capnhatNguoiDung':
-                                                require_once 'controllers/nguoidung.php'; // Đảm bảo đường dẫn đúng
+                                                require_once 'controllers/nguoidung.php'; 
                                                 $nguoiDungController = new NguoiDungController();
                                             
                                                 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-                                                    // Nếu form cập nhật được gửi đi thì xử lý cập nhật
                                                     $nguoiDungController->capNhatNguoiDung();
                                                 } elseif (isset($_GET['id'])) {
-                                                    // Nếu chỉ vào trang này với id, thì hiển thị form cập nhật
                                                     include "Views/nguoidung/update.php";
                                                 } else {
                                                     echo "ID người dùng không hợp lệ!";
@@ -125,8 +116,8 @@ if (!isset($_SESSION['user_id']) || $_SESSION['tenquyen'] !== 'admin') {
                                                     include "Views/thongke/thongke.php";
                                                     break;
                                                 case 'banner':
-                                                    require_once 'controllers/banner.php'; // Đảm bảo file controller được include
-                                                    $controller = new BannerController(); // Khởi tạo controller trước khi gọi method
+                                                    require_once 'controllers/banner.php';
+                                                    $controller = new BannerController(); 
                                                     $controller->index();
                                                     break;
                                                 case 'addbanner':
