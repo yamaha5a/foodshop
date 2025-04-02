@@ -64,7 +64,7 @@ class NguoiDungController {
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             var_dump($_POST); // Kiểm tra dữ liệu đã gửi
         exit; // Dừ
-            // Lấy dữ liệu từ form
+            // Lấy dữ liệu từ form  
             $id = $_POST['id'] ?? null;
             $ten = $_POST['ten'] ?? null;
             $email = $_POST['email'] ?? null;
