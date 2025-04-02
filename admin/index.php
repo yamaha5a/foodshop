@@ -1,7 +1,7 @@
 <?php
 session_start();
 if (!isset($_SESSION['user_id']) || $_SESSION['tenquyen'] !== 'admin') {
-    header("Location: /shopfood/admin/Views/login/login.php"); // Chuyển hướng người dùng không phải admin
+    header("Location: /shopfood/admin/Views/login/login.php"); 
     exit();
 }
 ?>
@@ -28,7 +28,7 @@ if (!isset($_SESSION['user_id']) || $_SESSION['tenquyen'] !== 'admin') {
                 
                 <?php
                 if (isset($_GET['act'])) { 
-                    $act = htmlspecialchars($_GET['act']); // Ngăn chặn XSS
+                    $act = htmlspecialchars($_GET['act']); 
                     switch ($act) {
                         case 'thongke':
                             include "Views/thongke/thongke.php";  
@@ -59,8 +59,8 @@ if (!isset($_SESSION['user_id']) || $_SESSION['tenquyen'] !== 'admin') {
                                     $sql = "INSERT INTO danhmuc (tendanhmuc) VALUES (?)";
                                     pdo_execute($sql, $tenloai);
                                     $_SESSION['thongbao'] = "Thêm danh mục thành công!";
-                                    header("Location: index.php?act=danhmuc");
-                                    exit();
+                                    echo '<meta http-equiv="refresh" content="0;url=index.php?act=danhmuc">';
+                                exit();
                                 }
                                 include "Views/danhmuc/add.php";
                                 break;
@@ -102,14 +102,8 @@ if (!isset($_SESSION['user_id']) || $_SESSION['tenquyen'] !== 'admin') {
                                             case 'capnhatNguoiDung':
                                                 require_once 'controllers/nguoidung.php'; 
                                                 $nguoiDungController = new NguoiDungController();
-                                            
-                                                if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-                                                    $nguoiDungController->capNhatNguoiDung();
-                                                } elseif (isset($_GET['id'])) {
-                                                    include "Views/nguoidung/update.php";
-                                                } else {
-                                                    echo "ID người dùng không hợp lệ!";
-                                                }
+                                                
+
                                                 break;
                                                 case 'thongke':
                                                     $total_users = $thongKeModel->demTongTaiKhoan();

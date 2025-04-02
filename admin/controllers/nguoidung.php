@@ -44,7 +44,7 @@ class NguoiDungController {
             if (ob_get_length()) {
                 ob_clean(); 
             }
-            header("Location: index.php?act=nguoidung");
+            echo '<meta http-equiv="refresh" content="0;url=index.php?act=nguoidung">';
             exit();
         }
         include __DIR__ . '/../views/nguoidung/add.php';
@@ -60,32 +60,40 @@ class NguoiDungController {
         include __DIR__ . '/../views/nguoidung/detail.php'; 
     }
     public function capNhatNguoiDung() {
+        // Kiểm tra xem có dữ liệu được gửi lên hay không
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-            $id = $_POST['id'];
-            $ten = trim($_POST['ten']);
-            $email = trim($_POST['email']);
-            $sdt = trim($_POST['sdt']);
-            $id_phanquyen = $_POST['id_phanquyen'];
-            $trangthai = $_POST['trangthai'];
-            $hinhanh = $_POST['hinhanh']; 
-
-            if (!empty($_FILES['hinhanh']['name'])) {
-                $uploadDir = __DIR__ . '/../public/img/nguoidung/';
-                $tenHinh = basename($_FILES['hinhanh']['name']);
-                $hinhanh = "img/nguoidung/" . $tenHinh;
-                move_uploaded_file($_FILES['hinhanh']['tmp_name'], $uploadDir . $tenHinh);
+            var_dump($_POST); // Kiểm tra dữ liệu đã gửi
+        exit; // Dừ
+            // Lấy dữ liệu từ form
+            $id = $_POST['id'] ?? null;
+            $ten = $_POST['ten'] ?? null;
+            $email = $_POST['email'] ?? null;
+            $sodienthoai = $_POST['sodienthoai'] ?? null;
+            $hinhanh = $_POST['hinhanh'] ?? null; // Xử lý upload hình ảnh nếu cần
+            $id_phanquyen = $_POST['id_phanquyen'] ?? null;
+            $trangthai = $_POST['trangthai'] ?? null;
+    
+            // Kiểm tra dữ liệu hợp lệ
+            if ($id && $ten && filter_var($email, FILTER_VALIDATE_EMAIL)) {
+                // Gọi hàm cập nhật người dùng trong model
+                $this->nguoiDungModel->capNhatNguoiDung($id, $ten, $email, $sodienthoai, $hinhanh, $id_phanquyen, $trangthai);
+    
+                // Chuyển hướng về trang danh sách người dùng hoặc thông báo thành công
+                header("Location: danh_sach_nguoi_dung.php?msg=CapNhatThanhCong");
+                exit();
+            } else {
+                // Xử lý lỗi nếu dữ liệu không hợp lệ
+                header("Location: cap_nhat_nguoi_dung.php?id=$id&msg=DuLieuKhongHopLe");
+                exit();
             }
-
-            $this->nguoiDungModel->capNhatNguoiDung($id, $ten, $email, $sdt, $hinhanh, $id_phanquyen, $trangthai);
-
-            if (ob_get_length()) {
-                ob_clean();
-            }
-
-            header("Location: index.php?act=nguoidung");
+        } else {
+            // Nếu không phải là yêu cầu POST, chuyển hướng về trang danh sách
+            echo '<meta http-equiv="refresh" content="0;url=index.php?act=nguoidung">';
             exit();
         }
-        include __DIR__ . '/../views/nguoidung/update.php';
     }
+    
 }
+
+// Khởi tạo controller và gọi hàm cập nhật
 ?>

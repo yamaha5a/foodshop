@@ -20,9 +20,9 @@ class NguoiDung {
         $sql = "SELECT * FROM nguoidung WHERE id = ?";
         return pdo_query_one($sql, $id);
     }
-    public function capNhatNguoiDung($id, $ten, $email, $sdt, $hinhanh, $id_phanquyen, $trangthai) {
-        $sql = "UPDATE nguoidung SET ten = ?, email = ?, sdt = ?, id_phanquyen = ?, trangthai = ?, hinhanh = ? WHERE id = ?";
-        return pdo_execute($sql, $ten, $email, $sdt, $id_phanquyen, $trangthai, $hinhanh, $id);
+    public function capNhatNguoiDung($id, $ten, $email, $sodienthoai, $hinhanh, $id_phanquyen, $trangthai) {
+        $sql = "UPDATE nguoidung SET ten = ?, email = ?, sodienthoai = ?, id_phanquyen = ?, trangthai = ?, hinhanh = ? WHERE id = ?";
+        return pdo_execute($sql, $ten, $email, $sodienthoai, $id_phanquyen, $trangthai, $hinhanh, $id);
     }
         
 }

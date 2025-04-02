@@ -1,67 +1,74 @@
+<?php if (isset($nguoiDung)): ?>
 <!DOCTYPE html>
 <html lang="vi">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Cập nhật người dùng</title>
-    <link rel="stylesheet" href="css.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+    <title>Cập Nhật Người Dùng</title>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
 </head>
 <body>
-    <main class="main-content">
-        <div class="page-title">
-            <h2 class="title">Cập nhật người dùng</h2>
-            <a href="index.php?act=nguoidung" class="btn btn-secondary"><i class="fas fa-arrow-left"></i> Quay lại</a>
+<div class="container mt-5">
+    <h2 class="mb-4">Cập Nhật Người Dùng</h2>
+    
+    <!-- Thông báo lỗi nếu có -->
+    <?php if (isset($_GET['msg'])): ?>
+        <div class="alert alert-warning">
+            <?= htmlspecialchars($_GET['msg']) ?>
         </div>
-        <div class="table-card">
-            <div class="card-title">
-                <h3><i class="fas fa-edit"></i> Sửa thông tin người dùng</h3>
-            </div>
-            <form action="index.php?act=updateNguoiDung" method="POST" enctype="multipart/form-data" class="data-table">
-                <input type="hidden" name="id" value="<?php echo $nguoiDung['id']; ?>">
-                
-                <div class="form-group">
-                    <label for="ten">Tên:</label>
-                    <input type="text" id="ten" name="ten" value="<?php echo htmlspecialchars($nguoiDung['ten']); ?>" required>
-                </div>
-                
-                <div class="form-group">
-                    <label for="email">Email:</label>
-                    <input type="email" id="email" name="email" value="<?php echo htmlspecialchars($nguoiDung['email']); ?>" required>
-                </div>
-                
-                <div class="form-group">
-                    <label for="sdt">Số điện thoại:</label>
-                    <input type="text" id="sdt" name="sdt" value="<?php echo htmlspecialchars($nguoiDung['sdt']); ?>" required>
-                </div>
-                
-                <div class="form-group">
-                    <label for="hinhanh">Hình ảnh:</label>
-                    <input type="file" id="hinhanh" name="hinhanh" accept="image/*">
-                    <br>
-                    <img src="http://localhost/shopfood/admin/public/<?php echo htmlspecialchars($nguoiDung['hinhanh']); ?>" class="avatar" alt="Ảnh người dùng">
-                </div>
-                
-                <div class="form-group">
-                    <label for="id_phanquyen">Quyền:</label>
-                    <select id="id_phanquyen" name="id_phanquyen" required>
-                        <option value="1" <?php echo ($nguoiDung['id_phanquyen'] == 1) ? 'selected' : ''; ?>>Admin</option>
-                        <option value="2" <?php echo ($nguoiDung['id_phanquyen'] == 2) ? 'selected' : ''; ?>>Người dùng</option>
-                        <option value="3" <?php echo ($nguoiDung['id_phanquyen'] == 3) ? 'selected' : ''; ?>>Nhân viên</option>
-                    </select>
-                </div>
-                
-                <div class="form-group">
-                    <label for="trangthai">Trạng thái:</label>
-                    <select id="trangthai" name="trangthai" required>
-                        <option value="Hoạt động" <?php echo ($nguoiDung['trangthai'] == 'Hoạt động') ? 'selected' : ''; ?>>Hoạt động</option>
-                        <option value="Không hoạt động" <?php echo ($nguoiDung['trangthai'] == 'Không hoạt động') ? 'selected' : ''; ?>>Không hoạt động</option>
-                    </select>
-                </div>
-                
-                <button type="submit" class="btn btn-primary"><i class="fas fa-save"></i> Cập nhật</button>
-            </form>
+    <?php endif; ?>
+
+    <form action="index.php?act=capnhatnguoidung" method="POST" enctype="multipart/form-data">
+
+        <input type="hidden" name="id" value="<?= htmlspecialchars($nguoiDung['id']) ?>">
+
+        <div class="form-group">
+            <label for="ten">Tên:</label>
+            <input type="text" class="form-control" id="ten" name="ten" value="<?= htmlspecialchars($nguoiDung['ten']) ?>" required>
         </div>
-    </main>
+
+        <div class="form-group">
+            <label for="email">Email:</label>
+            <input type="email" class="form-control" id="email" name="email" value="<?= htmlspecialchars($nguoiDung['email']) ?>" required>
+        </div>
+
+        <div class="form-group">
+            <label for="sodienthoai">Số Điện Thoại:</label>
+            <input type="text" class="form-control" id="sodienthoai" name="sodienthoai" value="<?= htmlspecialchars($nguoiDung['sodienthoai']) ?>" required pattern="\d{10,15}" title="Số điện thoại phải từ 10 đến 15 chữ số">
+        </div>
+
+        <div class="form-group">
+            <label for="id_phanquyen">Quyền:</label>
+            <select class="form-control" id="id_phanquyen" name="id_phanquyen" required>
+                <option value="1" <?= $nguoiDung['id_phanquyen'] == 1 ? 'selected' : '' ?>>Admin</option>
+                <option value="2" <?= $nguoiDung['id_phanquyen'] == 2 ? 'selected' : '' ?>>Người Dùng</option>
+            </select>
+        </div>
+
+        <div class="form-group">
+            <label for="trangthai">Trạng Thái:</label>
+            <select class="form-control" id="trangthai" name="trangthai" required>
+                <option value="1" <?= $nguoiDung['trangthai'] == 1 ? 'selected' : '' ?>>Kích hoạt</option>
+                <option value="0" <?= $nguoiDung['trangthai'] == 0 ? 'selected' : '' ?>>Khóa</option>
+            </select>
+        </div>
+
+        <div class="form-group">
+            <label for="hinhanh">Hình Ảnh:</label>
+            <input type="file" class="form-control-file" id="hinhanh" name="hinhanh">
+            <small class="form-text text-muted">Hình ảnh hiện tại:</small>
+            <img src="<?= htmlspecialchars($nguoiDung['hinhanh']) ?>" alt="Hình ảnh người dùng" class="img-thumbnail" width="150">
+        </div>
+
+        <button type="submit" class="btn btn-primary">Cập Nhật</button>
+        <a href="index.php?act=nguoidung" class="btn btn-secondary">Hủy</a>
+    </form>
+</div>
+<script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.2/dist/umd/popper.min.js"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
 </body>
 </html>
+<?php else: ?>
+    <p>Không tìm thấy thông tin người dùng.</p>
+<?php endif; ?>
