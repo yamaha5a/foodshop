@@ -10,7 +10,6 @@
             border: 1px solid #ddd; /* Viền cho container */
             padding: 10px; /* Khoảng cách cho container */
             margin-top: 20px; /* Khoảng cách trên */
-            max-width: 100%; /* Đảm bảo chiều rộng tối đa */
         }
 
         /* Bảng */
@@ -26,32 +25,22 @@
             padding: 8px; /* Khoảng cách trong các ô */
             text-align: left; /* Căn trái nội dung */
         }
-
-        /* Nút */
-        .btn {
-            text-decoration: none; /* Bỏ gạch chân */
-            padding: 5px 10px; /* Padding cho nút */
-            color: white; /* Màu chữ */
-            border-radius: 4px; /* Bo góc */
-        }
-
-        .btn-warning {
-            background-color: orange; /* Màu nền nút sửa */
-        }
-
-        .btn-danger {
-            background-color: red; /* Màu nền nút xóa */
-        }
-
-        .btn-warning:hover, .btn-danger:hover {
-            opacity: 0.8; /* Hiệu ứng khi hover */
+        .wrapper{
+            max-height: 120px;
+            border: 1px solid #ddd;
+            overflow-x:auto;
         }
     </style>
 </head>
 <body>
 <main class="main-content">
     <div class="container-fluid">
-        <!-- Thông báo thành công -->
+        <div class="page-title">
+            <h2 class="title">Sản Phẩm</h2>
+            <a href="index.php?act=addSanPham" class="btn btn-primary">
+                <i class="fas fa-folder-plus"></i> Thêm mới
+            </a>
+        </div>
         <?php if (isset($thongbao)): ?>
             <div class="alert alert-success" role="alert">
                 <?= $thongbao; ?>
@@ -60,9 +49,6 @@
 
         <div class="card-title">
             <h3><i class="fas fa-box"></i> Danh sách sản phẩm</h3>
-            <a href="index.php?act=addSanPham" class="btn btn-primary">
-                <i class="fas fa-folder-plus"></i> Thêm mới
-            </a>
         </div>
         
         <div class="scroll-container">

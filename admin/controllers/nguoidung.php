@@ -50,50 +50,56 @@ class NguoiDungController {
         include __DIR__ . '/../views/nguoidung/add.php';
     }
 
-    public function chiTietNguoiDung($id) {
+    public function chiTietNguoiDung() {
+        $id = $_GET['id'] ?? null;
+    
+        if (!$id) {
+            die("Thiếu ID người dùng!");
+        }
+    
         $nguoiDung = $this->nguoiDungModel->layNguoiDungTheoID($id);
         
         if (!$nguoiDung) {
             die("Không tìm thấy người dùng!"); 
         }
-        
+    
         include __DIR__ . '/../views/nguoidung/detail.php'; 
     }
+    
     public function capNhatNguoiDung() {
-        // Kiểm tra xem có dữ liệu được gửi lên hay không
-        if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-            var_dump($_POST); // Kiểm tra dữ liệu đã gửi
-        exit; // Dừ
-            // Lấy dữ liệu từ form  
-            $id = $_POST['id'] ?? null;
-            $ten = $_POST['ten'] ?? null;
-            $email = $_POST['email'] ?? null;
-            $sodienthoai = $_POST['sodienthoai'] ?? null;
-            $hinhanh = $_POST['hinhanh'] ?? null; // Xử lý upload hình ảnh nếu cần
-            $id_phanquyen = $_POST['id_phanquyen'] ?? null;
-            $trangthai = $_POST['trangthai'] ?? null;
+        $id = $_GET['id'] ?? $_POST['id'] ?? null;
     
-            // Kiểm tra dữ liệu hợp lệ
-            if ($id && $ten && filter_var($email, FILTER_VALIDATE_EMAIL)) {
-                // Gọi hàm cập nhật người dùng trong model
-                $this->nguoiDungModel->capNhatNguoiDung($id, $ten, $email, $sodienthoai, $hinhanh, $id_phanquyen, $trangthai);
-    
-                // Chuyển hướng về trang danh sách người dùng hoặc thông báo thành công
-                header("Location: danh_sach_nguoi_dung.php?msg=CapNhatThanhCong");
-                exit();
-            } else {
-                // Xử lý lỗi nếu dữ liệu không hợp lệ
-                header("Location: cap_nhat_nguoi_dung.php?id=$id&msg=DuLieuKhongHopLe");
-                exit();
-            }
-        } else {
-            // Nếu không phải là yêu cầu POST, chuyển hướng về trang danh sách
-            echo '<meta http-equiv="refresh" content="0;url=index.php?act=nguoidung">';
+        if (!$id) {
+            // Nếu không có id thì quay lại danh sách
+            header("Location: index.php?act=nguoidung");
             exit();
         }
+    
+        // Lấy dữ liệu người dùng theo ID
+        $nguoiDung = $this->nguoiDungModel->layNguoiDungTheoId($id);
+    
+        if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+            // Lấy dữ liệu từ form
+            $ten = $_POST['ten'] ?? $nguoiDung['ten'];
+            $email = $_POST['email'] ?? $nguoiDung['email'];
+            $sodienthoai = $_POST['sodienthoai'] ?? $nguoiDung['sodienthoai'];
+            $hinhanh = $_POST['hinhanh'] ?? $nguoiDung['hinhanh'];
+            $id_phanquyen = $_POST['id_phanquyen'] ?? $nguoiDung['id_phanquyen'];
+            $trangthai = $_POST['trangthai'] ?? $nguoiDung['trangthai'];
+    
+            // Gọi hàm cập nhật người dùng trong model
+            $this->nguoiDungModel->capNhatNguoiDung($id, $ten, $email, $sodienthoai, $hinhanh, $id_phanquyen, $trangthai);
+    
+            // Thông báo và chuyển trang
+            $_SESSION['thongbao'] = "Cập nhật thành công!";
+            header("Location: index.php?act=nguoidung");
+            exit();
+        }
+    
+        // Nếu là GET, hiển thị form cập nhật
+        include 'views/nguoidung/update.php';
     }
     
+  
 }
-
-// Khởi tạo controller và gọi hàm cập nhật
 ?>

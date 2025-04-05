@@ -170,7 +170,6 @@
   
   .nav-item i {
     width: 24px;
-    margin-right: 12px;
     font-size: 18px;
     text-align: center;
     transition: var(--transition);

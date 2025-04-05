@@ -5,7 +5,7 @@ class BannerModel {
     private $conn;
 
     public function __construct() {
-        $this->conn = pdo_get_connection();
+        $this->conn = connection();
     }
 
     public function getAllBanners() {

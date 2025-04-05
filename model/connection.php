@@ -1,5 +1,5 @@
 <?php
-  function pdo_get_connection(){
+  function connection(){
     $dburl = "mysql:host=localhost;dbname=shopfood;charset=utf8";
     $username = 'root';
     $password = '';

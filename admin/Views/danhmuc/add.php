@@ -15,7 +15,7 @@
                 </div>
             <?php endif; ?>
 
-            <form action="index.php?act=addDM" method="POST">
+            <form action="index.php?act=adddanhmuc" method="POST">
                 <table class="data-table">
                     <thead>
                         <tr>
@@ -26,7 +26,7 @@
                     <tbody>
                         <tr>
                             <td>
-                                <input type="text" class="form-control" name="tenDM" placeholder="Nhập tên danh mục" required>
+                                <input type="text" class="form-control" name="tendanhmuc" placeholder="Nhập tên danh mục" required>
                             </td>
                             <td>
                                 <button type="submit" name="themmoi" class="btn btn-primary">

@@ -1,9 +1,9 @@
 <div class="container-fluid">
-    <h1 class="h3 mb-4 text-gray-800">Thống kê</h1>
+    <h1 class="h3 mb-4 text-gray-800">Danh mục </h1>
     
     <div class="card table-card">
     <div class="d-flex justify-content-between align-items-center mb-3">
-    <a href="index.php?act=addDM" class="btn btn-primary">
+    <a href="index.php?act=adddanhmuc" class="btn btn-primary">
         <i class="fas fa-folder-plus"></i> Thêm mới
     </a>
 </div>
@@ -28,7 +28,7 @@
     <div class="alert alert-success" role="alert">
         <?php 
             echo $_SESSION['thongbao']; 
-            unset($_SESSION['thongbao']); // Xóa thông báo sau khi hiển thị
+            unset($_SESSION['thongbao']);
         ?>
     </div>
 <?php endif; ?>
@@ -39,8 +39,8 @@
                     foreach ($listDM as $danhmuc) {
                         $id = $danhmuc['id']; 
                         $tendanhmuc = $danhmuc['tendanhmuc'];
-                        $suaDM = "index.php?act=updateDM&id=" . $id;
-                        $xoaDM = "index.php?act=delete&id=" . $id;
+                        $suaDM = "index.php?act=editdanhmuc&id=" . $id;
+                        $xoaDM = "index.php?act=deletedanhmuc&id=" . $id;
                     
                         echo "<tr>";
                         echo "<td>$id</td>";

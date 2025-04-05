@@ -4,6 +4,8 @@ if (!isset($_SESSION['user_id']) || $_SESSION['tenquyen'] !== 'admin') {
     header("Location: /shopfood/admin/Views/login/login.php"); 
     exit();
 }
+include 'Models/sanpham.php';
+
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -34,97 +36,75 @@ if (!isset($_SESSION['user_id']) || $_SESSION['tenquyen'] !== 'admin') {
                             include "Views/thongke/thongke.php";  
                             break;
 
-                        case 'danhmuc':
-                            $sql = "SELECT * FROM danhmuc ORDER BY id ASC"; 
-                            $listDM = pdo_query($sql);                                            
-                            include "Views/danhmuc/danhmuc.php";  
-                            break;
-
-                            case 'delete':
-                                $id = intval($_GET['id']); 
-                                $check = pdo_query_one("SELECT * FROM danhmuc WHERE id = ?", $id);
-                                if ($check) {
-                                    pdo_execute("DELETE FROM danhmuc WHERE id = ?", $id);
-                                    $_SESSION['thongbao'] = "Xóa danh mục thành công!";
-                                } else {
-                                    $_SESSION['thongbao'] = "Danh mục không tồn tại hoặc đã bị xóa!";
-                                }
-                                echo '<meta http-equiv="refresh" content="0;url=index.php?act=danhmuc">';
-                                exit();
+                            case 'danhmuc':
+                                require_once 'controllers/danhmuc.php';
+                                $controller = new DanhMucController();
+                                $controller->index();
                                 break;
-                                                     
-                            case 'addDM':
-                                if (isset($_POST['themmoi']) && !empty($_POST['tenDM'])) {
-                                    $tenloai = trim($_POST['tenDM']);
-                                    $sql = "INSERT INTO danhmuc (tendanhmuc) VALUES (?)";
-                                    pdo_execute($sql, $tenloai);
-                                    $_SESSION['thongbao'] = "Thêm danh mục thành công!";
-                                    echo '<meta http-equiv="refresh" content="0;url=index.php?act=danhmuc">';
-                                exit();
-                                }
-                                include "Views/danhmuc/add.php";
+                        
+                            case 'adddanhmuc':
+                                require_once 'controllers/danhmuc.php';
+                                $controller = new DanhMucController();
+                                $controller->add();
                                 break;
-                        case 'updateDM':
-                            if (isset($_POST['capnhat'])) {
-                                $id = intval($_POST['idDM']);
-                                $tenDM = trim($_POST['tenDM']);
-
-                                if (!empty($tenDM)) {
-                                    pdo_execute("UPDATE danhmuc SET tendanhmuc = ? WHERE id = ?", $tenDM, $id);
-                                    $_SESSION['thongbao'] = "Cập nhật danh mục thành công!";
-                                    header("Location: index.php?act=danhmuc");
-                                    exit();
-                                }
-                            }
-                            include "Views/danhmuc/update.php";
-                            break;
+                        
+                            case 'editdanhmuc':
+                                require_once 'controllers/danhmuc.php';
+                                $controller = new DanhMucController();
+                                $controller->edit();
+                                break;
+                        
+                            case 'deletedanhmuc':
+                                require_once 'controllers/danhmuc.php';
+                                $controller = new DanhMucController();
+                                $controller->delete();
+                                break;                    
                             case 'nguoidung':
                                 require_once 'controllers/nguoidung.php'; 
                                 $nguoiDungController = new NguoiDungController(); 
                                 $nguoiDungController->danhSach();
                                 break;
-                                case 'addnguoidung':
+                            case 'addnguoidung':
+                                require_once 'controllers/nguoidung.php';
+                                $nguoiDungController = new NguoiDungController();
+                                $nguoiDungController->addUser(); 
+                                break;
+                            case 'detailnguoidung':
                                     require_once 'controllers/nguoidung.php';
                                     $nguoiDungController = new NguoiDungController();
-                                    $nguoiDungController->addUser(); 
-                                    break;
-                                case 'detailnguoidung':
-                                        require_once 'controllers/nguoidung.php';
-                                        $nguoiDungController = new NguoiDungController();
+                                    $nguoiDungController->chiTietNguoiDung(); 
                                     
-                                        if (isset($_GET['id']) && is_numeric($_GET['id'])) {
-                                            $id = $_GET['id'];
-                                            $nguoiDungController->chiTietNguoiDung($id); 
-                                        } else {
-                                            echo "ID người dùng không hợp lệ!";
-                                        }
-                                        break;
-                                            case 'capnhatNguoiDung':
-                                                require_once 'controllers/nguoidung.php'; 
-                                                $nguoiDungController = new NguoiDungController();
-                                                
+                                    break;
+                            case 'capnhatNguoiDung':
+                                require_once 'controllers/nguoidung.php'; 
+                                $nguoiDungController = new NguoiDungController();
+                                $nguoiDungController->capNhatNguoiDung();
 
-                                                break;
-                                                case 'thongke':
-                                                    $total_users = $thongKeModel->demTongTaiKhoan();
-                                                    include "Views/thongke/thongke.php";
-                                                    break;
-                                                case 'banner':
-                                                    require_once 'controllers/banner.php';
-                                                    $controller = new BannerController(); 
-                                                    $controller->index();
-                                                    break;
-                                                case 'addbanner':
-                                                    require_once 'controllers/banner.php'; 
-                                                    $bannerController = new BannerController(); 
-                                                    $bannerController->addBanner();
-                                                    break;
-                                                case 'deletebanner':
-                                                    require_once 'controllers/banner.php'; 
-                                                    $bannerController = new BannerController(); 
-                                                    $bannerController->delete();
-                                                    break;
-                                                    
+                                break;
+                            case 'thongke':
+                                $total_users = $thongKeModel->demTongTaiKhoan();
+                                include "Views/thongke/thongke.php";
+                                break;
+                            case 'banner':
+                                require_once 'controllers/banner.php';
+                                $controller = new BannerController(); 
+                                $controller->index();
+                                break;
+                            case 'addbanner':
+                                require_once 'controllers/banner.php'; 
+                                $bannerController = new BannerController(); 
+                                $bannerController->addBanner();
+                                break;
+                            case 'deletebanner':
+                                require_once 'controllers/banner.php'; 
+                                $bannerController = new BannerController(); 
+                                $bannerController->delete();
+                                break;
+                            case 'sanpham':
+                                require_once 'controllers/sanpham.php';
+                                $controller = new SanPhamController();
+                                $controller->list();
+                                break;                          
                                                 
                                                 
                         default:

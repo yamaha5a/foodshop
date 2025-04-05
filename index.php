@@ -29,34 +29,62 @@
 <?php
 include 'views/client/header.php'; // Load header
 
-$page = isset($_GET['page']) ? $_GET['page'] : 'home';
+$page = $_GET['page'] ?? 'home';
 
-if ($page === 'home') {
-    include 'views/client/dieuhuong.php'; 
-} else {
-    switch ($page) {
-        case 'about':
-            include 'views/about.php';
-            break;
-        case 'contact':
-            include 'views/contact/contact.php';
-            break;
-        case 'product':
-            include 'views/product/product.php';
-            break;
-        case 'cart':
-            include 'views/cart/cart.php';
-            break;
-        case 'checkout':
-            include 'views/checkout/checkout.php';
-            break;
-        default:
-            include 'views/404.php';
-            break;
-    }
+switch ($page) {
+    case 'home':
+        require_once 'controller/banner.php';
+        require_once 'controller/sanpham.php';
+
+        $bannerController = new BannerController();
+        $bannerController->showBanners();
+
+        include 'views/home/sliderbar.php'; 
+
+        $sanphamController = new SanPhamController();
+        $sanphamController->list();
+        break;
+
+    case 'banner':
+        require_once 'controller/banner.php';
+        $bannerController = new BannerController();
+        $bannerController->showBanners();
+        break;
+
+    case 'sanpham':
+        require_once 'controller/sanpham.php';
+        $sanphamController = new SanPhamController();
+        $sanphamController->list();
+        break;
+
+    case 'about':
+        include 'views/about.php';
+        break;
+
+    case 'contact':
+        include 'views/contact/contact.php';
+        break;
+
+    case 'product':
+        include 'views/product/product.php';
+        break;
+
+    case 'cart':
+        include 'views/cart/cart.php';
+        break;
+
+    case 'checkout':
+        include 'views/checkout/checkout.php';
+        break;
+
+    case 'detail':
+        include 'views/detail/detail.php';
+        break;
+
+    default:
+        include 'views/404.php';
+        break;
 }
-
-include 'views/client/footer.php'; // Load footer
 ?>
 
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.4/jquery.min.js"></script>

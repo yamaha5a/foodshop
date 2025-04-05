@@ -24,7 +24,6 @@
 .avatar:hover {
     transform: scale(1.1); /* Phóng to nhẹ khi hover */
 }
-
 </style>
 <body>
 
@@ -33,9 +32,17 @@
         <div class="page-title">
             <h2 class="title">Danh sách người dùng</h2>
             <a href="index.php?act=addnguoidung" class="btn btn-primary">
-    <i class="fa-solid fa-plus"></i> Thêm mới
-</a>
-        </div>
+        <i class="fas fa-folder-plus"></i> Thêm mới
+        </a></div>
+
+
+             <div>
+    <div class="search-bar">
+        <i class="fas fa-search"></i>
+        <input type="text" id="searchInput" placeholder="Search..." onkeyup="showResults()" />
+    </div>
+    <div id="searchResults" class="search-results"></div> <!-- Khu vực hiển thị kết quả -->
+</div>
 
         <!-- Bảng danh sách người dùng -->
         <div class="table-card">
