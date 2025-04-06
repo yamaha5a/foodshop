@@ -1,18 +1,14 @@
 <?php
 session_start();
-require_once "../Models/connection.php";  
+require_once "../Models/login.php";
 
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $email = $_POST['email'];
     $password = $_POST['password'];
 
-    $sql = "SELECT nguoidung.*, phanquyen.tenquyen FROM nguoidung 
-            JOIN phanquyen ON nguoidung.id_phanquyen = phanquyen.id 
-            WHERE nguoidung.email = ? LIMIT 1";
+    $user = login($email, $password);
 
-    $user = pdo_query_one($sql, $email);
-
-    if ($user && password_verify($password, $user['matkhau'])) { 
+    if ($user) {
         $_SESSION['user_id'] = $user['id'];
         $_SESSION['ten'] = $user['ten'];
         $_SESSION['email'] = $user['email'];
@@ -22,7 +18,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         if ($user['tenquyen'] === 'admin') {
             header("Location: /shopfood/admin/index.php");
         } else {
-            header("Location: /shopfood/user/index.php");
+            header("Location: /shopfood/index.php");
         }
         exit();
     } else {
@@ -31,4 +27,3 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         exit();
     }
 }
-?>

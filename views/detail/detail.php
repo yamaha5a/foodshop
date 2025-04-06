@@ -5,7 +5,7 @@
                 <li class="breadcrumb-item"><a href="index.php?page=home">Home</a></li>
                 <li class="breadcrumb-item"><a href="index.php?page=detail">Pages</a></li>
                 <li class="breadcrumb-item active text-white">Shop Detail</li>
-            </ol>
+            </ol>+
         </div>
         <!-- Single Page Header End -->
 

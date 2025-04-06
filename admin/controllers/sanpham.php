@@ -79,5 +79,7 @@ class SanPhamController {
         header("Location: index.php?act=sanpham");
         exit();
     }
-} // Đóng lớp SanPhamController
+} 
+
+// Đóng lớp SanPhamController
 ?>
