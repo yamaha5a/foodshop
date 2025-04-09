@@ -17,35 +17,38 @@
                         </div>
                     </div>
 <!-- sản phẩm -->
-<div class="tab-content">
-    <div id="tab-1" class="tab-pane fade show p-0 active">
-        <div class="row g-4">
-            <div class="col-lg-12">
-                <div class="row g-4">
-                    <?php if (isset($sanphams) && count($sanphams) > 0): ?>
-                        <?php foreach ($sanphams as $sanpham): ?>
-                            <div class="col-md-6 col-lg-4 col-xl-3">
-                                <div class="rounded position-relative fruite-item">
-                                    <div class="fruite-img">
-                                        <img src="<?php echo htmlspecialchars($sanpham['hinhanh1']); ?>" class="img-fluid w-100 rounded-top" alt="<?php echo htmlspecialchars($sanpham['tensanpham']); ?>">
-                                    </div>
-                                    <div class="text-white bg-secondary px-3 py-1 rounded position-absolute" style="top: 10px; left: 10px;">Fruits</div>
-                                    <div class="p-4 border border-secondary border-top-0 rounded-bottom">
-                                        <h4><?php echo htmlspecialchars($sanpham['tensanpham']); ?></h4>
-                                        <p><?php echo htmlspecialchars($sanpham['mota']); ?></p>
-                                        <div class="d-flex justify-content-between flex-lg-wrap">
-                                            <p class="text-dark fs-5 fw-bold mb-0">$<?php echo number_format($sanpham['gia'], 2); ?> / kg</p>
-                                            <a href="#" class="btn border border-secondary rounded-pill px-3 text-primary">
-                                                <i class="fa fa-shopping-bag me-2 text-primary"></i> Add to cart
+                <div class="tab-content">
+                    <div id="tab-1" class="tab-pane fade show p-0 active">
+                        <div class="row g-4">
+                            <div class="col-lg-12">
+                                <div class="row g-4">
+                                <?php if (isset($sanphams) && count($sanphams) > 0): ?>
+                                <?php foreach ($sanphams as $sanpham): ?>
+                                    <div class="col-md-6 col-lg-4 col-xl-3">
+                                        <div class="rounded position-relative fruite-item">
+                                        <a href="index.php?page=detail&id=<?php echo $sanpham['id']; ?>" class="text-decoration-none text-dark">
+                                            <div class="fruite-img">
+                                                    <img src="<?php echo htmlspecialchars($sanpham['hinhanh1']); ?>" class="img-fluid w-100 rounded-top" alt="<?php echo htmlspecialchars($sanpham['tensanpham']); ?>">
+                                                </div>
+                                                <div class="text-white bg-secondary px-3 py-1 rounded position-absolute" style="top: 10px; left: 10px;">Fruits</div>
+                                                <div class="p-4 border border-secondary border-top-0 rounded-bottom">
+                                                    <h4><?php echo htmlspecialchars($sanpham['tensanpham']); ?></h4>
+                                                    <p><?php echo htmlspecialchars($sanpham['mota']); ?></p>
+                                                    <div class="d-flex justify-content-between flex-lg-wrap align-items-center">
+                                                        <p class="text-dark fs-5 fw-bold mb-0">$<?php echo number_format($sanpham['gia'], 2); ?> / kg</p>
+                                                        <span onclick="event.stopPropagation();" class="btn border border-secondary rounded-pill px-3 text-primary">
+                                                            <i class="fa fa-shopping-bag me-2 text-primary"></i> Add to cart
+                                                        </span>
+                                                    </div>
+                                                </div>
                                             </a>
                                         </div>
                                     </div>
-                                </div>
-                            </div>
-                        <?php endforeach; ?>
-                    <?php else: ?>
-                        <p class="text-center">Không có sản phẩm nào để hiển thị.</p>
-                    <?php endif; ?>
+                                <?php endforeach; ?>
+                            <?php else: ?>
+                                <p class="text-center">Không có sản phẩm nào để hiển thị.</p>
+                            <?php endif; ?>
+
                 </div>
             </div>
         </div>

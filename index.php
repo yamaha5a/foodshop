@@ -35,28 +35,12 @@ switch ($page) {
     case 'home':
         require_once 'controller/banner.php';
         require_once 'controller/sanpham.php';
-
         $bannerController = new BannerController();
         $bannerController->showBanners();
-
         include 'views/home/sliderbar.php'; 
-
         $sanphamController = new SanPhamController();
         $sanphamController->list();
         break;
-
-    case 'banner':
-        require_once 'controller/banner.php';
-        $bannerController = new BannerController();
-        $bannerController->showBanners();
-        break;
-
-    case 'sanpham':
-        require_once 'controller/sanpham.php';
-        $sanphamController = new SanPhamController();
-        $sanphamController->list();
-        break;
-
     case 'about':
         include 'views/about.php';
         break;
@@ -65,10 +49,30 @@ switch ($page) {
         include 'views/contact/contact.php';
         break;
 
-    case 'product':
-        include 'views/product/product.php';
-        break;
-
+        case 'product':
+            require_once 'controller/danhmuc.php';
+            require_once 'controller/shop.php';
+        
+            $danhMuc = new DanhMucController();
+            $danhMuc->index();
+        
+            $sanphamController = new ProductController();
+        
+            if (isset($_GET['category']) && is_numeric($_GET['category'])) {
+                $categoryId = $_GET['category'];
+                $products = $sanphamController->getProductsByCategory($categoryId);
+        
+                echo "<pre>🟢 DEBUG PRODUCTS (from getProductsByCategory):\n";
+                print_r($products);
+                echo "</pre>";
+            } else {
+                $products = $sanphamController->getAllProducts();
+            }
+        
+            include 'views/product/product.php';
+            break;
+        
+           
     case 'cart':
         include 'views/cart/cart.php';
         break;
@@ -77,9 +81,18 @@ switch ($page) {
         include 'views/checkout/checkout.php';
         break;
 
-    case 'detail':
-        include 'views/detail/detail.php';
-        break;
+        case 'detail':
+            require_once 'controller/detail.php';
+            $detailController = new DetailController();
+        
+            if (isset($_GET['id']) && is_numeric($_GET['id'])) {
+                $id = $_GET['id'];
+                $detailController->showDetail($id);
+            } else {
+                include 'views/404.php';
+            }
+            break;
+        
 
     default:
         include 'views/404.php';
