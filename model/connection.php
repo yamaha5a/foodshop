@@ -10,7 +10,7 @@ function pdo_get_connection(){
         return $conn;
     } catch (PDOException $e) {
         error_log("Connection failed: " . $e->getMessage());
-        return null; // Trả về null nếu không thể kết nối
+        return null;
     }
 }
 
@@ -22,13 +22,15 @@ function pdo_execute($sql) {
         try {
             $stmt = $conn->prepare($sql);
             $stmt->execute($sql_args);
+            return true;
         } catch (PDOException $e) {
             error_log("Error executing query: " . $e->getMessage());
-            throw $e; // Ném ngoại lệ để xử lý ở nơi khác
+            return false;
         } finally {
-            $conn = null; // Đóng kết nối
+            $conn = null;
         }
     }
+    return false;
 }
 
 function pdo_query($sql) {
@@ -42,12 +44,12 @@ function pdo_query($sql) {
             return $stmt->fetchAll(PDO::FETCH_ASSOC);
         } catch (PDOException $e) {
             error_log("Error executing query: " . $e->getMessage());
-            throw $e;
+            return [];
         } finally {
             $conn = null;
         }
     }
-    return []; // Trả về mảng rỗng nếu không kết nối
+    return [];
 }
 
 function pdo_query_one($sql) {
@@ -61,12 +63,12 @@ function pdo_query_one($sql) {
             return $stmt->fetch(PDO::FETCH_ASSOC);
         } catch (PDOException $e) {
             error_log("Error executing query: " . $e->getMessage());
-            throw $e;
+            return null;
         } finally {
             $conn = null;
         }
     }
-    return null; // Trả về null nếu không tìm thấy
+    return null;
 }
 
 function pdo_query_value($sql) {
@@ -78,14 +80,14 @@ function pdo_query_value($sql) {
             $stmt = $conn->prepare($sql);
             $stmt->execute($sql_args);
             $row = $stmt->fetch(PDO::FETCH_ASSOC);
-            return $row ? array_values($row)[0] : null; // Trả về giá trị đầu tiên hoặc null
+            return $row ? array_values($row)[0] : null;
         } catch (PDOException $e) {
             error_log("Error executing query: " . $e->getMessage());
-            throw $e;
+            return null;
         } finally {
             $conn = null;
         }
     }
-    return null; // Trả về null nếu không kết nối
+    return null;
 }
 ?>

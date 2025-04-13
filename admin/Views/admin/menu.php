@@ -34,7 +34,7 @@
         </div>
         <div class="nav-item">
             <i class="fas fa-money-check-alt"></i>
-            <a href="index.php?act=thanhtoan"><span>Quản lý thanh toán</span></a>
+            <a href="index.php?act=phuongthucthanhtoan"><span>Quản lý thanh toán</span></a>
         </div>
         <div class="nav-item">
             <i class="fas fa-shipping-fast"></i>

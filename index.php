@@ -1,8 +1,15 @@
+<?php
+session_start();
+?>
+<?php ini_set('display_errors', 1);
+ini_set('display_startup_errors', 1);
+error_reporting(E_ALL);
+?>
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="utf-8">
-    <title>Fruitables - Vegetable Website Template</title>
+    <title>SHOP FOOD - LONGBEO</title>
     <meta content="width=device-width, initial-scale=1.0" name="viewport">
     <meta content="" name="keywords">
     <meta content="" name="description">
@@ -25,11 +32,15 @@
 
     <!-- Template Stylesheet -->
     <link href="public/css/style.css" rel="stylesheet">
+    
+    <!-- Toastify CSS -->
+    <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/toastify-js/src/toastify.min.css">
 </head>
+<body>
 <?php
 include 'views/client/header.php'; // Load header
 
-$page = $_GET['page'] ?? 'home';
+$page = $_GET['page'] ?? 'home';    
 
 switch ($page) {
     case 'home':
@@ -49,50 +60,96 @@ switch ($page) {
         include 'views/contact/contact.php';
         break;
 
-        case 'product':
-            require_once 'controller/danhmuc.php';
-            require_once 'controller/shop.php';
-        
-            $danhMuc = new DanhMucController();
-            $danhMuc->index();
-        
-            $sanphamController = new ProductController();
-        
-            if (isset($_GET['category']) && is_numeric($_GET['category'])) {
-                $categoryId = $_GET['category'];
-                $products = $sanphamController->getProductsByCategory($categoryId);
-        
-                echo "<pre>🟢 DEBUG PRODUCTS (from getProductsByCategory):\n";
-                print_r($products);
-                echo "</pre>";
-            } else {
-                $products = $sanphamController->getAllProducts();
-            }
-        
-            include 'views/product/product.php';
-            break;
-        
-           
+    case 'product':
+        require_once 'controller/sanpham.php';
+        $productController = new SanPhamController();
+        $productController->listProduct();
+        break;
+    
     case 'cart':
-        include 'views/cart/cart.php';
+        require_once 'controller/cart.php';
+        $controller = new CartController();
+        $controller->viewCart();
         break;
-
+    
+    case 'addToCart':
+        require_once 'controller/cart.php';
+        $cart = new CartController();
+        $cart->addToCart();
+        break;
+    case 'updateCart':
+        require_once 'controller/cart.php';
+        $cartController = new CartController();
+        $cartController->updateCart();
+        break;
+    case 'removeCart':
+        require_once 'controller/cart.php';
+        $cartController = new CartController();
+        $cartController->removeCart();
+        break;
+                    
     case 'checkout':
-        include 'views/checkout/checkout.php';
+        require_once 'controller/checkout.php';
+        $checkoutController = new CheckoutController();
+        $checkoutController->viewCheckout();
         break;
 
-        case 'detail':
-            require_once 'controller/detail.php';
-            $detailController = new DetailController();
-        
-            if (isset($_GET['id']) && is_numeric($_GET['id'])) {
-                $id = $_GET['id'];
-                $detailController->showDetail($id);
-            } else {
-                include 'views/404.php';
-            }
-            break;
-        
+    case 'processCheckout':
+        require_once 'controller/order.php';
+        $orderController = new OrderController();
+        $orderController->processCheckout();
+        break;
+
+    case 'detail':
+        require_once 'controller/detail.php';
+        $detailController = new DetailController();
+    
+        if (isset($_GET['id']) && is_numeric($_GET['id'])) {
+            $id = $_GET['id'];
+            $detailController->showDetail($id);
+        } else {
+            include 'views/404.php';
+        }
+        break;
+    case 'login':
+        include 'controller/login.php';
+        $login = new AuthController();
+        $login->login();
+        break;
+    case 'register':
+        include 'controller/login.php';
+        $login = new AuthController();
+        $login->register();
+        break;
+    case 'logout':
+        include 'controller/login.php';
+        $login = new AuthController();
+        $login->logout();
+        break;
+    case 'profile':
+        if (!isset($_SESSION['user'])) {
+            $_SESSION['error_message'] = "Vui lòng đăng nhập để xem thông tin cá nhân";
+            echo '<script>window.location.href = "index.php?page=login";</script>';
+            exit;
+        }
+        include 'views/profile/profile.php';
+        break;
+    case 'orders':
+        require_once 'controller/order.php';
+        $orderController = new OrderController();
+        $orderController->viewOrders();
+        break;
+
+    case 'orderDetails':
+        if (!isset($_SESSION['user'])) {
+            $_SESSION['error_message'] = "Vui lòng đăng nhập để xem chi tiết đơn hàng";
+            echo '<script>window.location.href = "index.php?page=login";</script>';
+            exit;
+        }
+        require_once 'controller/order.php';
+        $orderController = new OrderController();
+        $orderController->viewOrderDetails();
+        break;
 
     default:
         include 'views/404.php';
@@ -101,15 +158,52 @@ switch ($page) {
 ?>
 
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.4/jquery.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="public/lib/easing/easing.min.js"></script>
-    <script src="public/lib/waypoints/waypoints.min.js"></script>
-    <script src="public/lib/lightbox/js/lightbox.min.js"></script>
-    <script src="public/lib/owlcarousel/owl.carousel.min.js"></script>
-    <script src="public/js/main.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0/dist/js/bootstrap.bundle.min.js"></script>
+<script src="public/lib/easing/easing.min.js"></script>
+<script src="public/lib/waypoints/waypoints.min.js"></script>
+<script src="public/lib/lightbox/js/lightbox.min.js"></script>
+<script src="public/lib/owlcarousel/owl.carousel.min.js"></script>
+<script src="public/js/main.js"></script>
 
-    <?php
-        include 'views/client/footer.php';
-    ?>
+<!-- Toastify JS -->
+<script type="text/javascript" src="https://cdn.jsdelivr.net/npm/toastify-js"></script>
+
+<?php if (isset($_SESSION['success_message'])): ?>
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        Toastify({
+            text: "<?php echo $_SESSION['success_message']; ?>",
+            duration: 3000,
+            gravity: "top",
+            position: "center",
+            backgroundColor: "#28a745",
+            stopOnFocus: true,
+            onClick: function(){}
+        }).showToast();
+    });
+    <?php unset($_SESSION['success_message']); ?>
+</script>
+<?php endif; ?>
+
+<?php if (isset($_SESSION['error_message'])): ?>
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        Toastify({
+            text: "<?php echo $_SESSION['error_message']; ?>",
+            duration: 3000,
+            gravity: "top",
+            position: "center",
+            backgroundColor: "#dc3545",
+            stopOnFocus: true,
+            onClick: function(){}
+        }).showToast();
+    });
+    <?php unset($_SESSION['error_message']); ?>
+</script>
+<?php endif; ?>
+
+<?php
+    include 'views/client/footer.php';
+?>
 </body>
 </html>

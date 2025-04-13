@@ -1,4 +1,4 @@
-       <div class="container-fluid page-header py-5">
+<div class="container-fluid page-header py-5">
             <h1 class="text-center text-white display-6">Shop Detail</h1>
             <ol class="breadcrumb justify-content-center mb-0">
                 <li class="breadcrumb-item"><a href="index.php?page=home">Home</a></li>
@@ -14,13 +14,13 @@
                     <div class="col-lg-6">
                         <div class="border rounded">
                         <a href="index.php?page=detail&id=<?= $product['id'] ?>">
-                                <img src="<?= htmlspecialchars($product['hinhanh1']) ?>" class="img-fluid rounded" alt="<?= htmlspecialchars($product['tensanpham']) ?>">
+                                <img src="upload/<?=htmlspecialchars($product['hinhanh1']) ?>" class="img-fluid rounded" alt="<?= htmlspecialchars($product['tensanpham']) ?>">
                             </a>
                         </div>
                     </div>
                     <div class="col-lg-6">
-                        <h4 class="fw-bold mb-3"><?= htmlspecialchars($product['tensanpham']) ?></h4>
-                        <p class="mb-3">Category: <?= isset($product['danhmuc']) ? htmlspecialchars($product['danhmuc']) : 'N/A' ?></p>
+                        <h4 class="fw-bold mb-3">Tên Sản Phẩm: <?= htmlspecialchars($product['tensanpham']) ?></h4>
+                        <p class="mb-3">Category: <?= isset($product['tendanhmuc']) ? htmlspecialchars($product['tendanhmuc']) : 'N/A' ?></p>
                         <h5 class="fw-bold mb-3">$<?= number_format($product['gia'], 2) ?></h5>
                         <div class="d-flex mb-4">
                             <i class="fa fa-star text-secondary"></i>
