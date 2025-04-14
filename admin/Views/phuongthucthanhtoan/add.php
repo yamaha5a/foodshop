@@ -1,73 +1,21 @@
-<style>
-    .ptt-container {
-        padding: 2rem;
-        font-family: Arial, sans-serif;
-    }
 
-    .ptt-header {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        margin-bottom: 1.5rem;
-    }
-
-    .ptt-header h2 {
-        font-size: 1.5rem;
-        font-weight: 600;
-    }
-
-    .ptt-header a {
-        padding: 0.5rem 1rem;
-        background-color: #1d4ed8;
-        color: #fff;
-        text-decoration: none;
-        border-radius: 0.375rem;
-        transition: background-color 0.3s ease;
-    }
-
-    .ptt-header a:hover {
-        background-color: #2563eb;
-    }
-
-    form input {
-        width: 100%;
-        padding: 0.5rem;
-        border: 1px solid #d1d5db;
-        border-radius: 0.375rem;
-        outline: none;
-        transition: border-color 0.3s ease;
-    }
-
-    form input:focus {
-        border-color: #2563eb;
-    }
-
-    form button {
-        padding: 0.5rem 1rem;
-        background-color: #1d4ed8;
-        color: white;
-        border: none;
-        border-radius: 0.375rem;
-        cursor: pointer;
-        transition: background-color 0.3s ease;
-    }
-
-    form button:hover {
-        background-color: #2563eb;
-    }
-</style>
-
-<div class="ptt-container">
-    <div class="ptt-header">
-        <h2>Thêm phương thức thanh toán</h2>
-        <a href="index.php?act=phuongthucthanhtoan">Quay lại danh sách</a>
-    </div>
-
-    <form action="index.php?act=phuongthucthanhtoan&action=store" method="POST">
-        <div style="margin-bottom: 1rem;">
-            <label for="tenphuongthuc" class="block mb-1 font-medium">Tên phương thức:</label>
-            <input type="text" name="tenphuongthuc" id="tenphuongthuc" required>
+<div class="container-fluid">
+    <div class="card shadow mb-4">
+        <div class="card-header py-3">
+            <h6 class="m-0 font-weight-bold text-primary">Thêm phương thức thanh toán mới</h6>
         </div>
-        <button type="submit">Lưu</button>
-    </form>
-</div>
+        <div class="card-body">
+            <?php if (isset($_SESSION['error'])): ?>
+                <div class="alert alert-danger"><?php echo $_SESSION['error']; unset($_SESSION['error']); ?></div>
+            <?php endif; ?>
+            <form action="index.php?act=addphuongthucthanhtoan" method="POST">
+                <div class="form-group">
+                    <label for="tenphuongthuc">Tên phương thức thanh toán</label>
+                    <input type="text" class="form-control" id="tenphuongthuc" name="tenphuongthuc" required>
+                </div>
+                <button type="submit" class="btn btn-primary">Thêm mới</button>
+                <a href="index.php?act=listphuongthucthanhtoan" class="btn btn-secondary">Quay lại</a>
+            </form>
+        </div>
+    </div>
+</div> 

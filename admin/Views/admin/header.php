@@ -1,3 +1,9 @@
+
+<?php
+if (!isset($_SESSION)) {
+    session_start();
+}
+?>
 <style>
 .dropdown-menu {
     display: none; /* Ẩn mặc định */
@@ -106,8 +112,9 @@
                     <img src="<?php echo $imagePath; ?>" alt="Profile">
                 </div>
                 <div class="user-info">
-                    <div class="user-name"><?php echo isset($_SESSION['ten']) ? $_SESSION['ten'] : 'Guest'; ?></div>
-                    <div class="user-role"><?php echo isset($_SESSION['tenquyen']) ? $_SESSION['tenquyen'] : 'Guest'; ?></div>
+
+                    <div class="user-name"><?php echo isset($_SESSION['ten']) ? $_SESSION['ten'] : 'Guest';?></div>
+                    <div class="user-role"><?php echo isset($_SESSION['tenquyen']) ? $_SESSION['tenquyen'] : 'Guest';?></div>
                 </div>
             </div>
             <div class="dropdown-menu" id="dropdownMenu">

@@ -12,7 +12,8 @@ CREATE TABLE phanquyen (
 CREATE TABLE nguoidung (
     id INT AUTO_INCREMENT PRIMARY KEY,
     ten VARCHAR(100) NOT NULL,
-    email VARCHAR(100) UNIQUE NOT NULL,
+
+    email VARCHAR(100) UNIQUE NOT NULL, 
     matkhau VARCHAR(255) NOT NULL, -- Sẽ lưu mật khẩu đã mã hóa
     sodienthoai VARCHAR(15),
     diachi TEXT,
@@ -99,6 +100,7 @@ CREATE TABLE hoadon (
     tongtien DECIMAL(10,2),
     diachigiaohang TEXT,
     trangthai ENUM('Chờ xác nhận', 'Đang giao', 'Đã giao', 'Đã hủy') NOT NULL,
+    ghichu TEXT NOT NULL,
     id_khuyenmai INT, 
     id_phuongthucthanhtoan INT,
     FOREIGN KEY (id_nguoidung) REFERENCES nguoidung(id) ON DELETE CASCADE,
@@ -146,3 +148,27 @@ CREATE TABLE diachinhanhang (
     macdinh BOOLEAN DEFAULT 0,
     FOREIGN KEY (id_nguoidung) REFERENCES nguoidung(id) ON DELETE CASCADE
 ) ENGINE=InnoDB;
+<<<<<<< HEAD
+=======
+-- 15. Bảng giỏ hàng (chỉ tồn tại khi chưa đặt hàng)
+CREATE TABLE giohang (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    id_nguoidung INT NOT NULL,
+    ngaytao TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    trangthai ENUM('Chưa đặt', 'Đã đặt') DEFAULT 'Chưa đặt',
+    FOREIGN KEY (id_nguoidung) REFERENCES nguoidung(id) ON DELETE CASCADE
+) ENGINE=InnoDB;
+
+-- 16. Bảng chi tiết giỏ hàng
+CREATE TABLE giohang_chitiet (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    id_giohang INT NOT NULL,
+    id_sanpham INT NOT NULL,
+    soluong INT NOT NULL DEFAULT 1,
+    id_topping INT, -- Nếu có topping
+    gia DECIMAL(10,2), -- Ghi nhận giá tại thời điểm thêm
+    FOREIGN KEY (id_giohang) REFERENCES giohang(id) ON DELETE CASCADE,
+    FOREIGN KEY (id_sanpham) REFERENCES sanpham(id) ON DELETE CASCADE,
+    FOREIGN KEY (id_topping) REFERENCES topping(id) ON DELETE SET NULL
+) ENGINE=InnoDB;
+>>>>>>> a7d59a7e2a92323ccd2d45c445f86ba2254d47e2

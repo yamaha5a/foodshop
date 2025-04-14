@@ -1,6 +1,8 @@
 <?php
 require_once "connection.php";
 
+
+class danhMucModel{
 function getAllDanhMuc() {
     $sql = "SELECT * FROM danhmuc ORDER BY id DESC";
     return pdo_query($sql);
@@ -25,3 +27,6 @@ function deleteDanhMuc($id) {
     $sql = "DELETE FROM danhmuc WHERE id = ?";
     pdo_execute($sql, $id);
 }
+
+}
+

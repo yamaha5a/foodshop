@@ -1,23 +1,57 @@
 <?php
-class PhuongThucThanhToanModel {
+
+require_once 'connection.php';
+
+class PaymentMethodModel {
+    private $conn;
+
+    public function __construct() {
+        $this->conn = new PDO("mysql:host=localhost;dbname=shopfood", "root", "");
+        $this->conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+    }
+
     public function getAll() {
-        return pdo_query("SELECT * FROM phuongthucthanhtoan ORDER BY id DESC");
+        $stmt = $this->conn->prepare("SELECT * FROM phuongthucthanhtoan");
+        $stmt->execute();
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
 
-    public function getOne($id) {
-        return pdo_query_one("SELECT * FROM phuongthucthanhtoan WHERE id = ?", $id);
+    public function getById($id) {
+        $stmt = $this->conn->prepare("SELECT * FROM phuongthucthanhtoan WHERE id = :id");
+        $stmt->bindParam(':id', $id);
+        $stmt->execute();
+        return $stmt->fetch(PDO::FETCH_ASSOC);
     }
 
-    public function insert($tenpt) {
-        pdo_execute("INSERT INTO phuongthucthanhtoan (tenphuongthuc) VALUES (?)", $tenpt);
+    public function add($tenphuongthuc) {
+        try {
+            $stmt = $this->conn->prepare("INSERT INTO phuongthucthanhtoan (tenphuongthuc) VALUES (:tenphuongthuc)");
+            $stmt->bindParam(':tenphuongthuc', $tenphuongthuc);
+            return $stmt->execute();
+        } catch (PDOException $e) {
+            return false;
+        }
     }
 
-    public function update($id, $tenpt) {
-        pdo_execute("UPDATE phuongthucthanhtoan SET tenphuongthuc = ? WHERE id = ?", $tenpt, $id);
+    public function update($id, $tenphuongthuc) {
+        try {
+            $stmt = $this->conn->prepare("UPDATE phuongthucthanhtoan SET tenphuongthuc = :tenphuongthuc WHERE id = :id");
+            $stmt->bindParam(':id', $id);
+            $stmt->bindParam(':tenphuongthuc', $tenphuongthuc);
+            return $stmt->execute();
+        } catch (PDOException $e) {
+            return false;
+        }
     }
 
     public function delete($id) {
-        pdo_execute("DELETE FROM phuongthucthanhtoan WHERE id = ?", $id);
+        try {
+            $stmt = $this->conn->prepare("DELETE FROM phuongthucthanhtoan WHERE id = :id");
+            $stmt->bindParam(':id', $id);
+            return $stmt->execute();
+        } catch (PDOException $e) {
+            return false;
+        }
     }
-}
-?>
+} 
+

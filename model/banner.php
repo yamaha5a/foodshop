@@ -5,9 +5,10 @@ class BannerModel {
     private $conn;
 
     public function __construct() {
-        $this->conn = connection();
-    }
 
+        $this->conn = pdo_get_connection();
+
+    }
     public function getAllBanners() {
         $sql = "SELECT hinhanh FROM banner";
         $stmt = $this->conn->prepare($sql);

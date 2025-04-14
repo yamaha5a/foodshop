@@ -1,61 +1,96 @@
 <?php
-ob_start();
 require_once __DIR__ . '/../Models/phuongthucthanhtoan.php';
-class PhuongThucThanhToanController
-{
+
+class PaymentMethodController {
     private $model;
-    public function __construct()
-    {
-        $this->model = new PhuongThucThanhToanModel();
+
+    public function __construct() {
+        $this->model = new PaymentMethodModel();
     }
-    public function handleRequest()
-    {
-        $action = $_GET['action'] ?? 'list';
 
-        switch ($action) {
-            case 'list':
-                $list = $this->model->getAll();
-                include __DIR__ . '/../Views/phuongthucthanhtoan/list.php';
-                break;
+    public function index() {
+        $paymentMethods = $this->model->getAll();
+        include __DIR__ . '/../Views/phuongthucthanhtoan/list.php';
+    }
 
-                case 'add':
-                    if (isset($_POST['add'])) {
-                        $ten = $_POST['tenpt'];
-                        $this->model->insert($ten);
-                        echo "<script>window.location.href = 'index.php?act=phuongthucthanhtoan';</script>";
-                        exit;
-                    } else {
-                        include __DIR__ . '/../Views/phuongthucthanhtoan/add.php';
-                    }
-                    break;
-                
+    public function add() {
+        if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+            $tenphuongthuc = $_POST['tenphuongthuc'];
+            
+            if (empty($tenphuongthuc)) {
+                $_SESSION['error'] = "Vui lòng nhập tên phương thức thanh toán";
+                echo '<meta http-equiv="refresh" content="0;url=index.php?act=addphuongthucthanhtoan">';
+                exit();
+            }
 
-            case 'edit':
-                $id = $_GET['id'];
-                $pt = $this->model->getOne($id);
-                include __DIR__ . '/../Views/phuongthucthanhtoan/edit.php';
-                break;
-
-            case 'update':
-                if (isset($_POST['capnhat'])) {
-                    $id = $_POST['id'];
-                    $ten = $_POST['tenpt'];
-                    $this->model->update($id, $ten);
-                    header("Location: index.php?act=phuongthucthanhtoan&action=list");
-                    exit;
-                }
-                break;
-
-            case 'delete':
-                if (isset($_GET['id'])) {
-                    $this->model->delete($_GET['id']);
-                    echo "<script>window.location.href = 'index.php?act=phuongthucthanhtoan';</script>";
-                    exit;
-
-                }
-                break;
+            $result = $this->model->add($tenphuongthuc);
+            if ($result) {
+                $_SESSION['success'] = "Thêm phương thức thanh toán thành công";
+                echo '<meta http-equiv="refresh" content="0;url=index.php?act=phuongthucthanhtoan">';
+                exit();
+            } else {
+                $_SESSION['error'] = "Thêm phương thức thanh toán thất bại";
+                echo '<meta http-equiv="refresh" content="0;url=index.php?act=addphuongthucthanhtoan">';
+                exit();
+            }
         }
+        include __DIR__ . '/../Views/phuongthucthanhtoan/add.php';
     }
-}
-ob_end_flush();
+
+    public function edit() {
+        if (!isset($_GET['id'])) {
+            echo '<meta http-equiv="refresh" content="0;url=index.php?act=phuongthucthanhtoan">';
+            exit();
+        }
+
+        $id = $_GET['id'];
+        $paymentMethod = $this->model->getById($id);
+
+        if (!$paymentMethod) {
+            echo '<meta http-equiv="refresh" content="0;url=index.php?act=phuongthucthanhtoan">';
+            exit();
+        }
+
+        if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+            $tenphuongthuc = $_POST['tenphuongthuc'];
+            
+            if (empty($tenphuongthuc)) {
+                $_SESSION['error'] = "Vui lòng nhập tên phương thức thanh toán";
+                echo '<meta http-equiv="refresh" content="0;url=index.php?act=editphuongthucthanhtoan&id=' . $id . '">';
+                exit();
+            }
+
+            $result = $this->model->update($id, $tenphuongthuc);
+            if ($result) {
+                $_SESSION['success'] = "Cập nhật phương thức thanh toán thành công";
+                echo '<meta http-equiv="refresh" content="0;url=index.php?act=phuongthucthanhtoan">';
+                exit();
+            } else {
+                $_SESSION['error'] = "Cập nhật phương thức thanh toán thất bại";
+                echo '<meta http-equiv="refresh" content="0;url=index.php?act=editphuongthucthanhtoan&id=' . $id . '">';
+                exit();
+            }
+        }
+        include __DIR__ . '/../Views/phuongthucthanhtoan/edit.php';
+    }
+
+    public function delete() {
+        if (!isset($_GET['id'])) {
+            echo '<meta http-equiv="refresh" content="0;url=index.php?act=phuongthucthanhtoan">';
+            exit();
+        }
+
+        $id = $_GET['id'];
+        $result = $this->model->delete($id);
+
+        if ($result) {
+            $_SESSION['success'] = "Xóa phương thức thanh toán thành công";
+        } else {
+            $_SESSION['error'] = "Xóa phương thức thanh toán thất bại";
+        }
+
+        echo '<meta http-equiv="refresh" content="0;url=index.php?act=phuongthucthanhtoan">';
+        exit();
+    }
+} 
 

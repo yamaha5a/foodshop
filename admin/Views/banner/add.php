@@ -16,19 +16,40 @@
                         </tr>
                     </thead>
                     <tbody>
-                        <tr>
-                            <td>
-                                <input type="file" class="form-control" name="hinhanh" required>
-                            </td>
-                            <td>
-                                <button type="submit" name="thembanner" class="btn btn-primary">
-                                    <i class="fas fa-plus"></i> Thêm mới
-                                </button>
-                            </td>
-                        </tr>
+                    <tr>
+                    <td>
+                        <input type="file" class="form-control" name="hinhanh" id="previewInput" accept="image/*" required>
+                        <img id="previewImage" src="#" alt="Ảnh sẽ hiển thị ở đây" style="display:none; margin-top:10px; max-height: 200px; border: 1px solid #ccc; padding: 5px;">
+                    </td>
+                    <td>
+                        <button type="submit" name="thembanner" class="btn btn-primary">
+                            <i class="fas fa-plus"></i> Thêm mới
+                        </button>
+                    </td>
+                </tr>
+
                     </tbody>
                 </table>
             </form>
         </div>
     </div>
 </div>
+
+<script>
+document.getElementById('previewInput').addEventListener('change', function (event) {
+    const file = event.target.files[0];
+    const preview = document.getElementById('previewImage');
+
+    if (file) {
+        const reader = new FileReader();
+        reader.onload = function (e) {
+            preview.src = e.target.result;
+            preview.style.display = 'block';
+        };
+        reader.readAsDataURL(file);
+    } else {
+        preview.src = '#';
+        preview.style.display = 'none';
+    }
+});
+</script>

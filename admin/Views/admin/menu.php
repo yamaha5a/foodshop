@@ -47,7 +47,8 @@
         <div class="menu-heading">Hỗ trợ</div>
         <div class="nav-item">
             <i class="fas fa-star"></i>
-            <a href="index.php?act=binhluan"><span>Đánh giá</span></a>
+
+            <a href="index.php?act=danhgia"><span>Đánh giá</span></a>
         </div>
         <div class="nav-item">
             <i class="fas fa-envelope"></i>

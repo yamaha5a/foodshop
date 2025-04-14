@@ -1,40 +1,50 @@
 <?php
-require_once 'Models/danhmuc.php';
+
+require_once __DIR__ . '/../models/danhmuc.php';
 
 class DanhMucController {
+    protected $danhMucModel;
+
+    public function __construct() {
+        $this->danhMucModel = new danhMucModel(); // Tạo đối tượng
+    }
+
     public function index() {
-        $listDM = getAllDanhMuc();
+        $listDM = $this->danhMucModel->getAllDanhMuc(); // Gọi qua object
         include 'views/danhmuc/danhmuc.php';
     }
 
     public function add() {
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $tendanhmuc = $_POST['tendanhmuc'];
-            addDanhMuc($tendanhmuc);
+
+            $this->danhMucModel->addDanhMuc($tendanhmuc);
             $_SESSION['thongbao'] = "Thêm thành công!";
             echo '<meta http-equiv="refresh" content="0;url=index.php?act=danhmuc">';
-            exit();        }
+            exit();
+        }
         include 'views/danhmuc/add.php';
     }
 
     public function edit() {
         $id = $_GET['id'] ?? null;
-        $dm = getOneDanhMuc($id);
+        $dm = $this->danhMucModel->getOneDanhMuc($id);
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $tendanhmuc = $_POST['tendanhmuc'];
-            updateDanhMuc($id, $tendanhmuc);
-            $_SESSION['thongbao'] = "Cập nhật thành công!";
+            $this->danhMucModel->updateDanhMuc($id, $tendanhmuc);
+         $_SESSION['thongbao'] = "Cập nhật thành công!";
             echo '<meta http-equiv="refresh" content="0;url=index.php?act=danhmuc">';
-        exit(); 
+            exit();
         }
         include 'views/danhmuc/update.php';
     }
 
     public function delete() {
         $id = $_GET['id'] ?? null;
-        deleteDanhMuc($id);
+        $this->danhMucModel->deleteDanhMuc($id);
         $_SESSION['thongbao'] = "Xoá thành công!";
         echo '<meta http-equiv="refresh" content="0;url=index.php?act=danhmuc">';
-        exit(); 
+        exit();
     }
 }
+

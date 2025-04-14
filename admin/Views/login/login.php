@@ -4,6 +4,19 @@ if (isset($_SESSION['user_id'])) {
     header("Location: /shopfood/admin/index.php");
     exit();
 }
+
+$error_message = '';
+if (isset($_SESSION['error'])) {
+    $error_message = $_SESSION['error'];
+    unset($_SESSION['error']); 
+}
+$logout_message = '';
+if (isset($_SESSION['logout_message'])) {
+    $logout_message = $_SESSION['logout_message'];
+    unset($_SESSION['logout_message']); 
+}
+
+
 ?>
 
 <!DOCTYPE html>
@@ -56,6 +69,14 @@ if (isset($_SESSION['user_id'])) {
    <?php if (!empty($error_message)): ?>
     <p id="error-message" class="login__error"><?php echo htmlspecialchars($error_message); ?></p>
 <?php endif; ?>
+<<<<<<< HEAD
+=======
+<?php if (!empty($logout_message)): ?>
+    <p class="login__success" style="color: green;" id="logout-message">
+        <?= htmlspecialchars($logout_message); ?>
+    </p>
+<?php endif; ?>
+>>>>>>> a7d59a7e2a92323ccd2d45c445f86ba2254d47e2
 
 
 </form>
@@ -70,9 +91,21 @@ if (isset($_SESSION['user_id'])) {
    document.addEventListener("DOMContentLoaded", function() {
       var errorMessage = document.getElementById("error-message");
       if (errorMessage.textContent.trim() !== "") {
+<<<<<<< HEAD
          alert(errorMessage.textContent); // Hiển thị lỗi bằng alert
       }
    });
+=======
+         alert(errorMessage.textContent);
+      }
+   });
+   document.addEventListener("DOMContentLoaded", function() {
+    var logoutMessage = document.getElementById("logout-message");
+    if (logoutMessage && logoutMessage.textContent.trim() !== "") {
+        alert(logoutMessage.textContent); // Hiển thị bằng alert
+    }
+});
+>>>>>>> a7d59a7e2a92323ccd2d45c445f86ba2254d47e2
 </script>
 
 </body>
