@@ -111,6 +111,11 @@ switch ($page) {
             include 'views/404.php';
         }
         break;
+    case 'addComment':
+        require_once 'controller/binhluan.php';
+        $commentController = new CommentController();
+        $commentController->addComment();
+        break;
     case 'login':
         include 'controller/login.php';
         $login = new AuthController();
@@ -124,15 +129,17 @@ switch ($page) {
     case 'logout':
         include 'controller/login.php';
         $login = new AuthController();
-        $login->logout();
+        $login->logout();   
         break;
     case 'profile':
-        if (!isset($_SESSION['user'])) {
-            $_SESSION['error_message'] = "Vui lòng đăng nhập để xem thông tin cá nhân";
-            echo '<script>window.location.href = "index.php?page=login";</script>';
-            exit;
-        }
-        include 'views/profile/profile.php';
+        require_once 'controller/profile.php';
+        $profileController = new ProfileController();
+        $profileController->viewProfile();
+        break;
+    case 'changeAvatar':
+        require_once 'controller/profile.php';
+        $profileController = new ProfileController();
+        $profileController->changeAvatar();
         break;
     case 'orders':
         require_once 'controller/order.php';

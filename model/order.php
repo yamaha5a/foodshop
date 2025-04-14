@@ -16,7 +16,14 @@ class OrderModel {
                 FROM chitiethoadon cthd 
                 JOIN sanpham sp ON cthd.id_sanpham = sp.id 
                 WHERE cthd.id_hoadon = ?";
-        return pdo_query($sql, $orderId);
+        $items = pdo_query($sql, $orderId);
+        
+        // Debug: Log the query and results
+        error_log("SQL Query: " . $sql);
+        error_log("Order ID: " . $orderId);
+        error_log("Items found: " . print_r($items, true));
+        
+        return $items;
     }
 
     public function getOrderById($orderId, $userId) {
@@ -47,16 +54,33 @@ class OrderModel {
             
             $orderId = pdo_last_insert_id();
 
+            // Debug: Log order creation
+            error_log("Created order with ID: " . $orderId);
+            error_log("Cart items to save: " . print_r($cartItems, true));
+
             // Add order items to chitiethoadon table
             foreach ($cartItems as $item) {
                 $sql = "INSERT INTO chitiethoadon (id_hoadon, id_sanpham, soluong, gia) 
                         VALUES (?, ?, ?, ?)";
                 pdo_execute($sql, $orderId, $item['id_sanpham'], $item['soluong'], $item['gia']);
+                
+                // Debug: Log each item being saved
+                error_log("Saved order item: " . print_r($item, true));
             }
 
-            // Update cart status
-            $sql = "UPDATE giohang SET trangthai = 'Đã đặt' WHERE id_nguoidung = ? AND trangthai = 'Chưa đặt'";
-            pdo_execute($sql, $orderData['id_nguoidung']);
+            // Get cart ID
+            $sql = "SELECT id FROM giohang WHERE id_nguoidung = ? AND trangthai = 'Chưa đặt'";
+            $cart = pdo_query_one($sql, $orderData['id_nguoidung']);
+
+            if ($cart) {
+                // Delete cart items
+                $sql = "DELETE FROM giohang_chitiet WHERE id_giohang = ?";
+                pdo_execute($sql, $cart['id']);
+
+                // Delete cart
+                $sql = "DELETE FROM giohang WHERE id = ?";
+                pdo_execute($sql, $cart['id']);
+            }
 
             // Commit transaction
             pdo_execute("COMMIT");
@@ -64,6 +88,7 @@ class OrderModel {
         } catch (Exception $e) {
             // Rollback transaction on error
             pdo_execute("ROLLBACK");
+            error_log("Error creating order: " . $e->getMessage());
             throw $e;
         }
     }

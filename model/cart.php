@@ -46,6 +46,33 @@ class CartModel {
                 WHERE gh.id_nguoidung = ? AND gh.trangthai = 'Chưa đặt'";
         return pdo_query($sql, $userId);
     }
+
+    public function clearCart($userId) {
+        try {
+            // Get cart ID
+            $sql = "SELECT id FROM giohang WHERE id_nguoidung = ? AND trangthai = 'Chưa đặt'";
+            $cart = pdo_query_one($sql, $userId);
+            
+            if (!$cart) {
+                return true; // No cart exists
+            }
+
+            $cartId = $cart['id'];
+
+            // Delete cart items
+            $sql = "DELETE FROM giohang_chitiet WHERE id_giohang = ?";
+            pdo_execute($sql, $cartId);
+
+            // Delete cart
+            $sql = "DELETE FROM giohang WHERE id = ?";
+            pdo_execute($sql, $cartId);
+
+            return true;
+        } catch (Exception $e) {
+            error_log("Error clearing cart: " . $e->getMessage());
+            return false;
+        }
+    }
 }
 
 function get_sanpham_by_id($id) {

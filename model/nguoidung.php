@@ -9,10 +9,8 @@ class NguoiDungModel {
         $this->conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
     }
 
-    public function getUsers($page = 1, $perPage = 8, $search = '') {
+    public function getUsers($search = '') {
         try {
-            $offset = ($page - 1) * $perPage;
-            
             $query = "SELECT n.*, p.tenquyen 
                      FROM nguoidung n 
                      LEFT JOIN phanquyen p ON n.id_phanquyen = p.id 
@@ -22,16 +20,13 @@ class NguoiDungModel {
                 $query .= " AND (n.ten LIKE :search OR n.email LIKE :search)";
             }
             
-            $query .= " ORDER BY n.id DESC LIMIT :offset, :perPage";
+            $query .= " ORDER BY n.id DESC";
             
             $stmt = $this->conn->prepare($query);
             
             if (!empty($search)) {
                 $stmt->bindValue(':search', "%$search%", PDO::PARAM_STR);
             }
-            
-            $stmt->bindValue(':offset', $offset, PDO::PARAM_INT);
-            $stmt->bindValue(':perPage', $perPage, PDO::PARAM_INT);
             
             $stmt->execute();
             return $stmt->fetchAll(PDO::FETCH_ASSOC);
@@ -39,29 +34,6 @@ class NguoiDungModel {
             return [];
         }
     }
-
-    public function getTotalUsers($search = '') {
-        try {
-            $query = "SELECT COUNT(*) as total FROM nguoidung WHERE 1=1";
-            
-            if (!empty($search)) {
-                $query .= " AND (ten LIKE :search OR email LIKE :search)";
-            }
-            
-            $stmt = $this->conn->prepare($query);
-            
-            if (!empty($search)) {
-                $stmt->bindValue(':search', "%$search%", PDO::PARAM_STR);
-            }
-            
-            $stmt->execute();
-            $result = $stmt->fetch(PDO::FETCH_ASSOC);
-            return $result['total'];
-        } catch (PDOException $e) {
-            return 0;
-        }
-    }
-
     public function dangNhap($email) {
         $sql = "SELECT * FROM nguoidung WHERE email = ?";
         return pdo_query_one($sql, $email);
@@ -76,6 +48,33 @@ class NguoiDungModel {
         } catch (PDOException $e) {
             echo "<pre>Lỗi DB: " . $e->getMessage() . "</pre>";
             return false;
+        }
+    }
+
+    public function getUserById($id) {
+        try {
+            $sql = "SELECT * FROM nguoidung WHERE id = ?";
+            $stmt = $this->conn->prepare($sql);
+            $stmt->execute([$id]);
+            return $stmt->fetch(PDO::FETCH_ASSOC);
+        } catch (PDOException $e) {
+            return null;
+        }
+    }
+
+    public function getCommentHistory($userId) {
+        try {
+            $sql = "SELECT b.*, s.tensanpham, s.hinhanh1 as hinhanh 
+                    FROM binhluan b 
+                    JOIN sanpham s ON b.id_sanpham = s.id 
+                    WHERE b.id_nguoidung = ? 
+                    ORDER BY b.ngaydang DESC";
+            
+            $stmt = $this->conn->prepare($sql);
+            $stmt->execute([$userId]);
+            return $stmt->fetchAll(PDO::FETCH_ASSOC);
+        } catch (PDOException $e) {
+            return [];
         }
     }
 }

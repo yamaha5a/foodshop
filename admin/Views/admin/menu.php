@@ -26,11 +26,11 @@
         </div>
         <div class="nav-item">
             <i class="fas fa-tags"></i>
-            <a href="index.php?act=magiamgia"><span>Mã giảm giá</span></a>
+            <a href="index.php?act=khuyenmai"><span>Mã giảm giá</span></a>
         </div>
         <div class="nav-item">
             <i class="fas fa-file-invoice"></i>
-            <a href="index.php?act=hoadon"><span>Hóa đơn</span></a>
+            <a href="index.php?act=chitiethoadon"><span>Hóa đơn</span></a>
         </div>
         <div class="nav-item">
             <i class="fas fa-money-check-alt"></i>
@@ -47,7 +47,7 @@
         <div class="menu-heading">Hỗ trợ</div>
         <div class="nav-item">
             <i class="fas fa-star"></i>
-            <a href="index.php?act=danhgia"><span>Đánh giá</span></a>
+            <a href="index.php?act=binhluan"><span>Đánh giá</span></a>
         </div>
         <div class="nav-item">
             <i class="fas fa-envelope"></i>

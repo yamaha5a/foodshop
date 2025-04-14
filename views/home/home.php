@@ -573,14 +573,18 @@ function addToCart(event) {
         method: 'POST',
         body: formData
     })
-    .then(response => {
-        if (!response.ok) {
-            throw new Error('Network response was not ok');
-        }
-        return response.json();
-    })
+    .then(response => response.json())
     .then(data => {
         if (data.success) {
+            // Cập nhật số lượng giỏ hàng trong header
+            const cartCountElement = document.getElementById('cart-count');
+            if (cartCountElement) {
+                cartCountElement.textContent = data.cartCount;
+                // Lưu số lượng vào localStorage để giữ trạng thái khi refresh trang
+                localStorage.setItem('cartCount', data.cartCount);
+            }
+            
+            // Hiển thị thông báo thành công
             Toastify({
                 text: data.message,
                 duration: 3000,
@@ -589,12 +593,6 @@ function addToCart(event) {
                 backgroundColor: "#28a745",
                 stopOnFocus: true
             }).showToast();
-            
-            // Update cart count in header if it exists
-            const cartCountElement = document.querySelector('.cart-count');
-            if (cartCountElement) {
-                cartCountElement.textContent = data.cartCount;
-            }
         } else {
             Toastify({
                 text: data.message,

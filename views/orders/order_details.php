@@ -8,7 +8,14 @@ if (isset($_SESSION['error_message'])) {
     unset($_SESSION['error_message']);
 }
 ?>
-
+<div class="container-fluid page-header py-5">
+    <h1 class="text-center text-white display-6">Chi tiết đơn hàng</h1>
+    <ol class="breadcrumb justify-content-center mb-0">
+        <li class="breadcrumb-item"><a href="index.php?page=home">Home</a></li>
+        <li class="breadcrumb-item"><a href="index.php?page=orders">Đơn hàng</a></li>
+        <li class="breadcrumb-item active text-white">Chi tiết đơn hàng</li>
+    </ol>
+</div>
 <div class="container mt-4">
     <div class="row">
         <div class="col-md-8">
@@ -28,23 +35,29 @@ if (isset($_SESSION['error_message'])) {
                                 </tr>
                             </thead>
                             <tbody>
-                                <?php foreach ($orderItems as $item): ?>
-                                    <tr>
-                                        <td>
-                                            <div class="d-flex align-items-center">
-                                                <img src="<?php echo htmlspecialchars($item['image']); ?>" 
-                                                     alt="<?php echo htmlspecialchars($item['name']); ?>"
-                                                     class="img-thumbnail" style="width: 50px; height: 50px;">
-                                                <div class="ms-3">
-                                                    <?php echo htmlspecialchars($item['name']); ?>
+                                <?php if (!empty($orderItems)): ?>
+                                    <?php foreach ($orderItems as $item): ?>
+                                        <tr>
+                                            <td>
+                                                <div class="d-flex align-items-center">
+                                                    <img src="upload/<?php echo htmlspecialchars($item['hinhanh1']); ?>" 
+                                                         alt="<?php echo htmlspecialchars($item['tensanpham']); ?>"
+                                                         class="img-thumbnail" style="width: 50px; height: 50px;">
+                                                    <div class="ms-3">
+                                                        <?php echo htmlspecialchars($item['tensanpham']); ?>
+                                                    </div>
                                                 </div>
-                                            </div>
-                                        </td>
-                                        <td><?php echo number_format($item['price'], 0, ',', '.') . ' VNĐ'; ?></td>
-                                        <td><?php echo htmlspecialchars($item['quantity']); ?></td>
-                                        <td><?php echo number_format($item['price'] * $item['quantity'], 0, ',', '.') . ' VNĐ'; ?></td>
+                                            </td>
+                                            <td><?php echo number_format($item['gia'], 0, ',', '.') . ' VNĐ'; ?></td>
+                                            <td><?php echo htmlspecialchars($item['soluong']); ?></td>
+                                            <td><?php echo number_format($item['gia'] * $item['soluong'], 0, ',', '.') . ' VNĐ'; ?></td>
+                                        </tr>
+                                    <?php endforeach; ?>
+                                <?php else: ?>
+                                    <tr>
+                                        <td colspan="4" class="text-center">Không có sản phẩm nào trong đơn hàng</td>
                                     </tr>
-                                <?php endforeach; ?>
+                                <?php endif; ?>
                             </tbody>
                         </table>
                     </div>
@@ -61,48 +74,36 @@ if (isset($_SESSION['error_message'])) {
                     <div class="mb-3">
                         <strong>Trạng thái:</strong>
                         <span class="badge bg-<?php 
-                            echo $order['status'] === 'pending' ? 'warning' : 
-                                ($order['status'] === 'completed' ? 'success' : 'danger'); 
+                            echo $order['trangthai'] === 'Chờ xác nhận' ? 'warning' : 
+                                ($order['trangthai'] === 'Đã giao' ? 'success' : 
+                                ($order['trangthai'] === 'Đã hủy' ? 'danger' : 'info')); 
                         ?>">
-                            <?php 
-                            echo $order['status'] === 'pending' ? 'Đang xử lý' : 
-                                ($order['status'] === 'completed' ? 'Hoàn thành' : 'Đã hủy'); 
-                            ?>
+                            <?php echo htmlspecialchars($order['trangthai']); ?>
                         </span>
                     </div>
                     <div class="mb-3">
                         <strong>Ngày đặt:</strong>
-                        <?php echo htmlspecialchars($order['created_at']); ?>
+                        <?php echo htmlspecialchars($order['ngaytao']); ?>
                     </div>
                     <div class="mb-3">
                         <strong>Phương thức thanh toán:</strong>
-                        <?php echo htmlspecialchars($order['payment_method']); ?>
+                        <?php echo htmlspecialchars($order['tenphuongthuc']); ?>
                     </div>
                     <div class="mb-3">
                         <strong>Địa chỉ giao hàng:</strong>
-                        <?php echo htmlspecialchars($order['shipping_address']); ?>
-                    </div>
-                    <div class="mb-3">
-                        <strong>Số điện thoại:</strong>
-                        <?php echo htmlspecialchars($order['phone']); ?>
-                    </div>
-                    <div class="mb-3">
-                        <strong>Email:</strong>
-                        <?php echo htmlspecialchars($order['email']); ?>
+                        <?php echo htmlspecialchars($order['diachigiaohang']); ?>
                     </div>
                     <hr>
                     <div class="mb-3">
-                        <strong>Tổng tiền hàng:</strong>
-                        <?php echo number_format($order['subtotal'], 0, ',', '.') . ' VNĐ'; ?>
+                        <strong>Tổng tiền:</strong>
+                        <?php echo number_format($order['tongtien'], 0, ',', '.') . ' VNĐ'; ?>
                     </div>
+                    <?php if (!empty($order['ghichu'])): ?>
                     <div class="mb-3">
-                        <strong>Phí vận chuyển:</strong>
-                        <?php echo number_format($order['shipping_fee'], 0, ',', '.') . ' VNĐ'; ?>
+                        <strong>Ghi chú:</strong>
+                        <?php echo htmlspecialchars($order['ghichu']); ?>
                     </div>
-                    <div class="mb-3">
-                        <strong>Tổng cộng:</strong>
-                        <?php echo number_format($order['total'], 0, ',', '.') . ' VNĐ'; ?>
-                    </div>
+                    <?php endif; ?>
                 </div>
             </div>
         </div>

@@ -50,6 +50,9 @@ class CartController {
             $cartItems = $this->cartModel->getCartItems($userId);
             $cartCount = count($cartItems);
             
+            // Lưu số lượng giỏ hàng vào session
+            $_SESSION['cart_count'] = $cartCount;
+            
             echo json_encode([
                 'success' => true,
                 'message' => 'Đã thêm sản phẩm vào giỏ hàng',

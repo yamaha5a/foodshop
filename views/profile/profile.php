@@ -1,3 +1,10 @@
+<?php
+if (!isset($_SESSION['user']) || !is_array($_SESSION['user'])) {
+    echo '<script>window.location.href = "index.php?page=home";</script>';
+    exit();
+}
+$comments = isset($GLOBALS['comments']) ? $GLOBALS['comments'] : [];
+?>
 <div class="container-fluid page-header py-5">
     <h1 class="text-center text-white display-6">Thông tin cá nhân</h1>
     <ol class="breadcrumb justify-content-center mb-0">
@@ -12,7 +19,13 @@
         <div class="col-lg-4">
             <div class="card mb-4">
                 <div class="card-body text-center">
-                    <img src="public/img/default-avatar.png" alt="avatar" class="rounded-circle img-fluid" style="width: 150px;">
+                    <?php 
+                    $avatarPath = 'public/img/default-avatar.png';
+                    ?>
+                    <img src="<?php echo $avatarPath; ?>" 
+                         alt="avatar" 
+                         class="rounded-circle img-fluid" 
+                         style="width: 150px; height: 150px; object-fit: cover;">
                     <h5 class="my-3"><?php echo htmlspecialchars($_SESSION['user']['ten']); ?></h5>
                     <p class="text-muted mb-1"><?php echo htmlspecialchars($_SESSION['user']['email']); ?></p>
                     <div class="d-flex justify-content-center mb-2">
@@ -120,12 +133,28 @@
                                 </tr>
                             </thead>
                             <tbody>
-                                <?php
-                                // TODO: Add code to fetch and display comment history
-                                ?>
-                                <tr>
-                                    <td colspan="4" class="text-center">Chưa có bình luận nào</td>
-                                </tr>
+                                <?php if (!empty($comments)): ?>
+                                    <?php foreach ($comments as $comment): ?>
+                                        <tr style="cursor: pointer;" onclick="window.location.href='index.php?page=detail&id=<?php echo $comment['id_sanpham']; ?>'">
+                                            <td><?php echo date('d/m/Y H:i', strtotime($comment['ngaydang'])); ?></td>
+                                            <td>
+                                                <a href="index.php?page=detail&id=<?php echo $comment['id_sanpham']; ?>" class="text-decoration-none">
+                                                    <?php echo htmlspecialchars($comment['tensanpham']); ?>
+                                                </a>
+                                            </td>
+                                            <td><?php echo htmlspecialchars($comment['noidung']); ?></td>
+                                            <td>
+                                                <?php for ($i = 1; $i <= 5; $i++): ?>
+                                                    <i class="fas fa-star <?php echo $i <= $comment['danhgia'] ? 'text-warning' : 'text-muted'; ?>"></i>
+                                                <?php endfor; ?>
+                                            </td>
+                                        </tr>
+                                    <?php endforeach; ?>
+                                <?php else: ?>
+                                    <tr>
+                                        <td colspan="4" class="text-center">Chưa có bình luận nào</td>
+                                    </tr>
+                                <?php endif; ?>
                             </tbody>
                         </table>
                     </div>
@@ -146,8 +175,9 @@
             <div class="modal-body">
                 <form action="index.php?page=changeAvatar" method="POST" enctype="multipart/form-data">
                     <div class="mb-3">
-                        <label for="avatar" class="form-label">Chọn ảnh</label>
-                        <input class="form-control" type="file" id="avatar" name="avatar" accept="image/*" required>
+                        <label for="avatar" class="form-label">Chọn ảnh (không bắt buộc)</label>
+                        <input class="form-control" type="file" id="avatar" name="avatar" accept="image/*">
+                        <small class="text-muted">Chỉ chấp nhận file ảnh (JPEG, PNG, GIF)</small>
                     </div>
                     <button type="submit" class="btn btn-primary">Tải lên</button>
                 </form>

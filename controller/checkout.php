@@ -39,6 +39,7 @@ class CheckoutController {
         // Lấy danh sách phương thức thanh toán
         $paymentMethods = $this->paymentMethodModel->getAll();
 
+        // Truyền dữ liệu sang view
         include 'views/checkout/checkout.php';
     }
 

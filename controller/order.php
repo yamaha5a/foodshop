@@ -20,6 +20,16 @@ class OrderController {
 
         $userId = $_SESSION['user']['id'];
         $orders = $this->orderModel->getOrders($userId);
+        
+        // Kiểm tra dữ liệu trước khi truyền sang view
+        if (!empty($orders)) {
+            foreach ($orders as &$order) {
+                if (!isset($order['phuongthucthanhtoan'])) {
+                    $order['phuongthucthanhtoan'] = 'Chưa xác định';
+                }
+            }
+        }
+
         include 'views/orders/orders.php';
     }
 
@@ -46,7 +56,10 @@ class OrderController {
             exit;
         }
 
+        // Lấy chi tiết sản phẩm trong đơn hàng
         $orderItems = $this->orderModel->getOrderItems($orderId);
+        
+        // Truyền dữ liệu sang view
         include 'views/orders/order_details.php';
     }
 
@@ -76,19 +89,31 @@ class OrderController {
                     }
                 }
 
-                $shippingInfo = [
-                    'address' => $_POST['address'],
-                    'first_name' => $_POST['first_name'],
-                    'sodienthoai' => $_POST['sodienthoai'],
-                    'email' => $_POST['email'],
-                    'note' => $_POST['note'] ?? ''
+                // Calculate total
+                $total = 0;
+                foreach ($cartItems as $item) {
+                    $total += $item['gia'] * $item['soluong'];
+                }
+
+                // Create order data
+                $orderData = [
+                    'id_nguoidung' => $userId,
+                    'diachigiaohang' => $_POST['address'],
+                    'tongtien' => $total,
+                    'trangthai' => 'Chờ xác nhận',
+                    'ghichu' => $_POST['note'] ?? '',
+                    'id_phuongthucthanhtoan' => $_POST['payment_method']
                 ];
 
-                $paymentMethod = $_POST['payment_method'];
-
-                $orderId = $this->orderModel->createOrder($userId, $shippingInfo, $paymentMethod, 0, $cartItems);
+                $orderId = $this->orderModel->createOrder($orderData, $cartItems);
 
                 if ($orderId) {
+                    // Clear cart session
+                    unset($_SESSION['cart']);
+                    
+                    // Clear cart from database
+                    $this->cartModel->clearCart($userId);
+                    
                     $_SESSION['success_message'] = "Đặt hàng thành công! Mã đơn hàng: #" . $orderId;
                     header("Location: index.php?page=orders");
                     exit;

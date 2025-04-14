@@ -144,6 +144,52 @@ include 'Models/sanpham.php';
                             $controller = new PaymentMethodController();
                             $controller->delete();
                             break;
+                        case 'chitiethoadon':
+                            require_once 'controllers/chitiethoadon.php';
+                            $controller = new OrderDetailController();
+                            $controller->index();
+                            break;
+                        
+                        case 'detailchitiethoadon':
+                            require_once 'controllers/chitiethoadon.php';
+                            $controller = new OrderDetailController();
+                            $controller->detail();
+                            break;
+                        case 'binhluan':
+                            require_once 'controllers/binhluan.php';
+                            $controller = new BinhluanController();
+                            $controller->index();
+                            break;
+                        case 'deletebinhluan':
+                            require_once 'controllers/binhluan.php';
+                            $controller = new BinhluanController();
+                            $controller->delete();
+                            break;
+                        case 'detailbinhluan':
+                            require_once 'controllers/binhluan.php';
+                            $controller = new BinhluanController();
+                            $controller->detail();
+                            break;
+                        case 'khuyenmai':
+                            require_once 'controllers/khuyenmai.php';
+                            $controller = new KhuyenMaiController();
+                            $controller->index();
+                            break;
+                        case 'addkhuyenmai':
+                            require_once 'controllers/khuyenmai.php';
+                            $controller = new KhuyenMaiController();
+                            $controller->add();
+                            break;
+                        case 'editkhuyenmai':
+                            require_once 'controllers/khuyenmai.php';
+                            $controller = new KhuyenMaiController();
+                            $controller->edit();
+                            break;
+                        case 'deletekhuyenmai':
+                            require_once 'controllers/khuyenmai.php';
+                            $controller = new KhuyenMaiController();
+                            $controller->delete();
+                            break;
                                             
                     default:
                         echo "<p>Chào mừng bạn đến với trang quản trị!</p>";
