@@ -33,8 +33,14 @@ if (session_status() === PHP_SESSION_NONE) {
             </button>
             <div class="collapse navbar-collapse bg-white" id="navbarCollapse">
                 <div class="navbar-nav mx-auto">
-                    <a href="index.php?page=home" class="nav-item nav-link active">Home</a>
-                    <a href="index.php?page=product" class="nav-item nav-link">Shop</a>
+                    <a href="index.php?page=home" class="nav-item nav-link active">Trang chủ</a>
+
+
+
+
+
+                    
+                    <a href="index.php?page=product" class="nav-item nav-link">Cửa hàng</a>
                     <div class="nav-item dropdown">
                         <a href="#" class="nav-link dropdown-toggle" data-bs-toggle="dropdown">Pages</a>
                         <div class="dropdown-menu m-0 bg-secondary rounded-0">

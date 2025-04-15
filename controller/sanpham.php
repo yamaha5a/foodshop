@@ -25,7 +25,9 @@ class sanPhamController
         }
 
         include 'views/home/home.php'; // Bao gồm view nếu có sản phẩm
-    }public function listProduct()
+    }
+
+    public function listProduct()
     {
         $limit = 8;
         $page = isset($_GET['p']) ? (int)$_GET['p'] : 1;

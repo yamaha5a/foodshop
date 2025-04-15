@@ -1,12 +1,12 @@
 <div class="container-fluid page-header py-5">
     <h1 class="text-center text-white display-6">Shop</h1>
-    <ol class="breadcrumb justify-content-center mb-0">
-        <li class="breadcrumb-item"><a href="index.php?page=home">Home</a></li>
+            <ol class="breadcrumb justify-content-center mb-0">
+                <li class="breadcrumb-item"><a href="index.php?page=home">Home</a></li>
         <li class="breadcrumb-item"><a href="#">Pages</a></li>
         <li class="breadcrumb-item active text-white">Shop</li>
-    </ol>
-</div>
-<div class="container-fluid py-5 mt-5">
+            </ol>
+        </div>
+        <div class="container-fluid py-5 mt-5">
     <div class="container py-5">
         <div class="row g-4 mb-5">
             <div class="col-lg-8 col-xl-9">
@@ -19,27 +19,27 @@
                         </div>
                     </div>
                     <div class="col-lg-6">
-                        <h4 class="fw-bold mb-3"><?= htmlspecialchars($product['tensanpham']) ?></h4>
-                        <p class="mb-3">Category: <?= htmlspecialchars($product['tendanhmuc']) ?></p>
-                        <h5 class="fw-bold mb-3"><?= number_format($product['gia'], 0, ',', '.') ?> VNĐ</h5>
-                        <div class="d-flex mb-4">
+                        <h4 class="fw-bold mb-3">Tên sản phẩm: <?= htmlspecialchars($product['tensanpham']) ?></h4>
+                        <p class="mb-3">Danh mục: <?= htmlspecialchars($product['tendanhmuc']) ?></p>
+                        <h5 class="fw-bold mb-3">Số tiền: <?= number_format($product['gia'], 0, ',', '.') ?> VNĐ</h5>
+                        <div class="d-flex mb-4">Đánh giá:    
                             <i class="fa fa-star text-secondary"></i>
                             <i class="fa fa-star text-secondary"></i>
                             <i class="fa fa-star text-secondary"></i>
                             <i class="fa fa-star text-secondary"></i>
                             <i class="fa fa-star"></i>
                         </div>
-                        <p class="mb-4"><?= nl2br(htmlspecialchars($product['mota'])) ?></p>
+                        <p class="mb-4">Mô tả: <?= nl2br(htmlspecialchars($product['mota'])) ?></p>
                         <div class="input-group quantity mb-5" style="width: 100px;">
                             <div class="input-group-btn">
                                 <button class="btn btn-sm btn-minus rounded-circle bg-light border">
                                     <i class="fa fa-minus"></i>
-                                </button>
+                                </button>   
                             </div>
                             <input type="text" class="form-control form-control-sm text-center border-0" value="1">
                             <div class="input-group-btn">
                                 <button class="btn btn-sm btn-plus rounded-circle bg-light border">
-                                    <i class="fa fa-plus"></i>
+                                    <i class="fa fa-plus"></i>  
                                 </button>
                             </div>
                         </div>
@@ -47,8 +47,8 @@
                             <input type="hidden" name="product_id" value="<?= $product['id'] ?>">
                             <input type="hidden" name="quantity" value="1">
                             <button type="submit" class="btn border border-secondary rounded-pill px-4 py-2 mb-4 text-primary">
-                                <i class="fa fa-shopping-bag me-2 text-primary"></i> Add to cart
-                            </button>
+                                <i class="fa fa-shopping-bag me-2 text-primary"></i> Thêm vào giỏ hàng
+                        </button>
                         </form>
                     </div>
                 </div>

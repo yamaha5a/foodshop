@@ -34,6 +34,34 @@ class AuthController {
                 exit;
             }
 
+            // Validate name (only letters and spaces)
+            if (!preg_match('/^[a-zA-Z\sÀ-ỹ]+$/', $_POST['ten'])) {
+                $_SESSION['error_message'] = "Tên không được chứa số hoặc ký tự đặc biệt";
+                echo '<script>window.location.href = "index.php?page=register";</script>';
+                exit;
+            }
+
+            // Validate email format
+            if (!preg_match('/^[a-zA-Z0-9._%+-]+@gmail\.com$/', $_POST['email'])) {
+                $_SESSION['error_message'] = "Email phải có định dạng @gmail.com";
+                echo '<script>window.location.href = "index.php?page=register";</script>';
+                exit;
+            }
+
+            // Validate password length
+            if (strlen($_POST['matkhau']) < 6) {
+                $_SESSION['error_message'] = "Mật khẩu phải có ít nhất 6 ký tự";
+                echo '<script>window.location.href = "index.php?page=register";</script>';
+                exit;
+            }
+
+            // Validate phone number if provided
+            if (!empty($_POST['sodienthoai']) && !preg_match('/^0\d{9}$/', $_POST['sodienthoai'])) {
+                $_SESSION['error_message'] = "Số điện thoại phải bắt đầu bằng 0 và có 10 chữ số";
+                echo '<script>window.location.href = "index.php?page=register";</script>';
+                exit;
+            }
+
             $ten = $_POST['ten'];
             $email = $_POST['email'];
             $matkhau = password_hash($_POST['matkhau'], PASSWORD_DEFAULT);

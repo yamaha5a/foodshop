@@ -25,6 +25,8 @@
         text-align: center;
     }
 </style>
+<!-- Thêm thư viện SweetAlert2 -->
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
         <div class="container-fluid fruite py-5">
             <div class="container py-5">
@@ -69,9 +71,9 @@
                                                 <p><?= htmlspecialchars($sanpham['mota']); ?></p>
                                                 <div class="d-flex justify-content-between flex-lg-wrap align-items-center">
                                                     <p class="text-dark fs-5 fw-bold mb-0">
-                                                        $<?= number_format($sanpham['gia'], 2); ?> / kg
+                                                        <?= number_format($sanpham['gia'], 0, ',', '.') ?> VNĐ
                                                     </p>
-                                                    <form method="post" action="index.php?page=addToCart" onsubmit="return checkLogin(event)">
+                                                    <form method="post" action="index.php?page=addToCart">
                                                         <input type="hidden" name="product_id" value="<?= $sanpham['id']; ?>">
                                                         <input type="hidden" name="quantity" value="1">
                                                         <button type="submit" class="btn border border-secondary rounded-pill px-3 text-primary">
@@ -159,8 +161,8 @@
                         <h4><?= htmlspecialchars($sanpham['tensanpham']); ?></h4>
                         <p><?= htmlspecialchars($sanpham['mota']); ?></p>
                         <div class="d-flex justify-content-between flex-lg-wrap">
-                            <p class="text-dark fs-5 fw-bold mb-0">$<?= number_format($sanpham['gia'], 2); ?> / kg</p>
-                            <form method="post" action="index.php?page=addToCart" onsubmit="return checkLogin(event)">
+                            <p class="text-dark fs-5 fw-bold mb-0"><?= number_format($sanpham['gia'], 0, ',', '.') ?> VNĐ</p>
+                            <form method="post" action="index.php?page=addToCart" onsubmit="return addToCart(event)">
                                 <input type="hidden" name="product_id" value="<?= $sanpham['id']; ?>">
                                 <input type="hidden" name="quantity" value="1">
                                 <button type="submit" class="btn border border-secondary rounded-pill px-3 text-primary">
@@ -356,7 +358,7 @@
                                     <i class="fas fa-star text-primary"></i>
                                     <i class="fas fa-star"></i>
                                 </div>
-                                <h4 class="mb-3">3.12 $</h4>
+                                <h4 class="mb-3"><?= number_format($sanpham['gia'], 0, ',', '.') ?> VNĐ</h4>
                                 <a href="#" class="btn border border-secondary rounded-pill px-3 text-primary"><i class="fa fa-shopping-bag me-2 text-primary"></i> Add to cart</a>
                             </div>
                         </div>
@@ -373,7 +375,7 @@
                                     <i class="fas fa-star text-primary"></i>
                                     <i class="fas fa-star"></i>
                                 </div>
-                                <h4 class="mb-3">3.12 $</h4>
+                                <h4 class="mb-3"><?= number_format($sanpham['gia'], 0, ',', '.') ?> VNĐ</h4>
                                 <a href="#" class="btn border border-secondary rounded-pill px-3 text-primary"><i class="fa fa-shopping-bag me-2 text-primary"></i> Add to cart</a>
                             </div>
                         </div>
@@ -390,7 +392,7 @@
                                     <i class="fas fa-star text-primary"></i>
                                     <i class="fas fa-star"></i>
                                 </div>
-                                <h4 class="mb-3">3.12 $</h4>
+                                <h4 class="mb-3"><?= number_format($sanpham['gia'], 0, ',', '.') ?> VNĐ</h4>
                                 <a href="#" class="btn border border-secondary rounded-pill px-3 text-primary"><i class="fa fa-shopping-bag me-2 text-primary"></i> Add to cart</a>
                             </div>
                         </div>
@@ -407,7 +409,7 @@
                                     <i class="fas fa-star text-primary"></i>
                                     <i class="fas fa-star"></i>
                                 </div>
-                                <h4 class="mb-3">3.12 $</h4>
+                                <h4 class="mb-3"><?= number_format($sanpham['gia'], 0, ',', '.') ?> VNĐ</h4>
                                 <a href="#" class="btn border border-secondary rounded-pill px-3 text-primary"><i class="fa fa-shopping-bag me-2 text-primary"></i> Add to cart</a>
                             </div>
                         </div>
@@ -545,87 +547,92 @@
             </div>
         </div>
 <script>
-function checkLogin(event) {
-    <?php if (!isset($_SESSION['user'])): ?>
-        event.preventDefault();
-        Toastify({
-            text: "Vui lòng đăng nhập để thêm sản phẩm vào giỏ hàng",
-            duration: 3000,
-            gravity: "top",
-            position: "center",
-            backgroundColor: "#dc3545",
-            stopOnFocus: true,
-            onClick: function() {
-                window.location.href = "index.php?page=login";
-            }
-        }).showToast();
-        return false;
-    <?php endif; ?>
-    return true;
-}
-
 function addToCart(event) {
     event.preventDefault();
     const form = event.target;
+    
+    // Kiểm tra đăng nhập trước khi gửi request
+    <?php if (!isset($_SESSION['user'])): ?>
+        Swal.fire({
+            title: 'Thông báo!',
+            text: 'Vui lòng đăng nhập để thêm sản phẩm vào giỏ hàng',
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#3085d6',
+            cancelButtonColor: '#d33',
+            confirmButtonText: 'Đăng nhập',
+            cancelButtonText: 'Hủy'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                window.location.href = "index.php?page=login";
+            }
+        });
+        return false;
+    <?php endif; ?>
+    
+    // Lấy dữ liệu từ form
     const formData = new FormData(form);
     
+    // Gửi request AJAX
     fetch('index.php?page=addToCart', {
         method: 'POST',
         body: formData
     })
-    .then(response => response.json())
-    .then(data => {
-        if (data.success) {
-            // Cập nhật số lượng giỏ hàng trong header
-            const cartCountElement = document.getElementById('cart-count');
-            if (cartCountElement) {
-                cartCountElement.textContent = data.cartCount;
-                // Lưu số lượng vào localStorage để giữ trạng thái khi refresh trang
-                localStorage.setItem('cartCount', data.cartCount);
-            }
+    .then(response => {
+        if (!response.ok) {
+            throw new Error('Network response was not ok');
+        }
+        return response.text();
+    })
+    .then(html => {
+        // Tạo một div ẩn để chứa response
+        const tempDiv = document.createElement('div');
+        tempDiv.innerHTML = html;
+        
+        // Lấy thông báo từ session
+        const successMessage = tempDiv.querySelector('meta[name="success_message"]')?.content;
+        const errorMessage = tempDiv.querySelector('meta[name="error_message"]')?.content;
+        const cartCount = tempDiv.querySelector('meta[name="cart_count"]')?.content;
+        
+        if (successMessage) {
+            // Cập nhật số lượng giỏ hàng từ session
+            document.getElementById('cart-count').textContent = cartCount;
             
-            // Hiển thị thông báo thành công
-            Toastify({
-                text: data.message,
-                duration: 3000,
-                gravity: "top",
-                position: "center",
-                backgroundColor: "#28a745",
-                stopOnFocus: true
-            }).showToast();
-        } else {
-            Toastify({
-                text: data.message,
-                duration: 3000,
-                gravity: "top",
-                position: "center",
-                backgroundColor: "#dc3545",
-                stopOnFocus: true
-            }).showToast();
+            Swal.fire({
+                title: 'Thành công!',
+                text: successMessage,
+                icon: 'success',
+                confirmButtonText: 'OK',
+                timer: 1500,
+                showConfirmButton: false
+            });
+        } else if (errorMessage) {
+            Swal.fire({
+                title: 'Lỗi!',
+                text: errorMessage,
+                icon: 'error',
+                confirmButtonText: 'OK'
+            });
         }
     })
     .catch(error => {
         console.error('Error:', error);
-        Toastify({
-            text: "Đã thêm sản phẩm vào giỏ hàng",
-            duration: 3000,
-            gravity: "top",
-            position: "center",
-            backgroundColor: "#dc3545",
-            stopOnFocus: true
-        }).showToast();
+        Swal.fire({
+            title: 'Lỗi!',
+            text: 'Có lỗi xảy ra khi thêm sản phẩm vào giỏ hàng',
+            icon: 'error',
+            confirmButtonText: 'OK'
+        });
     });
+    
+    return false;
 }
 
 // Update all add to cart forms to use the new function
 document.addEventListener('DOMContentLoaded', function() {
     const forms = document.querySelectorAll('form[action="index.php?page=addToCart"]');
     forms.forEach(form => {
-        form.addEventListener('submit', function(event) {
-            if (checkLogin(event)) {
-                addToCart(event);
-            }
-        });
+        form.addEventListener('submit', addToCart);
     });
 });
 </script>

@@ -1,48 +1,48 @@
 <?php
-require_once 'model/cart.php';
-require_once 'model/order.php';
-require_once 'model/payment_method.php';
+require_once 'model/checkout.php';
 
 class CheckoutController {
-    private $cartModel;
-    private $orderModel;
-    private $paymentMethodModel;
+    private $model;
 
     public function __construct() {
-        $this->cartModel = new CartModel();
-        $this->orderModel = new OrderModel();
-        $this->paymentMethodModel = new PaymentMethodModel();
+        $this->model = new CheckoutModel();
     }
 
+    // Display checkout page
     public function viewCheckout() {
         if (!isset($_SESSION['user'])) {
             $_SESSION['error_message'] = "Vui lòng đăng nhập để thanh toán";
-            header("Location: index.php?page=login");
+            header('Location: index.php?page=login');
             exit;
         }
 
         $userId = $_SESSION['user']['id'];
-        $cartItems = $this->cartModel->getCartItems($userId);
-
-        if (empty($cartItems)) {
-            $_SESSION['error_message'] = "Giỏ hàng trống";
-            header("Location: index.php?page=cart");
-            exit;
-        }
+        
+        // Get cart items
+        $cartItems = $this->model->getCartDetails($userId);
         
         // Calculate total
         $total = 0;
-        foreach ($cartItems as $item) {
-            $total += $item['gia'] * $item['soluong'];
+        if (!empty($cartItems)) {
+            foreach ($cartItems as $item) {
+                $total += ($item['gia'] + ($item['gia_topping'] ?? 0)) * $item['soluong'];
+            }
         }
 
-        // Lấy danh sách phương thức thanh toán
-        $paymentMethods = $this->paymentMethodModel->getAll();
+        // Get user addresses
+        $addresses = $this->model->getUserAddresses($userId);
+        
+        // Get payment methods
+        $paymentMethods = $this->model->getPaymentMethods();
+        
+        // Get active promotions
+        $promotions = $this->model->getActivePromotions();
 
-        // Truyền dữ liệu sang view
+        // Load view
         include 'views/checkout/checkout.php';
     }
 
+    // Process checkout
     public function processCheckout() {
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             if (!isset($_SESSION['user'])) {
@@ -52,7 +52,7 @@ class CheckoutController {
             }
 
             $userId = $_SESSION['user']['id'];
-            $cartItems = $this->cartModel->getCartItems($userId);
+            $cartItems = $this->model->getCartDetails($userId);
 
             if (empty($cartItems)) {
                 $_SESSION['error_message'] = "Giỏ hàng trống";
@@ -62,7 +62,7 @@ class CheckoutController {
 
             try {
                 // Validate required fields
-                $requiredFields = ['address', 'payment_method'];
+                $requiredFields = ['first_name', 'address', 'sodienthoai', 'email', 'payment_method'];
                 foreach ($requiredFields as $field) {
                     if (!isset($_POST[$field]) || empty($_POST[$field])) {
                         throw new Exception("Vui lòng điền đầy đủ thông tin");
@@ -75,7 +75,7 @@ class CheckoutController {
                     $total += $item['gia'] * $item['soluong'];
                 }
 
-                // Create order data according to hoadon table structure
+                // Create order data
                 $orderData = [
                     'id_nguoidung' => $userId,
                     'diachigiaohang' => $_POST['address'],
@@ -85,11 +85,17 @@ class CheckoutController {
                     'id_phuongthucthanhtoan' => $_POST['payment_method']
                 ];
 
-                $orderId = $this->orderModel->createOrder($orderData, $cartItems);
+                $orderId = $this->model->createOrder($orderData);
 
                 if ($orderId) {
+                    // Clear cart session
+                    unset($_SESSION['cart']);
+                    
+                    // Clear cart from database
+                    $this->model->clearCart($userId);
+                    
                     $_SESSION['success_message'] = "Đặt hàng thành công! Mã đơn hàng: #" . $orderId;
-                    header("Location: index.php?page=orders");
+                    header("Location: index.php?page=mock_order");
                     exit;
                 } else {
                     throw new Exception("Không thể tạo đơn hàng");
@@ -105,4 +111,4 @@ class CheckoutController {
             exit;
         }
     }
-} 
+}

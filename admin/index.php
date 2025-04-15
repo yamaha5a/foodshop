@@ -190,6 +190,60 @@ include 'Models/sanpham.php';
                             $controller = new KhuyenMaiController();
                             $controller->delete();
                             break;
+
+                        case 'topping':
+                            require_once 'controllers/topping.php';
+                            $controller = new ToppingController();
+                            $controller->index();
+                            break;
+
+                        case 'addtopping':
+                            require_once 'controllers/topping.php';
+                            $controller = new ToppingController();
+                            $controller->add();
+                            break;
+
+                        case 'edittopping':
+                            require_once 'controllers/topping.php';
+                            $controller = new ToppingController();
+                            $controller->edit();
+                            break;
+
+                        case 'deletetopping':
+                            require_once 'controllers/topping.php';
+                            $controller = new ToppingController();
+                            $controller->delete();
+                            break;
+
+                        case 'detailtopping':
+                            require_once 'controllers/topping.php';
+                            $controller = new ToppingController();
+                            $controller->detail();
+                            break;
+
+                        case 'sanpham_topping':
+                            require_once 'controllers/sanpham_topping.php';
+                            $controller = new SanPhamToppingController();
+                            $controller->index();
+                            break;
+
+                        case 'addsanpham_topping':
+                            require_once 'controllers/sanpham_topping.php';
+                            $controller = new SanPhamToppingController();
+                            $controller->add();
+                            break;
+
+                        case 'editsanpham_topping':
+                            require_once 'controllers/sanpham_topping.php';
+                            $controller = new SanPhamToppingController();
+                            $controller->edit();
+                            break;
+
+                        case 'deletesanpham_topping':
+                            require_once 'controllers/sanpham_topping.php';
+                            $controller = new SanPhamToppingController();
+                            $controller->delete();
+                            break;
                                             
                     default:
                         echo "<p>Chào mừng bạn đến với trang quản trị!</p>";

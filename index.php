@@ -10,6 +10,7 @@ error_reporting(E_ALL);
 <head>
     <meta charset="utf-8">
     <title>SHOP FOOD - LONGBEO</title>
+    <link rel="icon" type="" href="upload/z6502563846378_7a36bf7f53b765a9cbe480e8bea06d86.jpg">
     <meta content="width=device-width, initial-scale=1.0" name="viewport">
     <meta content="" name="keywords">
     <meta content="" name="description">
@@ -68,8 +69,8 @@ switch ($page) {
     
     case 'cart':
         require_once 'controller/cart.php';
-        $controller = new CartController();
-        $controller->viewCart();
+        $cartController = new CartController();
+        $cartController->viewCart();
         break;
     
     case 'addToCart':
@@ -95,9 +96,9 @@ switch ($page) {
         break;
 
     case 'processCheckout':
-        require_once 'controller/order.php';
-        $orderController = new OrderController();
-        $orderController->processCheckout();
+        require_once 'controller/checkout.php';
+        $checkoutController = new CheckoutController();
+        $checkoutController->processCheckout();
         break;
 
     case 'detail':
@@ -156,6 +157,16 @@ switch ($page) {
         require_once 'controller/order.php';
         $orderController = new OrderController();
         $orderController->viewOrderDetails();
+        break;
+
+    case 'mock_order':
+        include 'views/orders/mock_order.php';
+        break;
+
+    case 'applyDiscount':
+        require_once 'controller/discount.php';
+        $discountController = new DiscountController();
+        $discountController->applyDiscount();
         break;
 
     default:

@@ -71,7 +71,7 @@
                             <?php 
                                 $hinhanh = htmlspecialchars($nguoiDung['hinhanh']);
                                 $linkHinh = "http://localhost/shopfood/admin/public/" . $hinhanh;
-                            ?>
+                            ?>      
                             <img src="<?php echo $linkHinh; ?>" alt="Hình ảnh người dùng" class="avatar" onclick="openModal('<?php echo $linkHinh; ?>')">
                         </td>
 

@@ -21,7 +21,6 @@ class CommentController {
                 if ($comment_count >= 5) {
                     $_SESSION['error_message'] = "Bạn đã đạt giới hạn 5 bình luận cho sản phẩm này";
                     header("Location: index.php?page=detail&id=" . $product_id);
-                    exit();
                 }
 
                 // Thêm bình luận
@@ -35,7 +34,6 @@ class CommentController {
             }
 
             header("Location: index.php?page=detail&id=" . $product_id);
-            exit();
         }
     }
 }

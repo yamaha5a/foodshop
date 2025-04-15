@@ -2,80 +2,118 @@
 require_once 'connection.php';
 
 class CartModel {
-    public function getOrCreateCart($userId) {
-        // Check if user has an active cart
-        $sql = "SELECT id FROM giohang WHERE id_nguoidung = ? AND trangthai = 'Chưa đặt'";
-        $cart = pdo_query_one($sql, $userId);
-
-        if (!$cart) {
-            // Create new cart
-            $sql = "INSERT INTO giohang (id_nguoidung) VALUES (?)";
-            pdo_execute($sql, $userId);
-            return pdo_last_insert_id();
-        }
-
-        return $cart['id'];
+    public function getCart($userId) {
+        $sql = "SELECT * FROM giohang WHERE id_nguoidung = ? AND trangthai = 'Chưa đặt'";
+        return pdo_query_one($sql, $userId);
     }
-
-    public function getCartItem($cartId, $productId) {
-        $sql = "SELECT * FROM giohang_chitiet WHERE id_giohang = ? AND id_sanpham = ?";
-        return pdo_query_one($sql, $cartId, $productId);
+    public function createCart($userId) {
+        $sql = "INSERT INTO giohang (id_nguoidung, trangthai) VALUES (?, 'Chưa đặt')";
+        return pdo_execute($sql, $userId);
     }
-
-    public function addCartItem($cartId, $productId, $quantity, $price) {
-        $sql = "INSERT INTO giohang_chitiet (id_giohang, id_sanpham, soluong, gia) 
-                VALUES (?, ?, ?, ?)";
-        pdo_execute($sql, $cartId, $productId, $quantity, $price);
-    }
-
-    public function updateCartItem($cartId, $productId, $quantity) {
-        $sql = "UPDATE giohang_chitiet SET soluong = ? WHERE id_giohang = ? AND id_sanpham = ?";
-        pdo_execute($sql, $quantity, $cartId, $productId);
-    }
-
-    public function removeCartItem($cartId, $productId) {
-        $sql = "DELETE FROM giohang_chitiet WHERE id_giohang = ? AND id_sanpham = ?";
-        pdo_execute($sql, $cartId, $productId);
-    }
-
     public function getCartItems($userId) {
-        $sql = "SELECT gct.*, sp.tensanpham, sp.hinhanh1 
-                FROM giohang gh 
-                JOIN giohang_chitiet gct ON gh.id = gct.id_giohang 
+        $cart = $this->getCart($userId);
+        if (!$cart) {
+            return [];
+        }
+        $sql = "SELECT gct.*, sp.tensanpham, sp.hinhanh1, sp.gia 
+                FROM giohang_chitiet gct 
                 JOIN sanpham sp ON gct.id_sanpham = sp.id 
-                WHERE gh.id_nguoidung = ? AND gh.trangthai = 'Chưa đặt'";
-        return pdo_query($sql, $userId);
+                WHERE gct.id_giohang = ?";
+        return pdo_query($sql, $cart['id']);
     }
-
-    public function clearCart($userId) {
+    public function addToCart($userId, $productId, $quantity = 1) {
         try {
-            // Get cart ID
-            $sql = "SELECT id FROM giohang WHERE id_nguoidung = ? AND trangthai = 'Chưa đặt'";
-            $cart = pdo_query_one($sql, $userId);
-            
+            $cart = $this->getCart($userId);
             if (!$cart) {
-                return true; // No cart exists
+                $this->createCart($userId);
+                $cart = $this->getCart($userId);
+            }
+            $sql = "SELECT * FROM giohang_chitiet WHERE id_giohang = ? AND id_sanpham = ?";
+            $existingItem = pdo_query_one($sql, $cart['id'], $productId);
+            if ($existingItem) {
+                $newQuantity = $existingItem['soluong'] + $quantity;
+                $sql = "UPDATE giohang_chitiet SET soluong = ? WHERE id = ?";
+                return pdo_execute($sql, $newQuantity, $existingItem['id']);
+            } else {
+                $sql = "SELECT gia FROM sanpham WHERE id = ?";
+                $product = pdo_query_one($sql, $productId);  
+                if (!$product) {
+                    throw new Exception("Sản phẩm không tồn tại");
+                }
+                $sql = "INSERT INTO giohang_chitiet (id_giohang, id_sanpham, soluong, gia) 
+                        VALUES (?, ?, ?, ?)";
+                return pdo_execute($sql, $cart['id'], $productId, $quantity, $product['gia']);
+            }
+        } catch (Exception $e) {
+            error_log("Error in addToCart: " . $e->getMessage());
+            throw $e;
+        }
+    }
+    public function updateCartItem($userId, $productId, $quantity) {
+        try {
+            $cart = $this->getCart($userId);
+            if (!$cart) {
+                return false;
             }
 
-            $cartId = $cart['id'];
+            // Kiểm tra sản phẩm có tồn tại không
+            $sql = "SELECT id FROM sanpham WHERE id = ?";
+            $product = pdo_query_one($sql, $productId);
+            if (!$product) {
+                return false;
+            }
 
-            // Delete cart items
-            $sql = "DELETE FROM giohang_chitiet WHERE id_giohang = ?";
-            pdo_execute($sql, $cartId);
-
-            // Delete cart
-            $sql = "DELETE FROM giohang WHERE id = ?";
-            pdo_execute($sql, $cartId);
-
-            return true;
+            // Cập nhật số lượng
+            $sql = "UPDATE giohang_chitiet SET soluong = ? 
+                    WHERE id_giohang = ? AND id_sanpham = ?";
+            $result = pdo_execute($sql, $quantity, $cart['id'], $productId);
+            
+            return $result !== false;
         } catch (Exception $e) {
-            error_log("Error clearing cart: " . $e->getMessage());
+            error_log("Error in updateCartItem: " . $e->getMessage());
             return false;
         }
     }
-}
-
-function get_sanpham_by_id($id) {
-    $sql = "SELECT id, tensanpham, gia, hinhanh1 FROM sanpham WHERE id = ?";
-    return pdo_query_one($sql, $id);
+    public function removeCartItem($userId, $productId) {
+        $cart = $this->getCart($userId);
+        if (!$cart) {
+            return false;
+        }
+        $sql = "DELETE FROM giohang_chitiet 
+                WHERE id_giohang = ? AND id_sanpham = ?";
+        return pdo_execute($sql, $cart['id'], $productId);
+    }
+    public function clearCart($userId) {
+        try {
+            echo "<div style='background: #e3f2fd; padding: 10px; margin: 10px;'>";
+            echo "<h3>Cart Clear Debug:</h3>";
+            pdo_execute("START TRANSACTION");
+            echo "1. Starting transaction<br>";
+            $sql = "SELECT id FROM giohang WHERE id_nguoidung = ? AND trangthai = 'Chưa đặt'";
+            $cart = pdo_query_one($sql, $userId);
+            echo "2. Found cart with ID: " . ($cart ? $cart['id'] : 'null') . "<br>";
+            if ($cart) {
+                $sql = "DELETE FROM giohang_chitiet WHERE id_giohang = ?";
+                $result = pdo_execute($sql, $cart['id']);
+                echo "3. Deleted cart items. Result: " . ($result ? 'success' : 'failed') . "<br>";              
+                $sql = "DELETE FROM giohang WHERE id = ?";
+                $result = pdo_execute($sql, $cart['id']);
+                echo "4. Deleted cart. Result: " . ($result ? 'success' : 'failed') . "<br>";
+            } else {
+                echo "3. No cart found to delete<br>";
+            }
+            pdo_execute("COMMIT");
+            echo "5. Transaction committed successfully<br>";
+            echo "</div>";
+            return true;
+        } catch (Exception $e) {
+            pdo_execute("ROLLBACK");
+            echo "<div style='background: #ffebee; padding: 10px; margin: 10px;'>";
+            echo "<h3>Error in clearCart:</h3>";
+            echo "Error: " . $e->getMessage() . "<br>";
+            echo "Transaction rolled back<br>";
+            echo "</div>";
+            return false;
+        }
+    }
 }

@@ -44,6 +44,11 @@
             <i class="fas fa-utensils"></i>
             <a href="index.php?act=topping"><span>Quản lý Topping</span></a>
         </div>
+        <div class="nav-item">
+    <i class="fas fa-hamburger"></i>
+    <a href="index.php?act=sanpham_topping"><span>Sản phẩm - Topping</span></a>
+</div>
+
         <div class="menu-heading">Hỗ trợ</div>
         <div class="nav-item">
             <i class="fas fa-star"></i>
