@@ -122,7 +122,14 @@
                         <div class="row g-4 text-center align-items-center justify-content-center border-bottom py-3">
                             <div class="col-12">
                                 <h5 class="mb-3">Phương thức thanh toán</h5>
-                                <p class="mb-0">Thanh toán khi nhận hàng (COD)</p>
+                                <div class="form-check form-check-inline">
+                                    <input class="form-check-input" type="radio" name="payment_method" id="payment_cod" value="1" checked>
+                                    <label class="form-check-label" for="payment_cod">Thanh toán khi nhận hàng (COD)</label>
+                                </div>
+                                <div class="form-check form-check-inline">
+                                    <input class="form-check-input" type="radio" name="payment_method" id="payment_bank" value="2">
+                                    <label class="form-check-label" for="payment_bank">Chuyển khoản ngân hàng</label>
+                                </div>
                             </div>
                         </div>
                         <div class="row g-4 text-center align-items-center justify-content-center pt-4">
@@ -137,8 +144,6 @@
 
 <script>
 document.getElementById('checkoutForm').addEventListener('submit', function(e) {
-    e.preventDefault();
-    
     // Reset error messages
     document.querySelectorAll('.invalid-feedback').forEach(el => el.textContent = '');
     document.querySelectorAll('.form-control').forEach(el => el.classList.remove('is-invalid'));
@@ -177,44 +182,8 @@ document.getElementById('checkoutForm').addEventListener('submit', function(e) {
         isValid = false;
     }
     
-    if (isValid) {
-        const formData = new FormData(this);
-        fetch(this.action, {
-            method: 'POST',
-            body: formData
-        })
-        .then(response => {
-            if (response.redirected) {
-                window.location.href = 'index.php?page=mock_order';
-            } else {
-                return response.json();
-            }
-        })
-        .then(data => {
-            if (data.success) {
-                window.location.href = 'index.php?page=mock_order';
-            } else {
-                Toastify({
-                    text: data.message || "Có lỗi xảy ra khi đặt hàng. Vui lòng thử lại.",
-                    duration: 3000,
-                    gravity: "top",
-                    position: "center",
-                    backgroundColor: "#dc3545",
-                    stopOnFocus: true
-                }).showToast();
-            }
-        })
-        .catch(error => {
-            console.error('Error:', error);
-            Toastify({
-                text: "Có lỗi xảy ra khi đặt hàng. Vui lòng thử lại.",
-                duration: 3000,
-                gravity: "top",
-                position: "center",
-                backgroundColor: "#dc3545",
-                stopOnFocus: true
-            }).showToast();
-        });
+    if (!isValid) {
+        e.preventDefault();
     }
 });
 </script>

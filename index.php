@@ -47,11 +47,25 @@ switch ($page) {
     case 'home':
         require_once 'controller/banner.php';
         require_once 'controller/sanpham.php';
+        require_once 'controller/sanphamgiamgia.php';
+        
+        // Load banner first
         $bannerController = new BannerController();
         $bannerController->showBanners();
+        
+        // Load sliderbar
         include 'views/home/sliderbar.php'; 
+        
+        // Load regular products
         $sanphamController = new SanPhamController();
-        $sanphamController->list();
+        $sanphams = $sanphamController->getProducts();
+        
+        // Load discount products
+        $sanphamGiamGiaController = new SanPhamGiamGiaController();
+        $sanphamgiamgia = $sanphamGiamGiaController->getDiscountProducts();
+        
+        // Include the home view only once
+        include 'views/home/home.php';
         break;
     case 'about':
         include 'views/about.php';
@@ -158,15 +172,15 @@ switch ($page) {
         $orderController = new OrderController();
         $orderController->viewOrderDetails();
         break;
-
-    case 'mock_order':
-        include 'views/orders/mock_order.php';
-        break;
-
     case 'applyDiscount':
         require_once 'controller/discount.php';
         $discountController = new DiscountController();
         $discountController->applyDiscount();
+        break;
+    case 'discount':
+        require_once 'controller/sanphamgiamgia.php';
+        $sanphamGiamGiaController = new SanPhamGiamGiaController();
+        $sanphamGiamGiaController->listAllDiscountProducts();
         break;
 
     default:

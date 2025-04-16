@@ -60,6 +60,64 @@ public function countSanPhamByDanhMuc($idDanhMuc)
     return $stmt->fetchColumn();
 }
 
+public function searchSanPham($keyword, $start, $limit)
+{
+    $stmt = $this->conn->prepare("SELECT * FROM sanpham WHERE trangthai = 'Còn hàng' AND (tensanpham LIKE :keyword OR mota LIKE :keyword) ORDER BY id DESC LIMIT :start, :limit");
+    $stmt->bindValue(':keyword', '%' . $keyword . '%', PDO::PARAM_STR);
+    $stmt->bindValue(':start', (int)$start, PDO::PARAM_INT);
+    $stmt->bindValue(':limit', (int)$limit, PDO::PARAM_INT);
+    $stmt->execute();
+    return $stmt->fetchAll(PDO::FETCH_ASSOC);
+}
 
+public function countSearchSanPham($keyword)
+{
+    $stmt = $this->conn->prepare("SELECT COUNT(*) FROM sanpham WHERE trangthai = 'Còn hàng' AND (tensanpham LIKE :keyword OR mota LIKE :keyword)");
+    $stmt->bindValue(':keyword', '%' . $keyword . '%', PDO::PARAM_STR);
+    $stmt->execute();
+    return $stmt->fetchColumn();
+}
+
+public function filterByPrice($minPrice, $maxPrice, $start, $limit)
+{
+    $stmt = $this->conn->prepare("SELECT * FROM sanpham WHERE trangthai = 'Còn hàng' AND gia >= :minPrice AND gia <= :maxPrice ORDER BY id DESC LIMIT :start, :limit");
+    $stmt->bindValue(':minPrice', (float)$minPrice, PDO::PARAM_STR);
+    $stmt->bindValue(':maxPrice', (float)$maxPrice, PDO::PARAM_STR);
+    $stmt->bindValue(':start', (int)$start, PDO::PARAM_INT);
+    $stmt->bindValue(':limit', (int)$limit, PDO::PARAM_INT);
+    $stmt->execute();
+    return $stmt->fetchAll(PDO::FETCH_ASSOC);
+}
+
+public function countFilterByPrice($minPrice, $maxPrice)
+{
+    $stmt = $this->conn->prepare("SELECT COUNT(*) FROM sanpham WHERE trangthai = 'Còn hàng' AND gia >= :minPrice AND gia <= :maxPrice");
+    $stmt->bindValue(':minPrice', (float)$minPrice, PDO::PARAM_STR);
+    $stmt->bindValue(':maxPrice', (float)$maxPrice, PDO::PARAM_STR);
+    $stmt->execute();
+    return $stmt->fetchColumn();
+}
+
+public function searchAndFilterByPrice($keyword, $minPrice, $maxPrice, $start, $limit)
+{
+    $stmt = $this->conn->prepare("SELECT * FROM sanpham WHERE trangthai = 'Còn hàng' AND (tensanpham LIKE :keyword OR mota LIKE :keyword) AND gia >= :minPrice AND gia <= :maxPrice ORDER BY id DESC LIMIT :start, :limit");
+    $stmt->bindValue(':keyword', '%' . $keyword . '%', PDO::PARAM_STR);
+    $stmt->bindValue(':minPrice', (float)$minPrice, PDO::PARAM_STR);
+    $stmt->bindValue(':maxPrice', (float)$maxPrice, PDO::PARAM_STR);
+    $stmt->bindValue(':start', (int)$start, PDO::PARAM_INT);
+    $stmt->bindValue(':limit', (int)$limit, PDO::PARAM_INT);
+    $stmt->execute();
+    return $stmt->fetchAll(PDO::FETCH_ASSOC);
+}
+
+public function countSearchAndFilterByPrice($keyword, $minPrice, $maxPrice)
+{
+    $stmt = $this->conn->prepare("SELECT COUNT(*) FROM sanpham WHERE trangthai = 'Còn hàng' AND (tensanpham LIKE :keyword OR mota LIKE :keyword) AND gia >= :minPrice AND gia <= :maxPrice");
+    $stmt->bindValue(':keyword', '%' . $keyword . '%', PDO::PARAM_STR);
+    $stmt->bindValue(':minPrice', (float)$minPrice, PDO::PARAM_STR);
+    $stmt->bindValue(':maxPrice', (float)$maxPrice, PDO::PARAM_STR);
+    $stmt->execute();
+    return $stmt->fetchColumn();
+}
 
 }

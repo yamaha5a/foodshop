@@ -21,4 +21,11 @@ class danhMucController
 
         include 'views/home/home.php'; // Bao gồm view nếu có sản phẩm
     }
+    
+    // New method to get categories without including the view
+    public function getCategories()
+    {
+        $danhMucs = $this->danhMucModel->getAllDanhMuc(); // Lấy danh sách danh mục
+        return $danhMucs;
+    }
 }

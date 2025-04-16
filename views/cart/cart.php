@@ -66,7 +66,7 @@
                                     <img src="upload/<?= htmlspecialchars($item['hinhanh1']) ?>" width="80" class="rounded-circle" />
                                 </td>
                                 <td><?= htmlspecialchars($item['tensanpham']) ?></td>
-                                <td>$<?= number_format($item['gia'], 2) ?></td>
+                                <td><?= number_format($item['gia'], 0, ',', '.') ?> VNĐ</td>
                                 <td>
                                     <div class="input-group">
                                         <button type="button" class="btn btn-sm btn-outline-secondary" onclick="updateQuantity(<?= $item['id_sanpham'] ?>, 'decrease')">-</button>
@@ -79,7 +79,7 @@
                                         <button type="button" class="btn btn-sm btn-outline-secondary" onclick="updateQuantity(<?= $item['id_sanpham'] ?>, 'increase')">+</button>
                                     </div>
                                 </td>
-                                <td id="product-total-<?= $item['id_sanpham'] ?>">$<?= number_format($total, 2) ?></td>
+                                <td id="product-total-<?= $item['id_sanpham'] ?>"><?= number_format($total, 0, ',', '.') ?> VNĐ</td>
                                 <td>
                                     <a href="index.php?page=removeCart&id=<?= $item['id_sanpham'] ?>" class="btn btn-danger btn-sm" onclick="return confirm('Bạn có chắc chắn muốn xóa sản phẩm này?')">Xóa sản phẩm</a>
                                 </td>
@@ -88,7 +88,7 @@
 
                         <tr>
                             <td colspan="4" class="text-end"><strong>Tổng số tiền:</strong></td>
-                            <td colspan="2"><strong id="total-amount">$<?= number_format($totalAll, 2) ?></strong></td>
+                            <td colspan="2"><strong id="total-amount"><?= number_format($totalAll, 0, ',', '.') ?> VNĐ</strong></td>
                         </tr>
 
                     <?php else: ?>
@@ -106,6 +106,9 @@
                        placeholder="Nhập mã giảm giá" 
                        value="<?php echo isset($_SESSION['discount']['code']) ? $_SESSION['discount']['code'] : ''; ?>">
                 <button class="btn border-secondary rounded-pill px-4 py-3 text-primary" type="submit">Áp dụng mã giảm giá</button>
+                <?php if (isset($_SESSION['discount'])): ?>
+                    <a href="index.php?page=removeDiscount" class="btn border-secondary rounded-pill px-4 py-3 text-danger ms-2">Xóa mã giảm giá</a>
+                <?php endif; ?>
             </form>
             <div id="discountMessage" class="mt-2"></div>
         </div>
@@ -118,24 +121,24 @@
                         <h1 class="display-6 mb-4">Giỏ hàng <span class="fw-normal">Tổng</span></h1>
                         <div class="d-flex justify-content-between mb-4">
                             <h5 class="mb-0 me-4">Tạm tính:</h5>
-                            <p class="mb-0" id="subtotal">$<?= number_format($totalAll, 2) ?></p>
+                            <p class="mb-0" id="subtotal"><?= number_format($totalAll, 0, ',', '.') ?> VNĐ</p>
                         </div>
                         <?php if (isset($_SESSION['discount'])): ?>
                             <div class="d-flex justify-content-between" id="discountRow">
                                 <h5 class="mb-0 me-4">Giảm giá:</h5>
-                                <p class="mb-0" id="discountAmount">-$<?= number_format($_SESSION['discount']['amount'], 2) ?></p>
+                                <p class="mb-0" id="discountAmount">-<?= number_format($_SESSION['discount']['amount'], 0, ',', '.') ?> VNĐ</p>
                             </div>
                         <?php endif; ?>
                     </div>
                     <div class="py-4 mb-4 border-top border-bottom d-flex justify-content-between">
                         <h5 class="mb-0 ps-4 me-4">Tổng cộng:</h5>
                         <p class="mb-0 pe-4" id="grand-total">
-                            $<?php 
+                            <?php 
                                 $total = $totalAll;
                                 if (isset($_SESSION['discount']) && isset($_SESSION['discount']['newTotal'])) {
                                     $total = $_SESSION['discount']['newTotal'];
                                 }
-                                echo number_format($total, 2);
+                                echo number_format($total, 0, ',', '.') . ' VNĐ';
                             ?>
                         </p>
                     </div>
@@ -179,7 +182,7 @@ function updateQuantity(productId, action, newValue = null) {
             // Cập nhật tổng tiền của sản phẩm
             const price = <?= $item['gia'] ?>;
             const total = price * quantity;
-            document.getElementById(`product-total-${productId}`).textContent = `$${total.toFixed(2)}`;
+            document.getElementById(`product-total-${productId}`).textContent = `${total.toLocaleString('vi-VN')} VNĐ`;
             
             // Cập nhật tổng tiền của giỏ hàng
             updateCartTotal();
@@ -209,12 +212,22 @@ function updateQuantity(productId, action, newValue = null) {
 function updateCartTotal() {
     let totalAll = 0;
     document.querySelectorAll('[id^="product-total-"]').forEach(element => {
-        const total = parseFloat(element.textContent.replace('$', ''));
+        const total = parseFloat(element.textContent.replace(/[^\d]/g, ''));
         totalAll += total;
     });
-    document.getElementById('total-amount').textContent = `$${totalAll.toFixed(2)}`;
-    document.getElementById('subtotal').textContent = `$${totalAll.toFixed(2)}`;
-    document.getElementById('grand-total').textContent = `$${totalAll.toFixed(2)}`;
+    
+    // Update subtotal
+    document.getElementById('total-amount').textContent = `${totalAll.toLocaleString('vi-VN')} VNĐ`;
+    document.getElementById('subtotal').textContent = `${totalAll.toLocaleString('vi-VN')} VNĐ`;
+    
+    // Update grand total (with discount if applicable)
+    let grandTotal = totalAll;
+    if (document.getElementById('discountRow')) {
+        const discountAmount = parseFloat(document.getElementById('discountAmount').textContent.replace(/[^\d]/g, ''));
+        grandTotal = totalAll - discountAmount;
+    }
+    
+    document.getElementById('grand-total').textContent = `${grandTotal.toLocaleString('vi-VN')} VNĐ`;
 }
 
 function proceedToCheckout() {

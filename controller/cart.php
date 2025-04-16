@@ -54,6 +54,21 @@ class CartController {
         $userId = $_SESSION['user']['id'];
         $cartItems = $this->cartModel->getCartItems($userId);
         
+        // Calculate total amount
+        $totalAll = 0;
+        foreach ($cartItems as $item) {
+            $totalAll += $item['gia'] * $item['soluong'];
+        }
+        
+        // Apply discount if exists
+        if (isset($_SESSION['discount'])) {
+            $discountAmount = $_SESSION['discount']['amount'];
+            $newTotal = $totalAll - $discountAmount;
+            
+            // Update session with new total
+            $_SESSION['discount']['newTotal'] = $newTotal;
+        }
+        
         include 'views/cart/cart.php';
     }
 

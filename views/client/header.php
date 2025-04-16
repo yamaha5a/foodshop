@@ -44,14 +44,14 @@ if (session_status() === PHP_SESSION_NONE) {
                     <div class="nav-item dropdown">
                         <a href="#" class="nav-link dropdown-toggle" data-bs-toggle="dropdown">Pages</a>
                         <div class="dropdown-menu m-0 bg-secondary rounded-0">
-                            <a href="index.php?page=cart" class="dropdown-item">Cart</a>
-                            <a href="index.php?page=checkout" class="dropdown-item">Chackout</a>
+                            <a href="index.php?page=cart" class="dropdown-item">Giỏ hàng</a>
+                            <a href="index.php?page=checkout" class="dropdown-item">Thanh toán</a>
                             <a href="index.php?page=danhgia" class="dropdown-item">Testimonial</a>
                             <a href="404.html" class="dropdown-item">404 Page</a>
                         </div>
                     </div>
-                    <a href="index.php?page=contact" class="nav-item nav-link">Contact</a>
-                    <a href="index.php?page=contact" class="nav-item nav-link">About Us </a>
+                    <a href="index.php?page=contact" class="nav-item nav-link">Liên Hệ</a>
+                    <a href="index.php?page=contact" class="nav-item nav-link">Về chúng tôi</a>
                 </div>
                 <div class="d-flex m-3 me-0">
                     <button class="btn-search btn border border-secondary btn-md-square rounded-circle bg-white me-4" data-bs-toggle="modal" data-bs-target="#searchModal">

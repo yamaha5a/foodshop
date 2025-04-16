@@ -1,4 +1,22 @@
 <?php
+// Display success message from checkout process
+if (isset($_SESSION['success'])) {
+    echo '<div class="alert alert-success alert-dismissible fade show" role="alert">
+            <strong>Thành công!</strong> ' . $_SESSION['success'] . '
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+          </div>';
+    unset($_SESSION['success']);
+}
+
+// Display error message if any
+if (isset($_SESSION['error'])) {
+    echo '<div class="alert alert-danger alert-dismissible fade show" role="alert">
+            <strong>Lỗi!</strong> ' . $_SESSION['error'] . '
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+          </div>';
+    unset($_SESSION['error']);
+}
+
 if (isset($_SESSION['success_message'])) {
     echo '<div class="alert alert-success">' . $_SESSION['success_message'] . '</div>';
     unset($_SESSION['success_message']);
@@ -38,8 +56,13 @@ if (isset($_SESSION['error_message'])) {
                 </thead>
                 <tbody>
                     <?php foreach ($orders as $order): ?>
-                        <tr>
-                            <td>#<?php echo htmlspecialchars($order['id']); ?></td>
+                        <tr class="<?php echo (isset($_SESSION['order_id']) && $_SESSION['order_id'] == $order['id']) ? 'table-success fw-bold' : ''; ?>">
+                            <td>
+                                #<?php echo htmlspecialchars($order['id']); ?>
+                                <?php if (isset($_SESSION['order_id']) && $_SESSION['order_id'] == $order['id']): ?>
+                                    <span class="badge bg-success ms-2">Mới</span>
+                                <?php endif; ?>
+                            </td>
                             <td><?php echo htmlspecialchars($order['ngaytao']); ?></td>
                             <td><?php echo number_format($order['tongtien'], 0, ',', '.') . ' VNĐ'; ?></td>
                             <td><?php echo htmlspecialchars($order['phuongthucthanhtoan']); ?></td>
@@ -65,3 +88,23 @@ if (isset($_SESSION['error_message'])) {
         </div>
     <?php endif; ?>
 </div> 
+
+<?php if (isset($_SESSION['order_id'])): ?>
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Find the newly placed order row
+        const newOrderRow = document.querySelector('tr.table-success');
+        if (newOrderRow) {
+            // Scroll to the new order
+            newOrderRow.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            
+            // Add a subtle highlight effect
+            newOrderRow.style.transition = 'background-color 0.5s';
+            newOrderRow.style.backgroundColor = '#d4edda';
+            setTimeout(function() {
+                newOrderRow.style.backgroundColor = '';
+            }, 2000);
+        }
+    });
+</script>
+<?php endif; ?> 

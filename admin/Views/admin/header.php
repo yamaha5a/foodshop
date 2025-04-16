@@ -2,7 +2,14 @@
 if (!isset($_SESSION)) {
     session_start();
 }
+if (!isset($_SESSION['user_id']) || $_SESSION['tenquyen'] !== 'admin') {
+    header("Location: /shopfood/admin/Views/login/login.php");
+    exit();
+}
 ?>
+<!DOCTYPE html>
+<html>
+<head>
 <style>
 .dropdown-menu {
     display: none; /* Ẩn mặc định */

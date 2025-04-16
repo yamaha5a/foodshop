@@ -32,23 +32,23 @@
                         <p class="mb-4">Mô tả: <?= nl2br(htmlspecialchars($product['mota'])) ?></p>
                         <div class="input-group quantity mb-5" style="width: 100px;">
                             <div class="input-group-btn">
-                                <button class="btn btn-sm btn-minus rounded-circle bg-light border">
+                                <button type="button" class="btn btn-sm btn-minus rounded-circle bg-light border" id="decrease-btn">
                                     <i class="fa fa-minus"></i>
                                 </button>   
                             </div>
-                            <input type="text" class="form-control form-control-sm text-center border-0" value="1">
+                            <input type="text" id="quantity-input" class="form-control form-control-sm text-center border-0" value="1">
                             <div class="input-group-btn">
-                                <button class="btn btn-sm btn-plus rounded-circle bg-light border">
+                                <button type="button" class="btn btn-sm btn-plus rounded-circle bg-light border" id="increase-btn">
                                     <i class="fa fa-plus"></i>  
                                 </button>
                             </div>
                         </div>
-                        <form method="post" action="index.php?page=addToCart" onsubmit="return checkLogin(event)">
+                        <form method="post" action="index.php?page=addToCart" onsubmit="return addToCart(event)" class="add-to-cart-form">
                             <input type="hidden" name="product_id" value="<?= $product['id'] ?>">
-                            <input type="hidden" name="quantity" value="1">
+                            <input type="hidden" name="quantity" id="quantity-hidden" value="1">
                             <button type="submit" class="btn border border-secondary rounded-pill px-4 py-2 mb-4 text-primary">
                                 <i class="fa fa-shopping-bag me-2 text-primary"></i> Thêm vào giỏ hàng
-                        </button>
+                            </button>
                         </form>
                     </div>
                 </div>
@@ -172,6 +172,7 @@
 <div class="col-lg-12">
     <div class="text-center mb-5">
         <h1 class="fw-bold mb-0">Sản phẩm liên quan</h1>
+        <p class="text-muted">Các sản phẩm cùng danh mục: <?= htmlspecialchars($product['tendanhmuc']) ?></p>
     </div>
     <div class="vesitable">
         <div class="owl-carousel vegetable-carousel justify-content-center">
@@ -180,7 +181,18 @@
                     <div class="border border-primary rounded position-relative vesitable-item">
                         <div class="vesitable-img">
                             <a href="index.php?page=detail&id=<?= $related['id'] ?>">
-                                <img src="upload/<?= htmlspecialchars($related['hinhanh1']) ?>" class="img-fluid w-100 rounded-top" alt="<?= htmlspecialchars($related['tensanpham']) ?>">
+                                <?php 
+                                // Kiểm tra và hiển thị hình ảnh
+                                $image_path = '';
+                                if (isset($related['hinhanh1']) && !empty($related['hinhanh1'])) {
+                                    $image_path = 'upload/' . htmlspecialchars($related['hinhanh1']);
+                                } else if (isset($related['hinhanh']) && !empty($related['hinhanh'])) {
+                                    $image_path = 'upload/' . htmlspecialchars($related['hinhanh']);
+                                } else {
+                                    $image_path = 'upload/fruite-item-2.jpg'; // Sử dụng hình ảnh có sẵn trong thư mục upload
+                                }
+                                ?>
+                                <img src="<?= $image_path ?>" class="img-fluid w-100 rounded-top" alt="<?= htmlspecialchars($related['tensanpham']) ?>">
                             </a>
                         </div>
                         <div class="text-white bg-primary px-3 py-1 rounded position-absolute" style="top: 10px; right: 10px;">
@@ -195,7 +207,7 @@
                             <p><?= htmlspecialchars($related['mota']) ?></p>
                             <div class="d-flex justify-content-between flex-lg-wrap">
                                 <p class="text-dark fs-5 fw-bold mb-0"><?= number_format($related['gia'], 0, ',', '.') ?> VNĐ</p>
-                                <form method="post" action="index.php?page=addToCart" onsubmit="return checkLogin(event)">
+                                <form method="post" action="index.php?page=addToCart" onsubmit="return addToCart(event)" class="add-to-cart-form">
                                     <input type="hidden" name="product_id" value="<?= $related['id'] ?>">
                                     <input type="hidden" name="quantity" value="1">
                                     <button type="submit" class="btn border border-secondary rounded-pill px-3 py-1 mb-4 text-primary">
@@ -208,7 +220,7 @@
                 <?php endforeach; ?>
             <?php else: ?>
                 <div class="text-center p-4">
-                    <p class="text-muted">Không có sản phẩm liên quan</p>
+                    <p class="text-muted">Không có sản phẩm liên quan trong danh mục này</p>
                 </div>
             <?php endif; ?>
         </div>
@@ -235,37 +247,144 @@
     color: #ffd700;
 }
 </style>
+<!-- Thêm thư viện SweetAlert2 -->
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <script>
+// Hàm tăng số lượng
+function increaseQuantity() {
+    const input = document.getElementById('quantity-input');
+    const hiddenInput = document.getElementById('quantity-hidden');
+    let value = parseInt(input.value);
+    value = isNaN(value) ? 0 : value;
+    value++;
+    input.value = value;
+    hiddenInput.value = value;
+}
+
+// Hàm giảm số lượng
+function decreaseQuantity() {
+    const input = document.getElementById('quantity-input');
+    const hiddenInput = document.getElementById('quantity-hidden');
+    let value = parseInt(input.value);
+    value = isNaN(value) ? 0 : value;
+    if (value > 1) {
+        value--;
+        input.value = value;
+        hiddenInput.value = value;
+    }
+}
+
+// Thêm event listeners cho các nút tăng giảm
 document.addEventListener('DOMContentLoaded', function() {
-    const addToCartForms = document.querySelectorAll('.add-to-cart-form');
+    // Event listeners cho nút tăng giảm
+    const increaseBtn = document.getElementById('increase-btn');
+    const decreaseBtn = document.getElementById('decrease-btn');
     
-    addToCartForms.forEach(form => {
-        form.addEventListener('submit', function(e) {
-            e.preventDefault();
-            
-            const formData = new FormData(this);
-            
-            fetch('index.php?page=addToCart', {
-                method: 'POST',
-                body: formData
-            })
-            .then(response => response.json())
-            .then(data => {
-                if (data.success) {
-                    // Cập nhật số lượng giỏ hàng
-                    document.getElementById('cart-count').textContent = data.cart_count;
-                    
-                    // Hiển thị thông báo thành công
-                    alert(data.message);
-                } else {
-                    alert(data.message);
-                }
-            })
-            .catch(error => {
-                console.error('Error:', error);
-                alert('Có lỗi xảy ra khi thêm sản phẩm vào giỏ hàng');
-            });
-        });
+    // Xóa tất cả event listeners cũ (nếu có)
+    const newIncreaseBtn = increaseBtn.cloneNode(true);
+    const newDecreaseBtn = decreaseBtn.cloneNode(true);
+    
+    increaseBtn.parentNode.replaceChild(newIncreaseBtn, increaseBtn);
+    decreaseBtn.parentNode.replaceChild(newDecreaseBtn, decreaseBtn);
+    
+    // Thêm event listeners mới
+    newIncreaseBtn.addEventListener('click', function(e) {
+        e.preventDefault();
+        e.stopPropagation();
+        increaseQuantity();
+    });
+    
+    newDecreaseBtn.addEventListener('click', function(e) {
+        e.preventDefault();
+        e.stopPropagation();
+        decreaseQuantity();
+    });
+    
+    // Event listeners cho các form add to cart
+    const forms = document.querySelectorAll('form[action="index.php?page=addToCart"]');
+    forms.forEach(form => {
+        form.addEventListener('submit', addToCart);
     });
 });
+
+function addToCart(event) {
+    event.preventDefault();
+    const form = event.target;
+    
+    // Kiểm tra đăng nhập trước khi gửi request
+    <?php if (!isset($_SESSION['user'])): ?>
+        Swal.fire({
+            title: 'Thông báo!',
+            text: 'Vui lòng đăng nhập để thêm sản phẩm vào giỏ hàng',
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#3085d6',
+            cancelButtonColor: '#d33',
+            confirmButtonText: 'Đăng nhập',
+            cancelButtonText: 'Hủy'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                window.location.href = "index.php?page=login";
+            }
+        });
+        return false;
+    <?php endif; ?>
+    
+    // Lấy dữ liệu từ form
+    const formData = new FormData(form);
+    
+    // Gửi request AJAX
+    fetch('index.php?page=addToCart', {
+        method: 'POST',
+        body: formData
+    })
+    .then(response => {
+        if (!response.ok) {
+            throw new Error('Network response was not ok');
+        }
+        return response.text();
+    })
+    .then(html => {
+        // Tạo một div ẩn để chứa response
+        const tempDiv = document.createElement('div');
+        tempDiv.innerHTML = html;
+        
+        // Lấy thông báo từ session
+        const successMessage = tempDiv.querySelector('meta[name="success_message"]')?.content;
+        const errorMessage = tempDiv.querySelector('meta[name="error_message"]')?.content;
+        const cartCount = tempDiv.querySelector('meta[name="cart_count"]')?.content;
+        
+        if (successMessage) {
+            // Cập nhật số lượng giỏ hàng từ session
+            document.getElementById('cart-count').textContent = cartCount;
+            
+            Swal.fire({
+                title: 'Thành công!',
+                text: successMessage,
+                icon: 'success',
+                confirmButtonText: 'OK',
+                timer: 1500,
+                showConfirmButton: false
+            });
+        } else if (errorMessage) {
+            Swal.fire({
+                title: 'Lỗi!',
+                text: errorMessage,
+                icon: 'error',
+                confirmButtonText: 'OK'
+            });
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        Swal.fire({
+            title: 'Lỗi!',
+            text: 'Có lỗi xảy ra khi thêm sản phẩm vào giỏ hàng',
+            icon: 'error',
+            confirmButtonText: 'OK'
+        });
+    });
+    
+    return false;
+}
 </script>

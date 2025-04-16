@@ -66,6 +66,11 @@ class SanPhamModel {
 
     // Xóa sản phẩm
     public function xoaSanPham($id) {
+        // First, delete any associated discount records
+        $sql_delete_discounts = "DELETE FROM sanphamgiamgia WHERE id_sanpham = ?";
+        pdo_execute($sql_delete_discounts, $id);
+        
+        // Then delete the product
         $sql = "DELETE FROM sanpham WHERE id = ?";
         pdo_execute($sql, $id);
     }

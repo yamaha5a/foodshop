@@ -20,7 +20,7 @@ class DiscountController {
                 exit;
             }
 
-            $discountCode = $_POST['discountCode'];
+            $discountCode = $_POST['code'];
             
             // Kiểm tra mã giảm giá
             $discount = $this->discountModel->getDiscountByCode($discountCode);
@@ -82,12 +82,21 @@ class DiscountController {
             echo json_encode([
                 'success' => true,
                 'message' => 'Áp dụng mã giảm giá thành công',
-                'discountAmount' => number_format($discountAmount, 2),
-                'newTotal' => number_format($newTotal, 2),
-                'subtotal' => number_format($subtotal, 2)
+                'discountAmount' => number_format($discountAmount, 0, ',', '.'),
+                'newTotal' => number_format($newTotal, 0, ',', '.'),
+                'subtotal' => number_format($subtotal, 0, ',', '.')
             ]);
             exit;
         }
+    }
+
+    public function removeDiscount() {
+        if (isset($_SESSION['discount'])) {
+            unset($_SESSION['discount']);
+            $_SESSION['success_message'] = 'Đã xóa mã giảm giá';
+        }
+        header('Location: index.php?page=cart');
+        exit;
     }
 }
 ?> 

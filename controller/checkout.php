@@ -12,8 +12,8 @@ class CheckoutController {
     public function viewCheckout() {
         if (!isset($_SESSION['user'])) {
             $_SESSION['error_message'] = "Vui lòng đăng nhập để thanh toán";
-            header('Location: index.php?page=login');
-            exit;
+            echo '<meta http-equiv="refresh" content="0;url=index.php?page=login">';
+            exit();
         }
 
         $userId = $_SESSION['user']['id'];
@@ -45,70 +45,72 @@ class CheckoutController {
     // Process checkout
     public function processCheckout() {
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-            if (!isset($_SESSION['user'])) {
-                $_SESSION['error_message'] = "Vui lòng đăng nhập để thanh toán";
-                header("Location: index.php?page=login");
-                exit;
-            }
-
-            $userId = $_SESSION['user']['id'];
-            $cartItems = $this->model->getCartDetails($userId);
-
-            if (empty($cartItems)) {
-                $_SESSION['error_message'] = "Giỏ hàng trống";
-                header("Location: index.php?page=cart");
-                exit;
-            }
-
-            try {
-                // Validate required fields
-                $requiredFields = ['first_name', 'address', 'sodienthoai', 'email', 'payment_method'];
-                foreach ($requiredFields as $field) {
-                    if (!isset($_POST[$field]) || empty($_POST[$field])) {
-                        throw new Exception("Vui lòng điền đầy đủ thông tin");
-                    }
-                }
-
-                // Calculate total
-                $total = 0;
-                foreach ($cartItems as $item) {
-                    $total += $item['gia'] * $item['soluong'];
-                }
-
-                // Create order data
-                $orderData = [
-                    'id_nguoidung' => $userId,
-                    'diachigiaohang' => $_POST['address'],
-                    'tongtien' => $total,
-                    'trangthai' => 'Chờ xác nhận',
-                    'ghichu' => $_POST['note'] ?? '',
-                    'id_phuongthucthanhtoan' => $_POST['payment_method']
-                ];
-
-                $orderId = $this->model->createOrder($orderData);
-
-                if ($orderId) {
-                    // Clear cart session
-                    unset($_SESSION['cart']);
-                    
-                    // Clear cart from database
-                    $this->model->clearCart($userId);
-                    
-                    $_SESSION['success_message'] = "Đặt hàng thành công! Mã đơn hàng: #" . $orderId;
-                    header("Location: index.php?page=mock_order");
+            // Validate required fields
+            $requiredFields = ['first_name', 'address', 'sodienthoai', 'email'];
+            foreach ($requiredFields as $field) {
+                if (empty($_POST[$field])) {
+                    $_SESSION['error'] = "Vui lòng điền đầy đủ thông tin";
+                    include 'views/checkout/redirect.php';
+                    echo '<script>setTimeout(function() { window.location.href = "index.php?page=checkout"; }, 2000);</script>';
                     exit;
-                } else {
-                    throw new Exception("Không thể tạo đơn hàng");
                 }
-            } catch (Exception $e) {
-                $_SESSION['error_message'] = $e->getMessage();
-                header("Location: index.php?page=checkout");
+            }
+
+            // Get user ID from session
+            if (!isset($_SESSION['user']) || !isset($_SESSION['user']['id'])) {
+                $_SESSION['error'] = "Vui lòng đăng nhập để thanh toán";
+                include 'views/checkout/redirect.php';
+                echo '<script>setTimeout(function() { window.location.href = "index.php?page=login"; }, 2000);</script>';
                 exit;
             }
-        } else {
-            $_SESSION['error_message'] = "Phương thức không hợp lệ";
-            header("Location: index.php?page=checkout");
-            exit;
+            
+            $userId = $_SESSION['user']['id'];
+            
+            // Get cart items
+            $cartItems = $this->model->getCartDetails($userId);
+            
+            if (empty($cartItems)) {
+                $_SESSION['error'] = "Giỏ hàng của bạn đang trống";
+                include 'views/checkout/redirect.php';
+                echo '<script>setTimeout(function() { window.location.href = "index.php?page=checkout"; }, 2000);</script>';
+                exit;
+            }
+            
+            // Prepare data for order creation
+            $orderData = [
+                'userId' => $userId,
+                'address' => $_POST['address'],
+                'note' => $_POST['note'] ?? '',
+                'cart_items' => $cartItems
+            ];
+            
+            // Create order
+            $orderId = $this->model->createOrder($orderData);
+            
+            if ($orderId) {
+                // Create order details
+                $this->model->createOrderDetails($orderId, $cartItems);
+                
+                // Update cart status
+                $cartId = $this->model->getCartId($userId);
+                if ($cartId) {
+                    $this->model->updateCartStatus($cartId['id']);
+                }
+                
+                $_SESSION['success'] = "Đặt hàng thành công!";
+                $_SESSION['order_id'] = $orderId;
+                
+                // Clear cart after successful order
+                unset($_SESSION['cart']);
+                
+                // Redirect directly to orders page using echo
+                echo '<script>window.location.href = "index.php?page=orders";</script>';
+                exit;
+            } else {
+                $_SESSION['error'] = "Có lỗi xảy ra khi đặt hàng";
+                echo '<script>window.location.href = "index.php?page=checkout";</script>';
+                exit;
+            }
         }
     }
 }

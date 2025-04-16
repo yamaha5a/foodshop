@@ -21,13 +21,13 @@ function pdo_execute($sql) {
     if ($conn) {
         try {
             $stmt = $conn->prepare($sql);
-            $stmt->execute($sql_args);
-            return true;
+            $result = $stmt->execute($sql_args);
+            $conn = null;
+            return $result;
         } catch (PDOException $e) {
             error_log("Error executing query: " . $e->getMessage());
-            return false;
-        } finally {
             $conn = null;
+            return false;
         }
     }
     return false;

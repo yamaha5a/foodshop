@@ -15,7 +15,7 @@ class BinhluanController {
             } else {
                 $_SESSION['error'] = "Có lỗi xảy ra khi xóa bình luận";
             }
-            header("Location: index.php?act=binhluan");
+            echo '<meta http-equiv="refresh" content="0;url=index.php?act=binhluan">';
             exit();
         }
     }

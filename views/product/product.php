@@ -8,6 +8,36 @@
 </div>
 <!-- Single Page Header End -->
 <!-- Fruits Shop Start-->
+<style>
+    .overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.6);
+        z-index: 999;
+    }
+
+    .popup-message {
+        position: fixed;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        background-color: #fff;
+        color: #28a745;
+        padding: 30px 40px;
+        border-radius: 10px;
+        box-shadow: 0 5px 20px rgba(0, 0, 0, 0.4);
+        font-size: 18px;
+        font-weight: bold;
+        z-index: 1000;
+        text-align: center;
+    }
+</style>
+<!-- Thêm thư viện SweetAlert2 -->
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
 <div class="container-fluid fruite py-5">
     <div class="container py-5">
         <h1 class="mb-4">Fresh fruits shop</h1>
@@ -16,21 +46,31 @@
                 <div class="row g-4">
                     <div class="col-xl-3">
                         <div class="input-group w-100 mx-auto d-flex">
-                            <input type="search" class="form-control p-3" placeholder="keywords" aria-describedby="search-icon-1">
-                            <span id="search-icon-1" class="input-group-text p-3"><i class="fa fa-search"></i></span>
+                            <form action="index.php" method="get" class="w-100">
+                                <input type="hidden" name="page" value="product">
+                                <div class="input-group">
+                                    <input type="search" name="search" class="form-control p-3" placeholder="Tìm kiếm sản phẩm..." value="<?= isset($searchParams['keyword']) ? htmlspecialchars($searchParams['keyword']) : '' ?>">
+                                    <button type="submit" class="input-group-text p-3"><i class="fa fa-search"></i></button>
+                                </div>
+                            </form>
                         </div>
                     </div>
                     <div class="col-6"></div>
                     <div class="col-xl-3">
                         <div class="bg-light ps-3 py-3 rounded d-flex justify-content-between mb-4">
-                            <label for="fruits">Default Sorting:</label>
+                            <label for="fruits">Sắp xếp:</label>
                             <select id="fruits" name="fruitlist" class="border-0 form-select-sm bg-light me-3" form="fruitform">
-                                <option value="volvo">Nothing</option>
-                                <option value="saab">Popularity</option>
-                                <option value="opel">Organic</option>
-                                <option value="audi">Fantastic</option>
+                                <option value="volvo">Mặc định</option>
+                                <option value="saab">Phổ biến</option>
+                                <option value="opel">Giá tăng dần</option>
+                                <option value="audi">Giá giảm dần</option>
                             </select>
                         </div>
+                        <?php if (!empty($searchParams['keyword']) || $searchParams['min_price'] > 0 || $searchParams['max_price'] < PHP_FLOAT_MAX): ?>
+                        <div class="mb-3">
+                            <a href="index.php?page=product" class="btn btn-outline-secondary w-100">Xóa bộ lọc</a>
+                        </div>
+                        <?php endif; ?>
                     </div>
                 </div>
                 <div class="row g-4">
@@ -57,9 +97,19 @@
                             </div>
                             <div class="col-lg-12">
                                 <div class="mb-3">
-                                    <h4 class="mb-2">Price</h4>
-                                    <input type="range" class="form-range w-100" id="rangeInput" name="rangeInput" min="0" max="500" value="0" oninput="amount.value=rangeInput.value">
-                                    <output id="amount" name="amount" min-velue="0" max-value="500" for="rangeInput">0</output>
+                                    <h4 class="mb-2">Giá</h4>
+                                    <form action="index.php" method="get" id="priceFilterForm">
+                                        <input type="hidden" name="page" value="product">
+                                        <?php if (isset($searchParams['keyword']) && !empty($searchParams['keyword'])): ?>
+                                            <input type="hidden" name="search" value="<?= htmlspecialchars($searchParams['keyword']) ?>">
+                                        <?php endif; ?>
+                                        <div class="d-flex align-items-center mb-2">
+                                            <input type="number" name="min_price" class="form-control me-2" placeholder="Giá tối thiểu" value="<?= isset($searchParams['min_price']) && $searchParams['min_price'] > 0 ? $searchParams['min_price'] : '' ?>">
+                                            <span>-</span>
+                                            <input type="number" name="max_price" class="form-control ms-2" placeholder="Giá tối đa" value="<?= isset($searchParams['max_price']) && $searchParams['max_price'] < PHP_FLOAT_MAX ? $searchParams['max_price'] : '' ?>">
+                                        </div>
+                                        <button type="submit" class="btn btn-primary w-100">Lọc theo giá</button>
+                                    </form>
                                 </div>
                             </div>
                             <div class="col-lg-12">
@@ -177,8 +227,8 @@
                                             <p><?php echo htmlspecialchars($sanpham['mota']); ?></p>
                                             <div class="d-flex justify-content-between flex-lg-wrap">
                                                 <p class="text-dark fs-5 fw-bold mb-0">$<?php echo number_format($sanpham['gia'], 2); ?></p>
-                                                <form method="post" action="index.php?page=addToCart">
-                                                <input type="hidden" name="id" value="<?= $sanpham['id']; ?>">
+                                                <form method="post" action="index.php?page=addToCart" onsubmit="return addToCart(event)">
+                                                <input type="hidden" name="product_id" value="<?= $sanpham['id']; ?>">
                                                 <input type="hidden" name="quantity" value="1">
                                                 <button type="submit" class="btn border border-secondary rounded-pill px-3 text-primary">
                                                     <i class="fa fa-shopping-bag me-2 text-primary"></i> Add to cart
@@ -198,8 +248,24 @@
                             <div class="pagination d-flex justify-content-center mt-5">
                                 <?php
                                 $baseLink = "index.php?page=product";
-                                if (isset($_GET['danhmuc_id'])) {
-                                    $baseLink .= "&danhmuc_id=" . $_GET['danhmuc_id'];
+                                
+                                // Add search parameter if exists
+                                if (isset($searchParams['keyword']) && !empty($searchParams['keyword'])) {
+                                    $baseLink .= "&search=" . urlencode($searchParams['keyword']);
+                                }
+                                
+                                // Add price filter parameters if they exist
+                                if (isset($searchParams['min_price']) && $searchParams['min_price'] > 0) {
+                                    $baseLink .= "&min_price=" . $searchParams['min_price'];
+                                }
+                                
+                                if (isset($searchParams['max_price']) && $searchParams['max_price'] < PHP_FLOAT_MAX) {
+                                    $baseLink .= "&max_price=" . $searchParams['max_price'];
+                                }
+                                
+                                // Add category parameter if exists
+                                if (isset($_GET['danhmuc'])) {
+                                    $baseLink .= "&danhmuc=" . $_GET['danhmuc'];
                                 }
                                 ?>
 
@@ -236,3 +302,123 @@
     </div>
 </div>
 <!-- Fruits Shop End-->
+<script>
+function addToCart(event) {
+    event.preventDefault();
+    const form = event.target;
+    
+    // Kiểm tra đăng nhập trước khi gửi request
+    <?php if (!isset($_SESSION['user'])): ?>
+        Swal.fire({
+            title: 'Thông báo!',
+            text: 'Vui lòng đăng nhập để thêm sản phẩm vào giỏ hàng',
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#3085d6',
+            cancelButtonColor: '#d33',
+            confirmButtonText: 'Đăng nhập',
+            cancelButtonText: 'Hủy'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                window.location.href = "index.php?page=login";
+            }
+        });
+        return false;
+    <?php endif; ?>
+    
+    // Lấy dữ liệu từ form
+    const formData = new FormData(form);
+    
+    // Gửi request AJAX
+    fetch('index.php?page=addToCart', {
+        method: 'POST',
+        body: formData
+    })
+    .then(response => {
+        if (!response.ok) {
+            throw new Error('Network response was not ok');
+        }
+        return response.text();
+    })
+    .then(html => {
+        // Tạo một div ẩn để chứa response
+        const tempDiv = document.createElement('div');
+        tempDiv.innerHTML = html;
+        
+        // Lấy thông báo từ session
+        const successMessage = tempDiv.querySelector('meta[name="success_message"]')?.content;
+        const errorMessage = tempDiv.querySelector('meta[name="error_message"]')?.content;
+        const cartCount = tempDiv.querySelector('meta[name="cart_count"]')?.content;
+        
+        if (successMessage) {
+            // Cập nhật số lượng giỏ hàng từ session
+            document.getElementById('cart-count').textContent = cartCount;
+            
+            Swal.fire({
+                title: 'Thành công!',
+                text: successMessage,
+                icon: 'success',
+                confirmButtonText: 'OK',
+                timer: 1500,
+                showConfirmButton: false
+            });
+        } else if (errorMessage) {
+            Swal.fire({
+                title: 'Lỗi!',
+                text: errorMessage,
+                icon: 'error',
+                confirmButtonText: 'OK'
+            });
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        Swal.fire({
+            title: 'Lỗi!',
+            text: 'Có lỗi xảy ra khi thêm sản phẩm vào giỏ hàng',
+            icon: 'error',
+            confirmButtonText: 'OK'
+        });
+    });
+    
+    return false;
+}
+
+// Update all add to cart forms to use the new function
+document.addEventListener('DOMContentLoaded', function() {
+    const forms = document.querySelectorAll('form[action="index.php?page=addToCart"]');
+    forms.forEach(form => {
+        form.addEventListener('submit', addToCart);
+    });
+});
+
+// Add this to your existing JavaScript
+document.addEventListener('DOMContentLoaded', function() {
+    // Price filter form submission
+    const priceFilterForm = document.getElementById('priceFilterForm');
+    if (priceFilterForm) {
+        priceFilterForm.addEventListener('submit', function(e) {
+            const minPrice = this.querySelector('input[name="min_price"]').value;
+            const maxPrice = this.querySelector('input[name="max_price"]').value;
+            
+            if (minPrice === '' && maxPrice === '') {
+                e.preventDefault();
+                alert('Vui lòng nhập ít nhất một giá trị để lọc');
+            }
+        });
+    }
+    
+    // Search form submission
+    const searchForm = document.querySelector('form[action="index.php"]');
+    if (searchForm) {
+        const searchInput = searchForm.querySelector('input[name="search"]');
+        if (searchInput) {
+            searchInput.addEventListener('keyup', function(e) {
+                if (e.key === 'Enter') {
+                    searchForm.submit();
+                }
+            });
+        }
+    }
+});
+</script>

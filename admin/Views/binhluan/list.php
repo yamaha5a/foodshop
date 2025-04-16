@@ -43,9 +43,13 @@
                             <td><?= htmlspecialchars($comment['tensanpham']) ?></td>
                             <td><?= htmlspecialchars($comment['noidung']) ?></td>
                             <td>
-                                <?php for ($i = 1; $i <= 5; $i++): ?>
-                                    <i class="fas fa-star <?= $i <= $comment['danhgia'] ? 'text-warning' : 'text-muted' ?>"></i>
+                                <?php 
+                                $rating = isset($comment['danhgia']) ? (int)$comment['danhgia'] : 0;
+                                for ($i = 1; $i <= 5; $i++): 
+                                ?>
+                                    <i class="fas fa-star" style="color: <?= $i <= $rating ? '#ffc107' : '#6c757d' ?>"></i>
                                 <?php endfor; ?>
+                                <span class="ms-2">(<?= $rating ?>/5)</span>
                             </td>
                             <td><?= date('d/m/Y H:i', strtotime($comment['ngaydang'])) ?></td>
                             <td>

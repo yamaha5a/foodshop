@@ -33,7 +33,10 @@ include 'Models/sanpham.php';
                     $act = htmlspecialchars($_GET['act']); 
                     switch ($act) {
                         case 'thongke':
-                            include "Views/thongke/thongke.php";  
+                            require_once 'controllers/thongke.php';
+                            $controller = new ThongKeController();
+                            $data = $controller->index();
+                            include "Views/thongke/thongke.php";
                             break;
 
                         case 'danhmuc':
@@ -81,10 +84,6 @@ include 'Models/sanpham.php';
                             $nguoiDungController = new NguoiDungController();
                             $nguoiDungController->capNhatNguoiDung();
 
-                            break;
-                        case 'thongke':
-                            $total_users = $thongKeModel->demTongTaiKhoan();
-                            include "Views/thongke/thongke.php";
                             break;
                         case 'banner':
                             require_once 'controllers/banner.php';
@@ -153,7 +152,10 @@ include 'Models/sanpham.php';
                         case 'detailchitiethoadon':
                             require_once 'controllers/chitiethoadon.php';
                             $controller = new OrderDetailController();
+                            $controller->updateStatus();
+
                             $controller->detail();
+
                             break;
                         case 'binhluan':
                             require_once 'controllers/binhluan.php';
@@ -242,6 +244,30 @@ include 'Models/sanpham.php';
                         case 'deletesanpham_topping':
                             require_once 'controllers/sanpham_topping.php';
                             $controller = new SanPhamToppingController();
+                            $controller->delete();
+                            break;
+                            
+                        case 'sanphamgiamgia':
+                            require_once 'controllers/sanphamgiamgia.php';
+                            $controller = new SanPhamGiamGiaController();
+                            $controller->index();
+                            break;
+                            
+                        case 'addSanPhamGiamGia':
+                            require_once 'controllers/sanphamgiamgia.php';
+                            $controller = new SanPhamGiamGiaController();
+                            $controller->add();
+                            break;
+                            
+                        case 'suaSanPhamGiamGia':
+                            require_once 'controllers/sanphamgiamgia.php';
+                            $controller = new SanPhamGiamGiaController();
+                            $controller->edit();
+                            break;
+                            
+                        case 'xoaSanPhamGiamGia':
+                            require_once 'controllers/sanphamgiamgia.php';
+                            $controller = new SanPhamGiamGiaController();
                             $controller->delete();
                             break;
                                             

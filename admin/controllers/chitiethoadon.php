@@ -9,7 +9,23 @@ class OrderDetailController {
     }
 
     public function index() {
-        $orders = $this->orderDetailModel->getAllOrders();
+        // Get pagination parameters
+        $page = isset($_GET['page']) ? (int)$_GET['page'] : 1;
+        $limit = 10; // Number of items per page
+        
+        // Get search parameter
+        $search = isset($_GET['search']) ? trim($_GET['search']) : '';
+        
+        // Get orders with pagination and search
+        $orders = $this->orderDetailModel->getAllOrders($page, $limit, $search);
+        
+        // Get total number of orders for pagination
+        $totalOrders = $this->orderDetailModel->getTotalOrders($search);
+        
+        // Calculate total pages
+        $totalPages = ceil($totalOrders / $limit);
+        
+        // Pass data to the view
         include __DIR__ . '/../Views/chitiethoadon/list.php';
     }
 
@@ -25,4 +41,19 @@ class OrderDetailController {
         
         include __DIR__ . '/../Views/chitiethoadon/detail.php';
     }
+    public function updateStatus() {
+        if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['order_id'], $_POST['trangthai'])) {
+            $orderId = $_POST['order_id'];
+            $status = $_POST['trangthai'];
+    
+            $this->orderDetailModel->updateOrderStatus($orderId, $status);
+            
+            // Redirect back to detail page with success parameter using echo
+            echo "<script>
+                window.location.href = 'index.php?act=detailchitiethoadon&id=" . $orderId . "&success=1';
+            </script>";
+            exit;
+        }
+    }
+    
 } 

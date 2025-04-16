@@ -39,6 +39,13 @@ CREATE TABLE loaisanpham (
     madm INT,
     FOREIGN KEY (madm) REFERENCES danhmuc(id) ON DELETE CASCADE
 ) ENGINE=InnoDB;
+CREATE TABLE sanphamgiamgia (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    id_sanpham INT NOT NULL,
+    giagiam DECIMAL(10, 2) NOT NULL,
+    ngay_giamgia DATE DEFAULT CURRENT_DATE,
+    FOREIGN KEY (id_sanpham) REFERENCES sanpham(id)
+);
 
 -- 5. Bảng sản phẩm
 CREATE TABLE sanpham (

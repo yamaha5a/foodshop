@@ -38,7 +38,7 @@
         </div>
         <div class="nav-item">
             <i class="fas fa-shipping-fast"></i>
-            <a href="index.php?act=vanchuyen"><span>Trạng thái vận chuyển</span></a>
+            <a href="index.php?act=sanphamgiamgia"><span>Sản phẩm giảm giá</span></a>
         </div>
         <div class="nav-item">
             <i class="fas fa-utensils"></i>

@@ -38,7 +38,15 @@ function pdo_query($sql) {
     if ($conn) {
         try {
             $stmt = $conn->prepare($sql);
-            $stmt->execute($sql_args);
+            // Bind parameters with appropriate types
+            foreach ($sql_args as $i => $arg) {
+                if (is_int($arg)) {
+                    $stmt->bindValue($i + 1, $arg, PDO::PARAM_INT);
+                } else {
+                    $stmt->bindValue($i + 1, $arg, PDO::PARAM_STR);
+                }
+            }
+            $stmt->execute();
             return $stmt->fetchAll(PDO::FETCH_ASSOC);
         } catch (PDOException $e) {
             error_log("Error executing query: " . $e->getMessage());
@@ -57,7 +65,15 @@ function pdo_query_one($sql) {
     if ($conn) {
         try {
             $stmt = $conn->prepare($sql);
-            $stmt->execute($sql_args);
+            // Bind parameters with appropriate types
+            foreach ($sql_args as $i => $arg) {
+                if (is_int($arg)) {
+                    $stmt->bindValue($i + 1, $arg, PDO::PARAM_INT);
+                } else {
+                    $stmt->bindValue($i + 1, $arg, PDO::PARAM_STR);
+                }
+            }
+            $stmt->execute();
             return $stmt->fetch(PDO::FETCH_ASSOC);
         } catch (PDOException $e) {
             error_log("Error executing query: " . $e->getMessage());
@@ -76,7 +92,15 @@ function pdo_query_value($sql) {
     if ($conn) {
         try {
             $stmt = $conn->prepare($sql);
-            $stmt->execute($sql_args);
+            // Bind parameters with appropriate types
+            foreach ($sql_args as $i => $arg) {
+                if (is_int($arg)) {
+                    $stmt->bindValue($i + 1, $arg, PDO::PARAM_INT);
+                } else {
+                    $stmt->bindValue($i + 1, $arg, PDO::PARAM_STR);
+                }
+            }
+            $stmt->execute();
             $row = $stmt->fetch(PDO::FETCH_ASSOC);
             return $row ? array_values($row)[0] : null; // Trả về giá trị đầu tiên hoặc null
         } catch (PDOException $e) {

@@ -18,8 +18,11 @@ class DetailController {
         $danhmucModel = new danhMuc();
         $categories = $danhmucModel->getAllDanhMuc();
         
-        // Lấy sản phẩm liên quan
-        $related_products = get_related_products($product['id_danhmuc'], $id);
+        // Lấy sản phẩm liên quan - đảm bảo lấy đúng theo danh mục
+        $related_products = [];
+        if (isset($product['id_danhmuc']) && !empty($product['id_danhmuc'])) {
+            $related_products = get_related_products($product['id_danhmuc'], $id);
+        }
         
         include 'views/detail/detail.php'; 
     }

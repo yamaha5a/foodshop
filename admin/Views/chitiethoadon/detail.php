@@ -93,6 +93,17 @@
             background-color: #f8d7da;
             color: #721c24;
         }
+        .alert {
+            padding: 15px;
+            margin-bottom: 20px;
+            border: 1px solid transparent;
+            border-radius: 4px;
+        }
+        .alert-success {
+            color: #155724;
+            background-color: #d4edda;
+            border-color: #c3e6cb;
+        }
     </style>
 </head>
 <body>
@@ -105,12 +116,26 @@
                 </a>
             </div>
 
+            <?php if (isset($_GET['success']) && $_GET['success'] == 1): ?>
+            <div class="alert alert-success">
+                <i class="fas fa-check-circle"></i> Cập nhật trạng thái đơn hàng thành công!
+            </div>
+            <?php endif; ?>
+
             <!-- Thông tin khách hàng -->
             <div class="customer-info">
                 <h3><i class="fas fa-user"></i> Thông tin khách hàng</h3>
                 <div class="info-row">
                     <div class="info-label">Họ tên:</div>
                     <div class="info-value"><?php echo htmlspecialchars($order['ten_nguoidung']); ?></div>
+                </div>
+                <div class="info-row">
+                    <div class="info-label">Email:</div>
+                    <div class="info-value"><?php echo htmlspecialchars($order['email']); ?></div>
+                </div>
+                <div class="info-row">
+                    <div class="info-label">Số điện thoại:</div>
+                    <div class="info-value"><?php echo htmlspecialchars($order['sodienthoai']); ?></div>
                 </div>
                 <div class="info-row">
                     <div class="info-label">Địa chỉ giao hàng:</div>
@@ -134,13 +159,23 @@
                     <div class="info-value"><?php echo htmlspecialchars($order['tenphuongthuc'] ?? 'Chưa cập nhật'); ?></div>
                 </div>
                 <div class="info-row">
-                    <div class="info-label">Trạng thái:</div>
-                    <div class="info-value">
-                        <span class="status-badge status-<?php echo strtolower($order['trangthai']); ?>">
-                            <?php echo htmlspecialchars($order['trangthai']); ?>
-                        </span>
-                    </div>
+                <div class="info-label">Trạng thái:</div>
+                <div class="info-value">
+                    <form action="index.php?act=detailchitiethoadon" method="POST">
+                        <input type="hidden" name="order_id" value="<?php echo $order['id']; ?>">
+                        <select name="trangthai" onchange="this.form.submit()">
+                            <?php
+                                $statuses = ['Chờ xác nhận', 'Đang giao', 'Đã giao', 'Đã hủy'];
+                                foreach ($statuses as $status) {
+                                    $selected = ($order['trangthai'] === $status) ? 'selected' : '';
+                                    echo "<option value='$status' $selected>$status</option>";
+                                }
+                            ?>
+                        </select>
+                    </form>
                 </div>
+            </div>
+
             </div>
 
             <!-- Chi tiết sản phẩm -->
