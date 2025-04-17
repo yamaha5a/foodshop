@@ -26,4 +26,11 @@ function deleteDanhMuc($id) {
     $sql = "DELETE FROM danhmuc WHERE id = ?";
     pdo_execute($sql, $id);
 }
+
+// Kiểm tra xem danh mục có sản phẩm không
+function kiemTraDanhMucCoSanPham($id) {
+    $sql = "SELECT COUNT(*) as count FROM sanpham WHERE id_danhmuc = ?";
+    $result = pdo_query_one($sql, $id);
+    return $result['count'] > 0;
+}
 }

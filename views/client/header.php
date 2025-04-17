@@ -46,8 +46,6 @@ if (session_status() === PHP_SESSION_NONE) {
                         <div class="dropdown-menu m-0 bg-secondary rounded-0">
                             <a href="index.php?page=cart" class="dropdown-item">Giỏ hàng</a>
                             <a href="index.php?page=checkout" class="dropdown-item">Thanh toán</a>
-                            <a href="index.php?page=danhgia" class="dropdown-item">Testimonial</a>
-                            <a href="404.html" class="dropdown-item">404 Page</a>
                         </div>
                     </div>
                     <a href="index.php?page=contact" class="nav-item nav-link">Liên Hệ</a>

@@ -13,6 +13,7 @@ class ThongKeController {
         $data = [
             'total_users' => $this->thongKeModel->demTongTaiKhoan(),
             'total_orders' => $this->thongKeModel->demTongDonHang(),
+            'total_revenue' => $this->thongKeModel->tinhTongDoanhThu(),
             'recent_orders' => $this->thongKeModel->getDonHangMoiNhat()
         ];
         return $data;

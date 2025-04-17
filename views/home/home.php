@@ -24,6 +24,24 @@
         z-index: 1000;
         text-align: center;
     }
+
+    .product-description {
+        display: -webkit-box;
+        -webkit-line-clamp: 2;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        height: 3em;
+    }
+    
+    .product-name {
+        display: -webkit-box;
+        -webkit-line-clamp: 1;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        height: 1.5em;
+    }
 </style>
 <!-- Thêm thư viện SweetAlert2 -->
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
@@ -33,7 +51,7 @@
                 <div class="tab-class text-center">
                     <div class="row g-4">
                         <div class="col-lg-4 text-start">
-                            <h1>Our Organic Products</h1>
+                            <h1>Sản phẩm của chúng tôi</h1>
                         </div>
                         <div class="col-lg-8 text-end">
                             <ul class="nav nav-pills d-inline-flex text-center mb-5">
@@ -41,7 +59,6 @@
                                 <a class="d-flex m-2 py-2 bg-light rounded-pill active" href="index.php?page=product">
     <span class="text-dark" style="width: 130px;">All Products</span>
 </a>
-
                                 </li>
                             </ul>
                         </div>
@@ -61,22 +78,30 @@
                                                     <img src="upload/<?= htmlspecialchars($sanpham['hinhanh1']); ?>" class="img-fluid w-100 rounded-top" alt="<?= htmlspecialchars($sanpham['tensanpham']); ?>">
                                                 </a>
                                             </div>
-                                            <div class="text-white bg-secondary px-3 py-1 rounded position-absolute" style="top: 10px; left: 10px;">Fruits</div>
+                                            <div class="text-white bg-secondary px-3 py-1 rounded position-absolute" style="top: 10px; left: 10px;">Food</div>
                                             <div class="p-4 border border-secondary border-top-0 rounded-bottom">
                                                 <h4>
-                                                    <a href="index.php?page=detail&id=<?= $sanpham['id']; ?>" class="text-dark text-decoration-none">
+                                                    <a href="index.php?page=detail&id=<?= $sanpham['id']; ?>" class="text-dark text-decoration-none product-name">
                                                         <?= htmlspecialchars($sanpham['tensanpham']); ?>
                                                     </a>
                                                 </h4>
-                                                <p><?= htmlspecialchars($sanpham['mota']); ?></p>
-                                                <div class="d-flex justify-content-between flex-lg-wrap align-items-center">
-                                                    <p class="text-dark fs-5 fw-bold mb-0">
-                                                        <?= number_format($sanpham['gia'], 0, ',', '.') ?> VNĐ
-                                                    </p>
-                                                    <form method="post" action="index.php?page=addToCart">
+                                                <p class="mb-4 product-description"><?= htmlspecialchars($sanpham['chitiet']); ?></p>
+                                                <div class="d-flex flex-column align-items-center">
+                                                    <div class="w-100 mb-3">
+                                                        <p class="text-dark fs-5 fw-bold mb-1">Giá: 
+                                                            <?= number_format($sanpham['gia'], 0, ',', '.') ?> VNĐ
+                                                        </p>
+                                                        <div class="d-flex align-items-center">
+                                                            <span class="badge bg-primary me-2">Số lượng:</span>
+                                                            <span class="fw-bold <?= $sanpham['soluong'] > 10 ? 'text-success' : ($sanpham['soluong'] > 0 ? 'text-warning' : 'text-danger') ?>">
+                                                                <?= htmlspecialchars($sanpham['soluong']); ?>
+                                                            </span>
+                                                        </div>
+                                                    </div>
+                                                    <form method="post" action="index.php?page=addToCart" class="w-100 text-center">
                                                         <input type="hidden" name="product_id" value="<?= $sanpham['id']; ?>">
                                                         <input type="hidden" name="quantity" value="1">
-                                                        <button type="submit" class="btn border border-secondary rounded-pill px-3 text-primary">
+                                                        <button type="submit" class="btn border border-secondary rounded-pill px-4 py-2 text-primary w-100">
                                                             <i class="fa fa-shopping-bag me-2 text-primary"></i> Add to cart
                                                         </button>
                                                     </form>
@@ -93,9 +118,7 @@
         </div>
     </div>
 </div>
-
-
-        <!-- Fruits Shop End-->
+     <!-- Fruits Shop End-->
         <!-- Featurs Start -->
         <div class="container-fluid service py-5">
             <div class="container py-5">
@@ -103,10 +126,10 @@
                     <div class="col-md-6 col-lg-4">
                         <a href="#">
                             <div class="service-item bg-secondary rounded border border-secondary">
-                                <img src="public/img/featur-1.jpg" class="img-fluid rounded-top w-100" alt="">
+                                <img src="upload/anh2.jpg" class="img-fluid rounded-top w-100" alt="">
                                 <div class="px-4 rounded-bottom">
                                     <div class="service-content bg-primary text-center p-4 rounded">
-                                        <h5 class="text-white">Fresh Apples</h5>
+                                        <h5 class="text-white">Sạch sẽ, tiện lợi</h5>
                                         <h3 class="mb-0">20% OFF</h3>
                                     </div>
                                 </div>
@@ -116,7 +139,7 @@
                     <div class="col-md-6 col-lg-4">
                         <a href="#">
                             <div class="service-item bg-dark rounded border border-dark">
-                                <img src="public/img/featur-2.jpg" class="img-fluid rounded-top w-100" alt="">
+                                <img src="upload/anh4.jpg" class="img-fluid rounded-top w-100" alt="">
                                 <div class="px-4 rounded-bottom">
                                     <div class="service-content bg-light text-center p-4 rounded">
                                         <h5 class="text-primary">Tasty Fruits</h5>
@@ -129,11 +152,11 @@
                     <div class="col-md-6 col-lg-4">
                         <a href="#">
                             <div class="service-item bg-primary rounded border border-primary">
-                                <img src="public/img/featur-3.jpg" class="img-fluid rounded-top w-100" alt="">
+                                <img src="upload/anh3.jpg" class="img-fluid rounded-top w-100" alt="">
                                 <div class="px-4 rounded-bottom">
                                     <div class="service-content bg-secondary text-center p-4 rounded">
-                                        <h5 class="text-white">Exotic Vegitable</h5>
-                                        <h3 class="mb-0">Discount 30$</h3>
+                                        <h5 class="text-white">Giá rẻ bất chấp</h5>
+                                        <h3 class="mb-0">Bất ngờ chưa</h3>
                                     </div>
                                 </div>
                             </div>
@@ -143,41 +166,50 @@
             </div>
         </div>
         <!-- Featurs End -->
-
-
         <!-- Vesitable Shop Start-->
         <div class="container-fluid vesitable py-5">
         <div class="container py-5">
-    <h1 class="mb-0">Thức ăn nhanh ngon miệng và tiện lợi</h1>
-    <div class="owl-carousel vegetable-carousel justify-content-center">
-        <?php if (isset($sanphams) && count($sanphams) > 0): ?>
-            <?php foreach ($sanphams as $sanpham): ?>
-                <div class="border border-primary rounded position-relative vesitable-item">
-                    <div class="vesitable-img">
-                        <img src="upload/<?= htmlspecialchars($sanpham['hinhanh1']); ?>" class="img-fluid w-100 rounded-top" alt="<?= htmlspecialchars($sanpham['tensanpham']); ?>">
-                    </div>
-                    <div class="text-white bg-primary px-3 py-1 rounded position-absolute" style="top: 10px; right: 10px;">Thức ăn nhanh</div>
-                    <div class="p-4 rounded-bottom">
-                        <h4><?= htmlspecialchars($sanpham['tensanpham']); ?></h4>
-                        <p><?= htmlspecialchars($sanpham['mota']); ?></p>
-                        <div class="d-flex justify-content-between flex-lg-wrap">
-                            <p class="text-dark fs-5 fw-bold mb-0"><?= number_format($sanpham['gia'], 0, ',', '.') ?> VNĐ</p>
-                            <form method="post" action="index.php?page=addToCart" onsubmit="return addToCart(event)">
-                                <input type="hidden" name="product_id" value="<?= $sanpham['id']; ?>">
-                                <input type="hidden" name="quantity" value="1">
-                                <button type="submit" class="btn border border-secondary rounded-pill px-3 text-primary">
-                                    <i class="fa fa-shopping-bag me-2 text-primary"></i> Add to cart
-                                </button>
-                            </form>
+            <div class="text-center mb-5">
+                <h1 class="display-4 fw-bold text-primary">Thức ăn nhanh ngon miệng và tiện lợi</h1>
+                <p class="lead text-muted">Khám phá các món ăn nhanh chất lượng cao với giá cả phải chăng</p>
+            </div>
+            <div class="owl-carousel vegetable-carousel justify-content-center">
+                <?php if (isset($sanphams) && count($sanphams) > 0): ?>
+                    <?php foreach ($sanphams as $sanpham): ?>
+                        <div class="border border-primary rounded position-relative vesitable-item shadow-sm">
+                            <div class="vesitable-img">
+                                <img src="upload/<?= htmlspecialchars($sanpham['hinhanh1']); ?>" class="img-fluid w-100 rounded-top" alt="<?= htmlspecialchars($sanpham['tensanpham']); ?>">
+                            </div>
+                            <div class="text-white bg-primary px-3 py-1 rounded position-absolute" style="top: 10px; right: 10px;">Thức ăn nhanh</div>
+                            <div class="p-4 rounded-bottom">
+                                <h4 class="mb-3 product-name"><?= htmlspecialchars($sanpham['tensanpham']); ?></h4>
+                                <p class="text-muted mb-3 product-description"><?= htmlspecialchars($sanpham['chitiet']); ?></p>
+                                <div class="d-flex flex-column">
+                                    <div class="mb-3">
+                                        <p class="text-dark fs-5 fw-bold mb-1"><?= number_format($sanpham['gia'], 0, ',', '.') ?> VNĐ</p>
+                                        <div class="d-flex align-items-center">
+                                            <span class="badge bg-info me-2">Số lượng:</span>
+                                            <span class="fw-bold <?= $sanpham['soluong'] > 10 ? 'text-success' : ($sanpham['soluong'] > 0 ? 'text-warning' : 'text-danger') ?>">
+                                                <?= htmlspecialchars($sanpham['soluong']); ?>
+                                            </span>
+                                        </div>
+                                    </div>
+                                    <form method="post" action="index.php?page=addToCart" onsubmit="return addToCart(event)" class="text-center">
+                                        <input type="hidden" name="product_id" value="<?= $sanpham['id']; ?>">
+                                        <input type="hidden" name="quantity" value="1">
+                                        <button type="submit" class="btn border border-secondary rounded-pill px-4 py-2 w-100 text-primary">
+                                            <i class="fa fa-shopping-bag me-2 text-primary"></i> Thêm vào giỏ hàng
+                                        </button>
+                                    </form>
+                                </div>
+                            </div>
                         </div>
-                    </div>
-                </div>
-            <?php endforeach; ?>
-        <?php else: ?>
-            <p class="text-center">Không có sản phẩm nào để hiển thị.</p>
-        <?php endif; ?>
-    </div>
-</div>
+                    <?php endforeach; ?>
+                <?php else: ?>
+                    <p class="text-center">Không có sản phẩm nào để hiển thị.</p>
+                <?php endif; ?>
+            </div>
+        </div>
                
         <!-- Vesitable Shop End -->
 
@@ -302,94 +334,6 @@
             </div>
         </div>
         <!-- Fact Start -->
-
-
-        <!-- Tastimonial Start -->
-        <div class="container-fluid testimonial py-5">
-            <div class="container py-5">
-                <div class="testimonial-header text-center">
-                    <h4 class="text-primary">Our Testimonial</h4>
-                    <h1 class="display-5 mb-5 text-dark">Our Client Saying!</h1>
-                </div>
-                <div class="owl-carousel testimonial-carousel">
-                    <div class="testimonial-item img-border-radius bg-light rounded p-4">
-                        <div class="position-relative">
-                            <i class="fa fa-quote-right fa-2x text-secondary position-absolute" style="bottom: 30px; right: 0;"></i>
-                            <div class="mb-4 pb-4 border-bottom border-secondary">
-                                <p class="mb-0">Lorem Ipsum is simply dummy text of the printing Ipsum has been the industry's standard dummy text ever since the 1500s,
-                                </p>
-                            </div>
-                            <div class="d-flex align-items-center flex-nowrap">
-                                <div class="bg-secondary rounded">
-                                    <img src="img/testimonial-1.jpg" class="img-fluid rounded" style="width: 100px; height: 100px;" alt="">
-                                </div>
-                                <div class="ms-4 d-block">
-                                    <h4 class="text-dark">Client Name</h4>
-                                    <p class="m-0 pb-3">Profession</p>
-                                    <div class="d-flex pe-5">
-                                        <i class="fas fa-star text-primary"></i>
-                                        <i class="fas fa-star text-primary"></i>
-                                        <i class="fas fa-star text-primary"></i>
-                                        <i class="fas fa-star text-primary"></i>
-                                        <i class="fas fa-star"></i>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="testimonial-item img-border-radius bg-light rounded p-4">
-                        <div class="position-relative">
-                            <i class="fa fa-quote-right fa-2x text-secondary position-absolute" style="bottom: 30px; right: 0;"></i>
-                            <div class="mb-4 pb-4 border-bottom border-secondary">
-                                <p class="mb-0">Lorem Ipsum is simply dummy text of the printing Ipsum has been the industry's standard dummy text ever since the 1500s,
-                                </p>
-                            </div>
-                            <div class="d-flex align-items-center flex-nowrap">
-                                <div class="bg-secondary rounded">
-                                    <img src="img/testimonial-1.jpg" class="img-fluid rounded" style="width: 100px; height: 100px;" alt="">
-                                </div>
-                                <div class="ms-4 d-block">
-                                    <h4 class="text-dark">Client Name</h4>
-                                    <p class="m-0 pb-3">Profession</p>
-                                    <div class="d-flex pe-5">
-                                        <i class="fas fa-star text-primary"></i>
-                                        <i class="fas fa-star text-primary"></i>
-                                        <i class="fas fa-star text-primary"></i>
-                                        <i class="fas fa-star text-primary"></i>
-                                        <i class="fas fa-star text-primary"></i>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="testimonial-item img-border-radius bg-light rounded p-4">
-                        <div class="position-relative">
-                            <i class="fa fa-quote-right fa-2x text-secondary position-absolute" style="bottom: 30px; right: 0;"></i>
-                            <div class="mb-4 pb-4 border-bottom border-secondary">
-                                <p class="mb-0">Lorem Ipsum is simply dummy text of the printing Ipsum has been the industry's standard dummy text ever since the 1500s,
-                                </p>
-                            </div>
-                            <div class="d-flex align-items-center flex-nowrap">
-                                <div class="bg-secondary rounded">
-                                    <img src="img/testimonial-1.jpg" class="img-fluid rounded" style="width: 100px; height: 100px;" alt="">
-                                </div>
-                                <div class="ms-4 d-block">
-                                    <h4 class="text-dark">Client Name</h4>
-                                    <p class="m-0 pb-3">Profession</p>
-                                    <div class="d-flex pe-5">
-                                        <i class="fas fa-star text-primary"></i>
-                                        <i class="fas fa-star text-primary"></i>
-                                        <i class="fas fa-star text-primary"></i>
-                                        <i class="fas fa-star text-primary"></i>
-                                        <i class="fas fa-star text-primary"></i>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
 <script>
 function addToCart(event) {
     event.preventDefault();

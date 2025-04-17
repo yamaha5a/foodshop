@@ -90,8 +90,32 @@ class CartController {
             }
 
             $userId = $_SESSION['user']['id'];
+            
+            // Lấy thông tin sản phẩm để kiểm tra số lượng
+            $sql = "SELECT soluong FROM sanpham WHERE id = ?";
+            $product = pdo_query_one($sql, $productId);
+            
+            if (!$product) {
+                echo json_encode(['success' => false, 'message' => 'Không tìm thấy sản phẩm']);
+                exit;
+            }
+            
+            // Kiểm tra nếu số lượng vượt quá số lượng có sẵn
+            if ($quantity > $product['soluong']) {
+                echo json_encode([
+                    'success' => false, 
+                    'message' => 'Số lượng sản phẩm trong kho không đủ. Số lượng tối đa có thể đặt: ' . $product['soluong']
+                ]);
+                exit;
+            }
+            
             try {
-                $this->cartModel->updateCartItem($userId, $productId, $quantity);
+                $result = $this->cartModel->updateCartItem($userId, $productId, $quantity);
+                
+                if (!$result) {
+                    echo json_encode(['success' => false, 'message' => 'Không thể cập nhật số lượng']);
+                    exit;
+                }
                 
                 // Get updated cart totals
                 $cartItems = $this->cartModel->getCartItems($userId);
@@ -113,7 +137,7 @@ class CartController {
                     'message' => 'Đã cập nhật số lượng thành công'
                 ]);
             } catch (Exception $e) {
-                echo json_encode(['success' => false, 'message' => $e->getMessage()]);
+                echo json_encode(['success' => false, 'message' => 'Có lỗi xảy ra khi cập nhật số lượng']);
             }
             exit;
         }

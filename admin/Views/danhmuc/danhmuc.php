@@ -41,6 +41,9 @@
                         $tendanhmuc = $danhmuc['tendanhmuc'];
                         $suaDM = "index.php?act=editdanhmuc&id=" . $id;
                         $xoaDM = "index.php?act=deletedanhmuc&id=" . $id;
+                        
+                        // Kiểm tra xem danh mục có sản phẩm không
+                        $coSanPham = $this->danhMucModel->kiemTraDanhMucCoSanPham($id);
                     
                         echo "<tr>";
                         echo "<td>$id</td>";
@@ -48,11 +51,19 @@
                         echo "<td>
                                 <a href='$suaDM' class='btn btn-sm btn-outline-info'>
                                     <i class='fas fa-edit'></i> Sửa
-                                </a>
-                                <a href='$xoaDM' class='btn btn-sm btn-outline-danger' onclick='return confirm(\"Bạn có chắc chắn muốn xóa danh mục này?\")'>
+                                </a>";
+                        
+                        if ($coSanPham) {
+                            echo "<button class='btn btn-sm btn-outline-danger' disabled title='Không thể xóa danh mục này vì đã có sản phẩm liên quan'>
                                     <i class='fas fa-trash-alt'></i> Xóa
-                                </a>
-                            </td>";
+                                </button>";
+                        } else {
+                            echo "<a href='$xoaDM' class='btn btn-sm btn-outline-danger' onclick='return confirm(\"Bạn có chắc chắn muốn xóa danh mục này?\")'>
+                                    <i class='fas fa-trash-alt'></i> Xóa
+                                </a>";
+                        }
+                        
+                        echo "</td>";
                         echo "</tr>";
                     }
                     

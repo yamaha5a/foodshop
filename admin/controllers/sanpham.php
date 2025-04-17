@@ -46,6 +46,7 @@ class SanPhamController
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $tensanpham = $_POST['tensanpham'];
             $mota = $_POST['mota'];
+            $chitiet = $_POST['chitiet'] ?? '';
             $gia = $_POST['gia'];
             $soluong = $_POST['soluong'];
             $id_danhmuc = $_POST['id_danhmuc'];
@@ -59,7 +60,7 @@ class SanPhamController
             if (!empty($hinhanh2)) move_uploaded_file($_FILES["hinhanh2"]["tmp_name"], $target_dir . $hinhanh2);
             if (!empty($hinhanh3)) move_uploaded_file($_FILES["hinhanh3"]["tmp_name"], $target_dir . $hinhanh3);
 
-            $this->sanPhamModel->themSanPham($tensanpham, $mota, $gia, $soluong, $hinhanh1, $hinhanh2, $hinhanh3, $id_danhmuc);
+            $this->sanPhamModel->themSanPham($tensanpham, $mota, $chitiet, $gia, $soluong, $hinhanh1, $hinhanh2, $hinhanh3, $id_danhmuc);
             $_SESSION['thongbao'] = "Thêm sản phẩm thành công!";
             echo '<meta http-equiv="refresh" content="0;url=index.php?act=sanpham">';
             exit();
@@ -78,6 +79,26 @@ class SanPhamController
         include 'views/sanpham/detail.php'; // Bao gồm view chi tiết sản phẩm
     }
 
+    // Chi tiết sản phẩm (hàm mới)
+    public function chiTietSanPham()
+    {
+        $id = $_GET['id'] ?? 0;
+        if (!$id) {
+            $_SESSION['thongbao'] = "Không tìm thấy sản phẩm!";
+            header("Location: index.php?act=sanpham");
+            exit();
+        }
+        
+        $sanPham = $this->sanPhamModel->laySanPhamTheoID($id);
+        if (!$sanPham) {
+            $_SESSION['thongbao'] = "Không tìm thấy sản phẩm!";
+            header("Location: index.php?act=sanpham");
+            exit();
+        }
+        
+        include 'views/sanpham/detail.php';
+    }
+
     // Cập nhật sản phẩm
     public function edit()
     {
@@ -86,6 +107,7 @@ class SanPhamController
             // Lấy dữ liệu từ form
             $tensanpham = $_POST['tensanpham'];
             $mota = $_POST['mota'];
+            $chitiet = $_POST['chitiet'] ?? '';
             $gia = $_POST['gia'];
             $soluong = $_POST['soluong'];
             $id_danhmuc = $_POST['id_danhmuc'];
@@ -114,7 +136,7 @@ class SanPhamController
             }
 
 
-            $this->sanPhamModel->capNhatSanPham($id, $tensanpham, $mota, $gia, $soluong, $hinhanh1, $hinhanh2, $hinhanh3, $id_danhmuc);
+            $this->sanPhamModel->capNhatSanPham($id, $tensanpham, $mota, $chitiet, $gia, $soluong, $hinhanh1, $hinhanh2, $hinhanh3, $id_danhmuc);
             $_SESSION['thongbao'] = "Cập nhật sản phẩm thành công!";
             echo '<meta http-equiv="refresh" content="0;url=index.php?act=sanpham">';
             exit();
@@ -133,8 +155,15 @@ class SanPhamController
     public function delete()
     {
         $id = $_GET["id"] ?? 0;
-        $this->sanPhamModel->xoaSanPham($id);
-        $_SESSION['thongbaoxoa'] = "Xóa sản phẩm thành công!";
+        
+        // Kiểm tra xem sản phẩm có đơn hàng không
+        if ($this->sanPhamModel->kiemTraSanPhamCoDonHang($id)) {
+            $_SESSION['thongbaoxoa'] = "Không thể xóa sản phẩm này vì đã có đơn hàng liên quan!";
+        } else {
+            $this->sanPhamModel->xoaSanPham($id);
+            $_SESSION['thongbaoxoa'] = "Xóa sản phẩm thành công!";
+        }
+        
         echo '<meta http-equiv="refresh" content="0;url=index.php?act=sanpham">';
         exit();
     }

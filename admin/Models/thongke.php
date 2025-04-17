@@ -20,6 +20,12 @@ class ThongKe {
         return $result['total_orders'];
     }
     
+    public function tinhTongDoanhThu() {
+        $sql = "SELECT SUM(tongtien) AS total_revenue FROM hoadon WHERE trangthai = 'Đã giao'";
+        $result = pdo_query_one($sql);
+        return $result['total_revenue'] ?? 0;
+    }
+    
     public function getDonHangMoiNhat() {
         $sql = "SELECT hd.*, nd.ten as ten_nguoidung, ptt.tenphuongthuc 
                 FROM hoadon hd 

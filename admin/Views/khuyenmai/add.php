@@ -59,7 +59,7 @@
     </main>
 
     <script>
-    // Kiểm tra ngày kết thúc phải lớn hơn ngày bắt đầu
+    // Kiểm tra ngày kết thúc phải lớnơn ngày bắt đầu
     document.getElementById('ngayketthuc').addEventListener('change', function() {
         let startDate = new Date(document.getElementById('ngaybatdau').value);
         let endDate = new Date(this.value);
@@ -72,8 +72,13 @@
 
     // Kiểm tra ngày bắt đầu không được nhỏ hơn ngày hiện tại
     document.getElementById('ngaybatdau').addEventListener('change', function() {
+        // Lấy ngày hiện tại và đặt giờ về 00:00:00
         let today = new Date();
+        today.setHours(0, 0, 0, 0);
+        
+        // Lấy ngày được chọn và đặt giờ về 00:00:00
         let startDate = new Date(this.value);
+        startDate.setHours(0, 0, 0, 0);
         
         if (startDate < today) {
             alert('Ngày bắt đầu không được nhỏ hơn ngày hiện tại');

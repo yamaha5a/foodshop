@@ -44,10 +44,10 @@ class SanPhamModel {
     
     
     // Thêm sản phẩm
-    public function themSanPham($tensanpham, $mota, $gia, $soluong, $hinhanh1, $hinhanh2, $hinhanh3, $id_danhmuc) {
+    public function themSanPham($tensanpham, $mota, $chitiet, $gia, $soluong, $hinhanh1, $hinhanh2, $hinhanh3, $id_danhmuc) {
         $trangthai = ($soluong > 0) ? 'Còn hàng' : 'Hết hàng';
-        $sql = "INSERT INTO sanpham (tensanpham, mota, gia, soluong, hinhanh1, hinhanh2, hinhanh3, id_danhmuc, trangthai) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)";
-        pdo_execute($sql, $tensanpham, $mota, $gia, $soluong, $hinhanh1, $hinhanh2, $hinhanh3, $id_danhmuc, $trangthai);
+        $sql = "INSERT INTO sanpham (tensanpham, mota, chitiet, gia, soluong, hinhanh1, hinhanh2, hinhanh3, id_danhmuc, trangthai) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+        pdo_execute($sql, $tensanpham, $mota, $chitiet, $gia, $soluong, $hinhanh1, $hinhanh2, $hinhanh3, $id_danhmuc, $trangthai);
     }
 
     // Lấy sản phẩm theo ID
@@ -57,11 +57,11 @@ class SanPhamModel {
     }
 
     // Cập nhật sản phẩm
-    public function capNhatSanPham($id, $tensanpham, $mota, $gia, $soluong, $hinhanh1, $hinhanh2, $hinhanh3, $id_danhmuc) {
+    public function capNhatSanPham($id, $tensanpham, $mota, $chitiet, $gia, $soluong, $hinhanh1, $hinhanh2, $hinhanh3, $id_danhmuc) {
         $trangthai = ($soluong > 0) ? 'Còn hàng' : 'Hết hàng';
 
-        $sql = "UPDATE sanpham SET tensanpham = ?, mota = ?, gia = ?, soluong = ?, hinhanh1 = ?, hinhanh2 = ?, hinhanh3 = ?, id_danhmuc = ?, trangthai = ? WHERE id = ?";
-        pdo_execute($sql, $tensanpham, $mota, $gia, $soluong, $hinhanh1, $hinhanh2, $hinhanh3, $id_danhmuc, $trangthai, $id);
+        $sql = "UPDATE sanpham SET tensanpham = ?, mota = ?, chitiet = ?, gia = ?, soluong = ?, hinhanh1 = ?, hinhanh2 = ?, hinhanh3 = ?, id_danhmuc = ?, trangthai = ? WHERE id = ?";
+        pdo_execute($sql, $tensanpham, $mota, $chitiet, $gia, $soluong, $hinhanh1, $hinhanh2, $hinhanh3, $id_danhmuc, $trangthai, $id);
     }
 
     // Xóa sản phẩm
@@ -73,6 +73,17 @@ class SanPhamModel {
         // Then delete the product
         $sql = "DELETE FROM sanpham WHERE id = ?";
         pdo_execute($sql, $id);
+    }
+    
+    // Kiểm tra xem sản phẩm có đơn hàng không
+    public function kiemTraSanPhamCoDonHang($id) {
+        // Check if the product has any orders with status other than "Đã giao"
+        $sql = "SELECT COUNT(*) as count 
+                FROM chitiethoadon cth 
+                JOIN hoadon hd ON cth.id_hoadon = hd.id 
+                WHERE cth.id_sanpham = ? AND hd.trangthai != 'Đã giao'";
+        $result = pdo_query_one($sql, $id);
+        return $result['count'] > 0;
     }
 }
 ?>

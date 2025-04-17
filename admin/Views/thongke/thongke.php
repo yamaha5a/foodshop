@@ -18,7 +18,7 @@
   <div class="stat-card">
     <div class="card-header">
       <div>
-        <div class="card-value">$12,750</div>
+        <div class="card-value"><?= number_format($data['total_revenue'], 0, ',', '.') ?>đ</div>
         <div class="card-label">Tổng doanh thu</div>
       </div>
       <div class="card-icon blue">

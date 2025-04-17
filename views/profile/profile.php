@@ -20,7 +20,14 @@ $comments = isset($GLOBALS['comments']) ? $GLOBALS['comments'] : [];
             <div class="card mb-4">
                 <div class="card-body text-center">
                     <?php 
-                    $avatarPath = 'public/img/default-avatar.png';
+                    // Check if user has an avatar in the database
+                    if (isset($_SESSION['user']['hinhanh']) && !empty($_SESSION['user']['hinhanh'])) {
+                        // Use the same path structure as in list.php
+                        $avatarPath = "http://localhost/shopfood/admin/public/" . htmlspecialchars($_SESSION['user']['hinhanh']);
+                    } else {
+                        // Default avatar if user doesn't have one
+                        $avatarPath = 'public/img/default-avatar.png';
+                    }
                     ?>
                     <img src="<?php echo $avatarPath; ?>" 
                          alt="avatar" 

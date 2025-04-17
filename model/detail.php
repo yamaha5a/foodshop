@@ -15,13 +15,16 @@ function get_related_products($category_id, $current_product_id, $limit = 4) {
         return [];
     }
     
-    // Sửa truy vấn để lấy đúng tên cột hình ảnh
-    $sql = "SELECT sp.*, dm.tendanhmuc 
+    // Truy vấn để lấy sản phẩm cùng danh mục
+    $sql = "SELECT sp.*, dm.tendanhmuc, dm.id as id_danhmuc
             FROM sanpham sp 
             LEFT JOIN danhmuc dm ON sp.id_danhmuc = dm.id 
             WHERE sp.id_danhmuc = ? AND sp.id != ? 
             ORDER BY RAND() 
             LIMIT ?";
+    
+    // Debug để kiểm tra tham số
+    // echo "<pre>Category ID: " . $category_id . ", Product ID: " . $current_product_id . ", Limit: " . $limit . "</pre>";
     
     $results = pdo_query($sql, $category_id, $current_product_id, $limit);
     

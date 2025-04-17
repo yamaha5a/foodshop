@@ -54,6 +54,10 @@ class CheckoutModel {
                 throw new Exception("Không thể kết nối đến cơ sở dữ liệu");
             }
 
+            // Start transaction
+            $conn->beginTransaction();
+            error_log("Transaction started");
+
             // Prepare the SQL statement
             $sql = "INSERT INTO hoadon (id_nguoidung, tongtien, diachigiaohang, trangthai, ghichu) 
                     VALUES (?, ?, ?, ?, ?)";
@@ -87,66 +91,140 @@ class CheckoutModel {
             $stmt = $conn->prepare($sql);
             if (!$stmt) {
                 error_log("Failed to prepare statement");
+                $conn->rollBack();
                 throw new Exception("Không thể chuẩn bị câu lệnh SQL");
             }
             
             if ($stmt->execute($params)) {
                 $orderId = $conn->lastInsertId();
                 error_log("Order created successfully with ID: " . $orderId);
+                
+                // Create order details and update product quantities
+                if (!$this->createOrderDetails($orderId, $data['cart_items'], $conn)) {
+                    error_log("Failed to create order details or update product quantities");
+                    $conn->rollBack();
+                    throw new Exception("Không thể tạo chi tiết đơn hàng hoặc cập nhật số lượng sản phẩm");
+                }
+                
+                // Commit transaction
+                $conn->commit();
+                error_log("Transaction committed successfully");
+                
                 return $orderId;
             } else {
                 error_log("Failed to execute order creation SQL");
+                $conn->rollBack();
                 throw new Exception("Không thể tạo đơn hàng");
             }
         } catch (Exception $e) {
             error_log("Error creating order: " . $e->getMessage());
+            // Rollback transaction if it was started
+            if (isset($conn) && $conn->inTransaction()) {
+                $conn->rollBack();
+                error_log("Transaction rolled back due to error");
+            }
             throw new Exception("Lỗi khi tạo đơn hàng: " . $e->getMessage());
         }
     }
 
     // Create order details
-    public function createOrderDetails($orderId, $cartItems) {
+    public function createOrderDetails($orderId, $cartItems, $conn = null) {
         error_log("Starting createOrderDetails with orderId: " . $orderId);
         error_log("Cart items to process: " . print_r($cartItems, true));
 
-        $sql = "INSERT INTO chitiethoadon (id_hoadon, id_sanpham, soluong, gia, id_topping) 
-                VALUES (?, ?, ?, ?, ?)";
-        
-        foreach ($cartItems as $item) {
-            // Validate required fields
-            if (!isset($item['id_sanpham']) || !isset($item['soluong']) || !isset($item['gia'])) {
-                error_log("Missing required fields in cart item: " . print_r($item, true));
-                continue;
+        try {
+            // Use provided connection or get a new one
+            if ($conn === null) {
+                $conn = pdo_get_connection();
+                if (!$conn) {
+                    error_log("Failed to get database connection");
+                    throw new Exception("Không thể kết nối đến cơ sở dữ liệu");
+                }
             }
 
-            // Convert values to correct types
-            $id_sanpham = (int)$item['id_sanpham'];
-            $soluong = (int)$item['soluong'];
-            $gia = (float)$item['gia'];
-            $id_topping = !empty($item['id_topping']) ? (int)$item['id_topping'] : null;
+            $sql = "INSERT INTO chitiethoadon (id_hoadon, id_sanpham, soluong, gia, id_topping) 
+                    VALUES (?, ?, ?, ?, ?)";
+            
+            foreach ($cartItems as $item) {
+                // Validate required fields
+                if (!isset($item['id_sanpham']) || !isset($item['soluong']) || !isset($item['gia'])) {
+                    error_log("Missing required fields in cart item: " . print_r($item, true));
+                    continue;
+                }
 
-            $params = [
-                $orderId,
-                $id_sanpham,
-                $soluong,
-                $gia,
-                $id_topping
-            ];
-            
-            error_log("Attempting to insert order detail with params: " . print_r($params, true));
-            
-            try {
-                if (!pdo_execute($sql, ...$params)) {
+                // Convert values to correct types
+                $id_sanpham = (int)$item['id_sanpham'];
+                $soluong = (int)$item['soluong'];
+                $gia = (float)$item['gia'];
+                $id_topping = !empty($item['id_topping']) ? (int)$item['id_topping'] : null;
+
+                $params = [
+                    $orderId,
+                    $id_sanpham,
+                    $soluong,
+                    $gia,
+                    $id_topping
+                ];
+                
+                error_log("Attempting to insert order detail with params: " . print_r($params, true));
+                
+                $stmt = $conn->prepare($sql);
+                if (!$stmt) {
+                    error_log("Failed to prepare statement for order detail");
+                    return false;
+                }
+                
+                if (!$stmt->execute($params)) {
                     error_log("Failed to execute SQL for order detail");
                     return false;
                 }
                 error_log("Successfully inserted order detail");
-            } catch (Exception $e) {
-                error_log("Error inserting order detail: " . $e->getMessage());
-                return false;
+                
+                // Update product quantity in the database
+                $updateSql = "UPDATE sanpham SET soluong = soluong - ? WHERE id = ?";
+                $updateStmt = $conn->prepare($updateSql);
+                if (!$updateStmt) {
+                    error_log("Failed to prepare statement for updating product quantity");
+                    return false;
+                }
+                
+                if (!$updateStmt->execute([$soluong, $id_sanpham])) {
+                    error_log("Failed to update product quantity for product ID: " . $id_sanpham);
+                    return false;
+                }
+                error_log("Successfully updated product quantity for product ID: " . $id_sanpham);
+                
+                // Update product status if quantity becomes 0
+                $checkSql = "SELECT soluong FROM sanpham WHERE id = ?";
+                $checkStmt = $conn->prepare($checkSql);
+                if (!$checkStmt) {
+                    error_log("Failed to prepare statement for checking product quantity");
+                    return false;
+                }
+                
+                $checkStmt->execute([$id_sanpham]);
+                $product = $checkStmt->fetch(PDO::FETCH_ASSOC);
+                
+                if ($product && $product['soluong'] <= 0) {
+                    $statusSql = "UPDATE sanpham SET trangthai = 'Hết hàng' WHERE id = ?";
+                    $statusStmt = $conn->prepare($statusSql);
+                    if (!$statusStmt) {
+                        error_log("Failed to prepare statement for updating product status");
+                        return false;
+                    }
+                    
+                    if (!$statusStmt->execute([$id_sanpham])) {
+                        error_log("Failed to update product status for product ID: " . $id_sanpham);
+                        return false;
+                    }
+                    error_log("Updated product status to 'Hết hàng' for product ID: " . $id_sanpham);
+                }
             }
+            return true;
+        } catch (Exception $e) {
+            error_log("Error in createOrderDetails: " . $e->getMessage());
+            return false;
         }
-        return true;
     }
 
     // Update cart status to 'Đã đặt'

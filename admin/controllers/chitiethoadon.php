@@ -16,8 +16,11 @@ class OrderDetailController {
         // Get search parameter
         $search = isset($_GET['search']) ? trim($_GET['search']) : '';
         
-        // Get orders with pagination and search
-        $orders = $this->orderDetailModel->getAllOrders($page, $limit, $search);
+        // Get sort parameter
+        $sortBy = isset($_GET['sort_by']) ? $_GET['sort_by'] : 'date_desc';
+        
+        // Get orders with pagination, search, and sorting
+        $orders = $this->orderDetailModel->getAllOrders($page, $limit, $search, $sortBy);
         
         // Get total number of orders for pagination
         $totalOrders = $this->orderDetailModel->getTotalOrders($search);

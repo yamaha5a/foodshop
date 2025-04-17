@@ -104,6 +104,17 @@ if (isset($_SESSION['error_message'])) {
                         <?php echo htmlspecialchars($order['ghichu']); ?>
                     </div>
                     <?php endif; ?>
+                    
+                    <?php if ($order['trangthai'] === 'Chờ xác nhận'): ?>
+                    <div class="mt-4">
+                        <form action="index.php?page=cancelOrder" method="POST" onsubmit="return confirm('Bạn có chắc chắn muốn hủy đơn hàng này?');">
+                            <input type="hidden" name="order_id" value="<?php echo $order['id']; ?>">
+                            <button type="submit" class="btn btn-danger w-100">
+                                <i class="fas fa-times-circle me-2"></i>Hủy đơn hàng
+                            </button>
+                        </form>
+                    </div>
+                    <?php endif; ?>
                 </div>
             </div>
         </div>

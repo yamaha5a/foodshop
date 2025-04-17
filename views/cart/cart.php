@@ -75,9 +75,11 @@
                                                value="<?= $item['soluong'] ?>"
                                                min="1" 
                                                onchange="updateQuantity(<?= $item['id_sanpham'] ?>, 'change', this.value)"
-                                               onkeydown="return event.keyCode !== 69 && event.keyCode !== 189 && event.keyCode !== 109">
+                                               onkeydown="return event.keyCode !== 69 && event.keyCode !== 189 && event.keyCode !== 109"
+                                               data-available="<?= $item['soluong_kho'] ?>">
                                         <button type="button" class="btn btn-sm btn-outline-secondary" onclick="updateQuantity(<?= $item['id_sanpham'] ?>, 'increase')">+</button>
                                     </div>
+                                    <small class="text-muted d-block mt-1">Còn lại: <?= $item['soluong_kho'] ?> sản phẩm</small>
                                 </td>
                                 <td id="product-total-<?= $item['id_sanpham'] ?>"><?= number_format($total, 0, ',', '.') ?> VNĐ</td>
                                 <td>
@@ -155,18 +157,39 @@ function updateQuantity(productId, action, newValue = null) {
     let quantity = parseInt(input.value);
     
     if (action === 'increase') {
-        if (quantity < 100) {
+        // Get the available quantity from the data attribute
+        const availableQuantity = parseInt(input.getAttribute('data-available') || '100');
+        if (quantity < availableQuantity) {
             quantity++;
             input.value = quantity;
+        } else {
+            // Show specific error message for maximum stock reached
+            Swal.fire({
+                title: 'Đã đạt tối đa!',
+                text: `Sản phẩm đã đạt số lượng tối đa trong kho (${availableQuantity})`,
+                icon: 'info',
+                confirmButtonText: 'OK'
+            });
+            return;
         }
     } else if (action === 'decrease' && quantity > 1) {
         quantity--;
         input.value = quantity;
     } else if (action === 'change' && newValue !== null) {
         quantity = parseInt(newValue);
+        const availableQuantity = parseInt(input.getAttribute('data-available') || '100');
         if (quantity < 1) quantity = 1;
-        if (quantity > 100) quantity = 100;
-        input.value = quantity;
+        if (quantity > availableQuantity) {
+            quantity = availableQuantity;
+            input.value = quantity;
+            // Show specific error message for maximum stock reached
+            Swal.fire({
+                title: 'Đã đạt tối đa!',
+                text: `Sản phẩm đã đạt số lượng tối đa trong kho (${availableQuantity})`,
+                icon: 'info',
+                confirmButtonText: 'OK'
+            });
+        }
     }
     
     // Update quantity in database

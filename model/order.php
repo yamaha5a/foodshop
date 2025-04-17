@@ -133,4 +133,45 @@ class OrderModel {
         }
     }
     
+    /**
+     * Cancel an order by updating its status to "Đã hủy"
+     * 
+     * @param int $orderId The ID of the order to cancel
+     * @param int $userId The ID of the user who owns the order
+     * @return bool True if the order was successfully cancelled, false otherwise
+     */
+    public function cancelOrder($orderId, $userId) {
+        try {
+            // Start transaction
+            pdo_execute("START TRANSACTION");
+            
+            // Check if the order exists and belongs to the user
+            $sql = "SELECT id, trangthai FROM hoadon WHERE id = ? AND id_nguoidung = ?";
+            $order = pdo_query_one($sql, $orderId, $userId);
+            
+            if (!$order) {
+                pdo_execute("ROLLBACK");
+                return false;
+            }
+            
+            // Check if the order can be cancelled (only orders in "Chờ xác nhận" status can be cancelled)
+            if ($order['trangthai'] !== 'Chờ xác nhận') {
+                pdo_execute("ROLLBACK");
+                return false;
+            }
+            
+            // Update the order status to "Đã hủy"
+            $sql = "UPDATE hoadon SET trangthai = 'Đã hủy' WHERE id = ? AND id_nguoidung = ?";
+            $result = pdo_execute($sql, $orderId, $userId);
+            
+            // Commit transaction
+            pdo_execute("COMMIT");
+            
+            return $result;
+        } catch (Exception $e) {
+            // Rollback transaction on error
+            pdo_execute("ROLLBACK");
+            return false;
+        }
+    }
 } 

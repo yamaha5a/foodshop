@@ -9,6 +9,10 @@
             <a href="index.php?act=thongke"><span>Bảng điều khiển</span></a>
         </div>
         <div class="nav-item">
+            <i class="fas fa-chart-line"></i>
+            <a href="index.php?act=bieudo"><span>Biểu đồ doanh thu</span></a>
+        </div>
+        <div class="nav-item">
         <i class="fas fa-image"></i> 
         <a href="index.php?act=banner"><span>Banner</span></a>
     </div>

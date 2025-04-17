@@ -2,7 +2,7 @@
 require_once __DIR__ . '/connection.php';
 
 class OrderDetailModel {
-    public function getAllOrders($page = 1, $limit = 10, $search = '') {
+    public function getAllOrders($page = 1, $limit = 10, $search = '', $sortBy = 'date_desc') {
         $offset = ($page - 1) * $limit;
         $params = [];
         
@@ -18,7 +18,24 @@ class OrderDetailModel {
             $params = [$searchTerm, $searchTerm, $searchTerm];
         }
         
-        $sql .= " ORDER BY hd.ngaytao DESC LIMIT ? OFFSET ?";
+        // Add sorting based on the sortBy parameter
+        switch ($sortBy) {
+            case 'date_asc':
+                $sql .= " ORDER BY hd.ngaytao ASC";
+                break;
+            case 'amount_desc':
+                $sql .= " ORDER BY hd.tongtien DESC";
+                break;
+            case 'amount_asc':
+                $sql .= " ORDER BY hd.tongtien ASC";
+                break;
+            case 'date_desc':
+            default:
+                $sql .= " ORDER BY hd.ngaytao DESC";
+                break;
+        }
+        
+        $sql .= " LIMIT ? OFFSET ?";
         
         // Convert limit and offset to integers
         $params[] = (int)$limit;

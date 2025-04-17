@@ -39,8 +39,15 @@ class DanhMucController {
 
     public function delete() {
         $id = $_GET['id'] ?? null;
-        $this->danhMucModel->deleteDanhMuc($id);
-        $_SESSION['thongbao'] = "Xoá thành công!";
+        
+        // Kiểm tra xem danh mục có sản phẩm không
+        if ($this->danhMucModel->kiemTraDanhMucCoSanPham($id)) {
+            $_SESSION['thongbao'] = "Không thể xóa danh mục này vì đã có sản phẩm liên quan!";
+        } else {
+            $this->danhMucModel->deleteDanhMuc($id);
+            $_SESSION['thongbao'] = "Xóa danh mục thành công!";
+        }
+        
         echo '<meta http-equiv="refresh" content="0;url=index.php?act=danhmuc">';
         exit();
     }

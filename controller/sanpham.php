@@ -83,4 +83,95 @@ class sanPhamController
         include 'views/product/product.php';
     }
     
+    public function getSanPhamByPriceAsc()
+    {
+        $page = isset($_GET['page']) ? (int)$_GET['page'] : 1;
+        $limit = 12;
+        $start = ($page - 1) * $limit;
+        
+        $sanPhamModel = new SanPham();
+        $totalProducts = $sanPhamModel->countAll();
+        $totalPages = ceil($totalProducts / $limit);
+        
+        $products = $sanPhamModel->getSanPhamByPriceAsc($start, $limit);
+        
+        include 'views/product/product.php';
+    }
+
+    public function getSanPhamByPriceDesc()
+    {
+        $page = isset($_GET['page']) ? (int)$_GET['page'] : 1;
+        $limit = 12;
+        $start = ($page - 1) * $limit;
+        
+        $sanPhamModel = new SanPham();
+        $totalProducts = $sanPhamModel->countAll();
+        $totalPages = ceil($totalProducts / $limit);
+        
+        $products = $sanPhamModel->getSanPhamByPriceDesc($start, $limit);
+        
+        include 'views/product/product.php';
+    }
+
+    public function getSanPhamByDanhMucAndPriceAsc($idDanhMuc)
+    {
+        $page = isset($_GET['page']) ? (int)$_GET['page'] : 1;
+        $limit = 12;
+        $start = ($page - 1) * $limit;
+        
+        $sanPhamModel = new SanPham();
+        $totalProducts = $sanPhamModel->countByDanhMuc($idDanhMuc);
+        $totalPages = ceil($totalProducts / $limit);
+        
+        $products = $sanPhamModel->getSanPhamByDanhMucAndPriceAsc($idDanhMuc, $start, $limit);
+        
+        include 'views/product/product.php';
+    }
+
+    public function getSanPhamByDanhMucAndPriceDesc($idDanhMuc)
+    {
+        $page = isset($_GET['page']) ? (int)$_GET['page'] : 1;
+        $limit = 12;
+        $start = ($page - 1) * $limit;
+        
+        $sanPhamModel = new SanPham();
+        $totalProducts = $sanPhamModel->countByDanhMuc($idDanhMuc);
+        $totalPages = ceil($totalProducts / $limit);
+        
+        $products = $sanPhamModel->getSanPhamByDanhMucAndPriceDesc($idDanhMuc, $start, $limit);
+        
+        include 'views/product/product.php';
+    }
+
+    public function searchSanPhamByPriceAsc()
+    {
+        $keyword = isset($_GET['keyword']) ? $_GET['keyword'] : '';
+        $page = isset($_GET['page']) ? (int)$_GET['page'] : 1;
+        $limit = 12;
+        $start = ($page - 1) * $limit;
+        
+        $sanPhamModel = new SanPham();
+        $totalProducts = $sanPhamModel->countSearch($keyword);
+        $totalPages = ceil($totalProducts / $limit);
+        
+        $products = $sanPhamModel->searchSanPhamByPriceAsc($keyword, $start, $limit);
+        
+        include 'views/product/product.php';
+    }
+
+    public function searchSanPhamByPriceDesc()
+    {
+        $keyword = isset($_GET['keyword']) ? $_GET['keyword'] : '';
+        $page = isset($_GET['page']) ? (int)$_GET['page'] : 1;
+        $limit = 12;
+        $start = ($page - 1) * $limit;
+        
+        $sanPhamModel = new SanPham();
+        $totalProducts = $sanPhamModel->countSearch($keyword);
+        $totalPages = ceil($totalProducts / $limit);
+        
+        $products = $sanPhamModel->searchSanPhamByPriceDesc($keyword, $start, $limit);
+        
+        include 'views/product/product.php';
+    }
 }

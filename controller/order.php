@@ -131,4 +131,43 @@ class OrderController {
             exit;
         }
     }
+    
+    /**
+     * Handle order cancellation request
+     */
+    public function cancelOrder() {
+        if (!isset($_SESSION['user'])) {
+            $_SESSION['error_message'] = "Vui lòng đăng nhập để hủy đơn hàng";
+            echo '<script>window.location.href = "index.php?page=login";</script>';
+            exit;
+        }
+        
+        if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+            $_SESSION['error_message'] = "Phương thức không hợp lệ";
+            echo '<script>window.location.href = "index.php?page=orders";</script>';
+            exit;
+        }
+        
+        if (!isset($_POST['order_id']) || empty($_POST['order_id'])) {
+            $_SESSION['error_message'] = "Không tìm thấy đơn hàng";
+            echo '<script>window.location.href = "index.php?page=orders";</script>';
+            exit;
+        }
+        
+        $orderId = $_POST['order_id'];
+        $userId = $_SESSION['user']['id'];
+        
+        // Attempt to cancel the order
+        $result = $this->orderModel->cancelOrder($orderId, $userId);
+        
+        if ($result) {
+            $_SESSION['success_message'] = "Đã hủy đơn hàng #" . $orderId . " thành công";
+        } else {
+            $_SESSION['error_message'] = "Không thể hủy đơn hàng. Đơn hàng có thể không tồn tại hoặc không ở trạng thái có thể hủy.";
+        }
+        
+        // Redirect back to order details page using JavaScript
+        echo '<script>window.location.href = "index.php?page=orderDetails&id=' . $orderId . '";</script>';
+        exit;
+    }
 } 

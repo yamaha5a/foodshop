@@ -155,6 +155,9 @@ form input[type="submit"]:hover {
                 <label for="mota">Mô tả:</label>
                 <textarea name="mota" id="mota" rows="4"><?= $mota ?></textarea><br>
 
+                <label for="chitiet">Chi tiết sản phẩm:</label>
+                <textarea name="chitiet" id="chitiet" rows="4"><?= $chitiet ?? '' ?></textarea><br>
+
                 <label for="gia">Giá sản phẩm:</label>
                 <input type="number" name="gia" id="gia" required value="<?= $gia ?>"><br>
 

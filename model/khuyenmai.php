@@ -2,70 +2,62 @@
 require_once 'connection.php';
 
 class KhuyenMaiModel {
-    private $conn;
-
-    public function __construct() {
-        $this->conn = pdo_get_connection();
-    }
-
     public function getDiscountByCode($code) {
-        $stmt = $this->conn->prepare("SELECT * FROM khuyenmai WHERE makm = :code AND trangthai = 'Hoạt động'");
-        $stmt->bindValue(':code', $code, PDO::PARAM_STR);
-        $stmt->execute();
-        return $stmt->fetch(PDO::FETCH_ASSOC);
+        $sql = "SELECT * FROM khuyenmai WHERE makm = ?";
+        return pdo_query_one($sql, $code);
     }
 
     public function getAllDiscounts() {
-        $stmt = $this->conn->prepare("SELECT * FROM khuyenmai ORDER BY id DESC");
-        $stmt->execute();
-        return $stmt->fetchAll(PDO::FETCH_ASSOC);
-    }
-
-    public function addDiscount($data) {
-        $stmt = $this->conn->prepare("INSERT INTO khuyenmai (makm, tenkm, giatrigiam, ngaybatdau, ngayketthuc, trangthai) 
-                VALUES (:makm, :tenkm, :giatrigiam, :ngaybatdau, :ngayketthuc, :trangthai)");
-        $stmt->bindValue(':makm', $data['makm'], PDO::PARAM_STR);
-        $stmt->bindValue(':tenkm', $data['tenkm'], PDO::PARAM_STR);
-        $stmt->bindValue(':giatrigiam', $data['giatrigiam'], PDO::PARAM_STR);
-        $stmt->bindValue(':ngaybatdau', $data['ngaybatdau'], PDO::PARAM_STR);
-        $stmt->bindValue(':ngayketthuc', $data['ngayketthuc'], PDO::PARAM_STR);
-        $stmt->bindValue(':trangthai', $data['trangthai'], PDO::PARAM_STR);
-        return $stmt->execute();
-    }
-
-    public function updateDiscount($id, $data) {
-        $stmt = $this->conn->prepare("UPDATE khuyenmai 
-                SET makm = :makm, 
-                    tenkm = :tenkm, 
-                    giatrigiam = :giatrigiam, 
-                    ngaybatdau = :ngaybatdau, 
-                    ngayketthuc = :ngayketthuc, 
-                    trangthai = :trangthai 
-                WHERE id = :id");
-        $stmt->bindValue(':makm', $data['makm'], PDO::PARAM_STR);
-        $stmt->bindValue(':tenkm', $data['tenkm'], PDO::PARAM_STR);
-        $stmt->bindValue(':giatrigiam', $data['giatrigiam'], PDO::PARAM_STR);
-        $stmt->bindValue(':ngaybatdau', $data['ngaybatdau'], PDO::PARAM_STR);
-        $stmt->bindValue(':ngayketthuc', $data['ngayketthuc'], PDO::PARAM_STR);
-        $stmt->bindValue(':trangthai', $data['trangthai'], PDO::PARAM_STR);
-        $stmt->bindValue(':id', $id, PDO::PARAM_INT);
-        return $stmt->execute();
-    }
-
-    public function deleteDiscount($id) {
-        $stmt = $this->conn->prepare("DELETE FROM khuyenmai WHERE id = :id");
-        $stmt->bindValue(':id', $id, PDO::PARAM_INT);
-        return $stmt->execute();
+        $sql = "SELECT * FROM khuyenmai ORDER BY ngaybatdau DESC";
+        return pdo_query($sql);
     }
 
     public function getActiveDiscounts() {
         $currentDate = date('Y-m-d');
-        $stmt = $this->conn->prepare("SELECT * FROM khuyenmai 
+        $sql = "SELECT * FROM khuyenmai 
                 WHERE trangthai = 'Hoạt động' 
-                AND :currentDate BETWEEN ngaybatdau AND ngayketthuc");
-        $stmt->bindValue(':currentDate', $currentDate, PDO::PARAM_STR);
-        $stmt->execute();
-        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+                AND ngaybatdau <= ? 
+                AND ngayketthuc >= ?
+                ORDER BY ngaybatdau DESC";
+        return pdo_query($sql, $currentDate, $currentDate);
+    }
+
+    public function addDiscount($data) {
+        $sql = "INSERT INTO khuyenmai (makm, tenkhuyenmai, giatrigiam, ngaybatdau, ngayketthuc, trangthai) 
+                VALUES (?, ?, ?, ?, ?, ?)";
+        return pdo_execute($sql, 
+            $data['makm'],
+            $data['tenkhuyenmai'],
+            $data['giatrigiam'],
+            $data['ngaybatdau'],
+            $data['ngayketthuc'],
+            $data['trangthai'] ?? 'Hoạt động'
+        );
+    }
+
+    public function updateDiscount($id, $data) {
+        $sql = "UPDATE khuyenmai 
+                SET makm = ?, 
+                    tenkhuyenmai = ?, 
+                    giatrigiam = ?, 
+                    ngaybatdau = ?, 
+                    ngayketthuc = ?, 
+                    trangthai = ? 
+                WHERE id = ?";
+        return pdo_execute($sql, 
+            $data['makm'],
+            $data['tenkhuyenmai'],
+            $data['giatrigiam'],
+            $data['ngaybatdau'],
+            $data['ngayketthuc'],
+            $data['trangthai'],
+            $id
+        );
+    }
+
+    public function deleteDiscount($id) {
+        $sql = "DELETE FROM khuyenmai WHERE id = ?";
+        return pdo_execute($sql, $id);
     }
 }
-?> 
+?>

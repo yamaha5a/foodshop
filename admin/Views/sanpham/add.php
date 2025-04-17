@@ -142,15 +142,15 @@
             <form action="index.php?act=addSanPham" method="POST" enctype="multipart/form-data">
                 <label for="tensanpham">Tên sản phẩm:</label>
                 <input type="text" name="tensanpham" id="tensanpham" required><br>
-
-                <label for="mota">Mô tả:</label>
+                <label for="chitiet">Mô tả: </label>
+                <textarea name="chitiet" id="chitiet" rows="4"></textarea><br>
+                <label for="mota">Chi tiết sản phẩm:</label>
                 <textarea name="mota" id="mota" rows="4"></textarea><br>
-
                 <label for="gia">Giá sản phẩm:</label>
-                <input type="number" name="gia" id="gia" required><br>
+                <input type="text" name="gia" id="gia" required><br>
 
                 <label for="soluong">Số lượng:</label>
-                <input type="number" name="soluong" id="soluong" required><br>
+                <input type="number" name="soluong" id="soluong" min="0" required><br>
                 <label for="thoigiantao">Thời gian tạo:</label>
                 <input type="date" name="thoigiantao" id="thoigiantao" required><br>
 
@@ -178,3 +178,25 @@
     </div>
 
 </div>
+
+<script>
+    // Format price as user types
+    document.getElementById('gia').addEventListener('input', function(e) {
+        // Remove all non-digit characters
+        let value = this.value.replace(/\D/g, '');
+        
+        // Format with thousands separator
+        if (value) {
+            // Convert to number and format with Vietnamese currency format
+            let formattedValue = new Intl.NumberFormat('vi-VN').format(value);
+            this.value = formattedValue;
+        }
+    });
+    
+    // Before form submission, remove formatting for database storage
+    document.querySelector('form').addEventListener('submit', function(e) {
+        let priceInput = document.getElementById('gia');
+        // Remove all non-digit characters before submitting
+        priceInput.value = priceInput.value.replace(/\D/g, '');
+    });
+</script>

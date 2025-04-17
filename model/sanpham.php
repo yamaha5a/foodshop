@@ -12,14 +12,26 @@ class SanPham
 
     public function get8sp()
     {
-        $stmt = $this->conn->prepare("SELECT * FROM sanpham WHERE trangthai = 'Còn hàng' ORDER BY id DESC LIMIT 8");
+        $stmt = $this->conn->prepare("
+            SELECT sp.* 
+            FROM sanpham sp 
+            WHERE sp.trangthai = 'Còn hàng' 
+            AND sp.id NOT IN (SELECT id_sanpham FROM sanphamgiamgia)
+            ORDER BY sp.id DESC 
+            LIMIT 8
+        ");
         $stmt->execute();
 
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
     public function getAll()
     {
-        $stmt = $this->conn->prepare("SELECT * FROM sanpham WHERE trangthai = 'Còn hàng'");
+        $stmt = $this->conn->prepare("
+            SELECT sp.* 
+            FROM sanpham sp 
+            WHERE sp.trangthai = 'Còn hàng'
+            AND sp.id NOT IN (SELECT id_sanpham FROM sanphamgiamgia)
+        ");
 
         $stmt->execute();
     
@@ -28,7 +40,14 @@ class SanPham
   // Lấy sản phẩm theo phân trang
 public function getSanPhamByPage($start, $limit)
 {
-    $stmt = $this->conn->prepare("SELECT * FROM sanpham WHERE trangthai = 'Còn hàng' ORDER BY id DESC LIMIT :start, :limit");
+    $stmt = $this->conn->prepare("
+        SELECT sp.* 
+        FROM sanpham sp 
+        WHERE sp.trangthai = 'Còn hàng' 
+        AND sp.id NOT IN (SELECT id_sanpham FROM sanphamgiamgia)
+        ORDER BY sp.id DESC 
+        LIMIT :start, :limit
+    ");
     $stmt->bindValue(':start', (int)$start, PDO::PARAM_INT);
     $stmt->bindValue(':limit', (int)$limit, PDO::PARAM_INT);
     $stmt->execute();
@@ -38,13 +57,26 @@ public function getSanPhamByPage($start, $limit)
 // Đếm tổng số sản phẩm
 public function countAllSanPham()
 {
-    $stmt = $this->conn->prepare("SELECT COUNT(*) FROM sanpham WHERE trangthai = 'Còn hàng'");
+    $stmt = $this->conn->prepare("
+        SELECT COUNT(*) 
+        FROM sanpham sp 
+        WHERE sp.trangthai = 'Còn hàng'
+        AND sp.id NOT IN (SELECT id_sanpham FROM sanphamgiamgia)
+    ");
     $stmt->execute();
     return $stmt->fetchColumn();
 }
 public function getSanPhamByDanhMuc($idDanhMuc, $start, $limit)
 {
-    $stmt = $this->conn->prepare("SELECT * FROM sanpham WHERE trangthai = 'Còn hàng' AND id_danhmuc = :id_danhmuc ORDER BY id DESC LIMIT :start, :limit");
+    $stmt = $this->conn->prepare("
+        SELECT sp.* 
+        FROM sanpham sp 
+        WHERE sp.trangthai = 'Còn hàng' 
+        AND sp.id_danhmuc = :id_danhmuc
+        AND sp.id NOT IN (SELECT id_sanpham FROM sanphamgiamgia)
+        ORDER BY sp.id DESC 
+        LIMIT :start, :limit
+    ");
     $stmt->bindValue(':id_danhmuc', (int)$idDanhMuc, PDO::PARAM_INT);
     $stmt->bindValue(':start', (int)$start, PDO::PARAM_INT);
     $stmt->bindValue(':limit', (int)$limit, PDO::PARAM_INT);
@@ -54,7 +86,13 @@ public function getSanPhamByDanhMuc($idDanhMuc, $start, $limit)
 
 public function countSanPhamByDanhMuc($idDanhMuc)
 {
-    $stmt = $this->conn->prepare("SELECT COUNT(*) FROM sanpham WHERE trangthai = 'Còn hàng' AND id_danhmuc = :id_danhmuc");
+    $stmt = $this->conn->prepare("
+        SELECT COUNT(*) 
+        FROM sanpham sp 
+        WHERE sp.trangthai = 'Còn hàng' 
+        AND sp.id_danhmuc = :id_danhmuc
+        AND sp.id NOT IN (SELECT id_sanpham FROM sanphamgiamgia)
+    ");
     $stmt->bindValue(':id_danhmuc', (int)$idDanhMuc, PDO::PARAM_INT);
     $stmt->execute();
     return $stmt->fetchColumn();
@@ -118,6 +156,70 @@ public function countSearchAndFilterByPrice($keyword, $minPrice, $maxPrice)
     $stmt->bindValue(':maxPrice', (float)$maxPrice, PDO::PARAM_STR);
     $stmt->execute();
     return $stmt->fetchColumn();
+}
+
+// Thêm phương thức sắp xếp sản phẩm theo giá tăng dần
+public function getSanPhamByPriceAsc($start, $limit)
+{
+    $stmt = $this->conn->prepare("SELECT * FROM sanpham WHERE trangthai = 'Còn hàng' ORDER BY gia ASC LIMIT :start, :limit");
+    $stmt->bindValue(':start', (int)$start, PDO::PARAM_INT);
+    $stmt->bindValue(':limit', (int)$limit, PDO::PARAM_INT);
+    $stmt->execute();
+    return $stmt->fetchAll(PDO::FETCH_ASSOC);
+}
+
+// Thêm phương thức sắp xếp sản phẩm theo giá giảm dần
+public function getSanPhamByPriceDesc($start, $limit)
+{
+    $stmt = $this->conn->prepare("SELECT * FROM sanpham WHERE trangthai = 'Còn hàng' ORDER BY gia DESC LIMIT :start, :limit");
+    $stmt->bindValue(':start', (int)$start, PDO::PARAM_INT);
+    $stmt->bindValue(':limit', (int)$limit, PDO::PARAM_INT);
+    $stmt->execute();
+    return $stmt->fetchAll(PDO::FETCH_ASSOC);
+}
+
+// Thêm phương thức sắp xếp sản phẩm theo danh mục và giá tăng dần
+public function getSanPhamByDanhMucAndPriceAsc($idDanhMuc, $start, $limit)
+{
+    $stmt = $this->conn->prepare("SELECT * FROM sanpham WHERE trangthai = 'Còn hàng' AND id_danhmuc = :id_danhmuc ORDER BY gia ASC LIMIT :start, :limit");
+    $stmt->bindValue(':id_danhmuc', (int)$idDanhMuc, PDO::PARAM_INT);
+    $stmt->bindValue(':start', (int)$start, PDO::PARAM_INT);
+    $stmt->bindValue(':limit', (int)$limit, PDO::PARAM_INT);
+    $stmt->execute();
+    return $stmt->fetchAll(PDO::FETCH_ASSOC);
+}
+
+// Thêm phương thức sắp xếp sản phẩm theo danh mục và giá giảm dần
+public function getSanPhamByDanhMucAndPriceDesc($idDanhMuc, $start, $limit)
+{
+    $stmt = $this->conn->prepare("SELECT * FROM sanpham WHERE trangthai = 'Còn hàng' AND id_danhmuc = :id_danhmuc ORDER BY gia DESC LIMIT :start, :limit");
+    $stmt->bindValue(':id_danhmuc', (int)$idDanhMuc, PDO::PARAM_INT);
+    $stmt->bindValue(':start', (int)$start, PDO::PARAM_INT);
+    $stmt->bindValue(':limit', (int)$limit, PDO::PARAM_INT);
+    $stmt->execute();
+    return $stmt->fetchAll(PDO::FETCH_ASSOC);
+}
+
+// Thêm phương thức sắp xếp sản phẩm theo tìm kiếm và giá tăng dần
+public function searchSanPhamByPriceAsc($keyword, $start, $limit)
+{
+    $stmt = $this->conn->prepare("SELECT * FROM sanpham WHERE trangthai = 'Còn hàng' AND (tensanpham LIKE :keyword OR mota LIKE :keyword) ORDER BY gia ASC LIMIT :start, :limit");
+    $stmt->bindValue(':keyword', '%' . $keyword . '%', PDO::PARAM_STR);
+    $stmt->bindValue(':start', (int)$start, PDO::PARAM_INT);
+    $stmt->bindValue(':limit', (int)$limit, PDO::PARAM_INT);
+    $stmt->execute();
+    return $stmt->fetchAll(PDO::FETCH_ASSOC);
+}
+
+// Thêm phương thức sắp xếp sản phẩm theo tìm kiếm và giá giảm dần
+public function searchSanPhamByPriceDesc($keyword, $start, $limit)
+{
+    $stmt = $this->conn->prepare("SELECT * FROM sanpham WHERE trangthai = 'Còn hàng' AND (tensanpham LIKE :keyword OR mota LIKE :keyword) ORDER BY gia DESC LIMIT :start, :limit");
+    $stmt->bindValue(':keyword', '%' . $keyword . '%', PDO::PARAM_STR);
+    $stmt->bindValue(':start', (int)$start, PDO::PARAM_INT);
+    $stmt->bindValue(':limit', (int)$limit, PDO::PARAM_INT);
+    $stmt->execute();
+    return $stmt->fetchAll(PDO::FETCH_ASSOC);
 }
 
 }

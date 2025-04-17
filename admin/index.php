@@ -39,6 +39,10 @@ include 'Models/sanpham.php';
                             include "Views/thongke/thongke.php";
                             break;
 
+                        case 'bieudo':
+                            require_once 'controllers/bieudo.php';
+                            break;
+
                         case 'danhmuc':
                             require_once 'controllers/danhmuc.php';
                             $controller = new DanhMucController();
@@ -119,6 +123,11 @@ include 'Models/sanpham.php';
                             require_once 'controllers/sanpham.php';
                             $xoaController = new SanPhamController();
                             $xoaController->delete();
+                            break;
+                        case 'chiTietSanPham':
+                            require_once 'controllers/sanpham.php';
+                            $controller = new SanPhamController();
+                            $controller->chiTietSanPham();
                             break;
                         case 'phuongthucthanhtoan':
                             require_once 'controllers/phuongthucthanhtoan.php';

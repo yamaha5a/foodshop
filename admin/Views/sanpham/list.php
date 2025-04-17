@@ -97,12 +97,11 @@
                     <tr>
                         <th scope="col">ID</th>
                         <th scope="col">Tên sản phẩm</th>
-                        <th scope="col">Mô tả</th>
+                        <th scope="col">Chi tiết</th>
                         <th scope="col">Giá</th>
                         <th scope="col">Số lượng</th>
                         <th scope="col">Hình ảnh 1</th>
                         <th scope="col">Hình ảnh 2</th>
-                        <th scope="col">Hình ảnh 3</th>
                         <th scope="col">Thời gian tạo</th>
                         <th scope="col">Danh Mục</th>
                         <th scope="col">Trạng thái</th>
@@ -115,13 +114,12 @@
                         <tr>
                             <td><?= htmlspecialchars($list['id']) ?></td>
                             <td><?= htmlspecialchars($list['tensanpham']) ?></td>
-                            <td><?= htmlspecialchars($list['mota']) ?></td>
+                            <td><?= htmlspecialchars($list['chitiet']) ?></td>
                             <td><?= number_format($list['gia'], 0, ',', '.') ?> đ</td>
                             <td><?= htmlspecialchars($list['soluong']) ?></td>
                             <?php
                             $adress_hinh1 = "../upload/" . $list['hinhanh1'];
                             $adress_hinh2 = "../upload/" . $list['hinhanh2'];
-                            $adress_hinh3 = "../upload/" . $list['hinhanh3'];
 
                             if (is_file($adress_hinh1)) {
                                 $list['hinhanh1'] = '<img src="' . $adress_hinh1 . '" width=58" />';
@@ -133,15 +131,9 @@
                             } else {
                                 $list['hinhanh2'] = "No image!";
                             }
-                            if (is_file($adress_hinh3)) {
-                                $list['hinhanh3'] = '<img src="' . $adress_hinh3 . '" width=58" />';
-                            } else {
-                                $list['hinhanh3'] = "No image!";
-                            }
                             ?>
                             <td><?= $list['hinhanh1'] ?></td>
                             <td><?= $list['hinhanh2'] ?></td>
-                            <td><?= $list['hinhanh3'] ?></td>
                             <td><?= date("d-m-Y", strtotime($list['thoigiantao'])) ?></td>
                             <td><?= $list['tendanhmuc'] ?></td>
                             <td>
@@ -149,7 +141,16 @@
                             </td>
                             <td>
                                 <a href="index.php?act=suaSanPham&id=<?= $list['id'] ?>" class="btn btn-warning">Sửa</a>
-                                <a href="index.php?act=xoaSP&id=<?= $list['id'] ?>" class="btn btn-danger">Xóa</a>
+                                <?php 
+                                // Kiểm tra xem sản phẩm có đơn hàng không
+                                $sanPhamModel = new SanPhamModel();
+                                if (!$sanPhamModel->kiemTraSanPhamCoDonHang($list['id'])): 
+                                ?>
+                                    <a href="index.php?act=xoaSP&id=<?= $list['id'] ?>" class="btn btn-danger" onclick="return confirm('Bạn có chắc chắn muốn xóa sản phẩm này?')">Xóa</a>
+                                <?php else: ?>
+                                    <button class="btn btn-secondary" disabled title="Không thể xóa sản phẩm đang có đơn hàng chưa giao">Xóa</button>
+                                <?php endif; ?>
+                                <a href="index.php?act=chiTietSanPham&id=<?= $list['id'] ?>" class="btn btn-info">Chi tiết</a>
                             </td>
                         </tr> 
                     <?php endforeach; ?>

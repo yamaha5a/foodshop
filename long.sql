@@ -30,28 +30,12 @@ CREATE TABLE danhmuc (
 ) ENGINE=InnoDB;
 
 -- 4. Bảng loại sản phẩm
-CREATE TABLE loaisanpham (
-    id INT AUTO_INCREMENT PRIMARY KEY,
-    malsp VARCHAR(50) NOT NULL UNIQUE,
-    tenloai VARCHAR(100) NOT NULL,
-    hinhanh VARCHAR(255),
-    mota TEXT,
-    madm INT,
-    FOREIGN KEY (madm) REFERENCES danhmuc(id) ON DELETE CASCADE
-) ENGINE=InnoDB;
-CREATE TABLE sanphamgiamgia (
-    id INT AUTO_INCREMENT PRIMARY KEY,
-    id_sanpham INT NOT NULL,
-    giagiam DECIMAL(10, 2) NOT NULL,
-    ngay_giamgia DATE DEFAULT CURRENT_DATE,
-    FOREIGN KEY (id_sanpham) REFERENCES sanpham(id)
-);
-
 -- 5. Bảng sản phẩm
 CREATE TABLE sanpham (
     id INT AUTO_INCREMENT PRIMARY KEY,
     tensanpham VARCHAR(100) NOT NULL,
     mota TEXT,
+    chitiet TEXT,
     gia DECIMAL(10,2) NOT NULL,
     soluong INT NOT NULL,
     hinhanh1 VARCHAR(255),
@@ -85,6 +69,7 @@ CREATE TABLE sanpham_topping (
 -- 8. Bảng khuyến mãi
 CREATE TABLE khuyenmai (
     id INT AUTO_INCREMENT PRIMARY KEY,
+    makm VARCHAR(50) NOT NULL UNIQUE,
     tenkhuyenmai VARCHAR(100) NOT NULL,
     giatrigiam DECIMAL(10,2),
     ngaybatdau DATE,

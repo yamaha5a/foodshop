@@ -172,6 +172,16 @@ switch ($page) {
         $orderController = new OrderController();
         $orderController->viewOrderDetails();
         break;
+    case 'cancelOrder':
+        if (!isset($_SESSION['user'])) {
+            $_SESSION['error_message'] = "Vui lòng đăng nhập để hủy đơn hàng";
+            echo '<script>window.location.href = "index.php?page=login";</script>';
+            exit;
+        }
+        require_once 'controller/order.php';
+        $orderController = new OrderController();
+        $orderController->cancelOrder();
+        break;
     case 'applyDiscount':
         require_once 'controller/discount.php';
         $discountController = new DiscountController();

@@ -15,7 +15,7 @@ class CartModel {
         if (!$cart) {
             return [];
         }
-        $sql = "SELECT gct.*, sp.tensanpham, sp.hinhanh1, sp.gia 
+        $sql = "SELECT gct.*, sp.tensanpham, sp.hinhanh1, sp.gia, sp.soluong as soluong_kho 
                 FROM giohang_chitiet gct 
                 JOIN sanpham sp ON gct.id_sanpham = sp.id 
                 WHERE gct.id_giohang = ?";
@@ -31,9 +31,8 @@ class CartModel {
             $sql = "SELECT * FROM giohang_chitiet WHERE id_giohang = ? AND id_sanpham = ?";
             $existingItem = pdo_query_one($sql, $cart['id'], $productId);
             if ($existingItem) {
-                $newQuantity = $existingItem['soluong'] + $quantity;
                 $sql = "UPDATE giohang_chitiet SET soluong = ? WHERE id = ?";
-                return pdo_execute($sql, $newQuantity, $existingItem['id']);
+                return pdo_execute($sql, $quantity, $existingItem['id']);
             } else {
                 $sql = "SELECT gia FROM sanpham WHERE id = ?";
                 $product = pdo_query_one($sql, $productId);  
@@ -53,14 +52,19 @@ class CartModel {
         try {
             $cart = $this->getCart($userId);
             if (!$cart) {
-                return false;
+                throw new Exception("Không tìm thấy giỏ hàng");
             }
 
-            // Kiểm tra sản phẩm có tồn tại không
-            $sql = "SELECT id FROM sanpham WHERE id = ?";
+            // Kiểm tra sản phẩm có tồn tại không và lấy số lượng hiện có
+            $sql = "SELECT id, soluong, tensanpham FROM sanpham WHERE id = ?";
             $product = pdo_query_one($sql, $productId);
             if (!$product) {
-                return false;
+                throw new Exception("Không tìm thấy sản phẩm");
+            }
+
+            // Kiểm tra nếu số lượng yêu cầu vượt quá số lượng có sẵn
+            if ($quantity > $product['soluong']) {
+                throw new Exception("Số lượng sản phẩm '" . $product['tensanpham'] . "' trong kho không đủ. Số lượng tối đa có thể đặt: " . $product['soluong']);
             }
 
             // Cập nhật số lượng
@@ -68,10 +72,14 @@ class CartModel {
                     WHERE id_giohang = ? AND id_sanpham = ?";
             $result = pdo_execute($sql, $quantity, $cart['id'], $productId);
             
-            return $result !== false;
+            if ($result === false) {
+                throw new Exception("Không thể cập nhật số lượng sản phẩm");
+            }
+            
+            return true;
         } catch (Exception $e) {
             error_log("Error in updateCartItem: " . $e->getMessage());
-            return false;
+            throw $e;
         }
     }
     public function removeCartItem($userId, $productId) {

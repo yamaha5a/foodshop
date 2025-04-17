@@ -1,11 +1,48 @@
 <?php
-require_once 'model/khuyenmai.php';
+require_once '../model/khuyenmai.php';
+require_once 'model/cart.php';
 
-class DiscountController {
-    private $discountModel;
+class KhuyenMaiController {
+    private $khuyenMaiModel;
+    private $cartModel;
 
     public function __construct() {
-        $this->discountModel = new KhuyenMaiModel();
+        $this->khuyenMaiModel = new KhuyenMaiModel();
+        $this->cartModel = new CartModel();
+    }
+
+    public function applyDiscount($code) {
+        $discount = $this->khuyenMaiModel->getDiscountByCode($code);
+        if ($discount) {
+            return [
+                'success' => true,
+                'discount' => $discount
+            ];
+        }
+        return [
+            'success' => false,
+            'message' => 'Mã khuyến mãi không hợp lệ hoặc đã hết hạn'
+        ];
+    }
+
+    public function getAllDiscounts() {
+        return $this->khuyenMaiModel->getAllDiscounts();
+    }
+
+    public function addDiscount($data) {
+        return $this->khuyenMaiModel->addDiscount($data);
+    }
+
+    public function updateDiscount($id, $data) {
+        return $this->khuyenMaiModel->updateDiscount($id, $data);
+    }
+
+    public function deleteDiscount($id) {
+        return $this->khuyenMaiModel->deleteDiscount($id);
+    }
+
+    public function getActiveDiscounts() {
+        return $this->khuyenMaiModel->getActiveDiscounts();
     }
 
     public function applyDiscount() {
@@ -23,7 +60,7 @@ class DiscountController {
             $discountCode = $_POST['code'];
             
             // Kiểm tra mã giảm giá
-            $discount = $this->discountModel->getDiscountByCode($discountCode);
+            $discount = $this->khuyenMaiModel->getDiscountByCode($discountCode);
             
             if (!$discount) {
                 echo json_encode([
@@ -52,12 +89,13 @@ class DiscountController {
                 exit;
             }
 
-            // Tính toán số tiền giảm giá
+            // Tính toán tổng tiền từ giỏ hàng
+            $userId = $_SESSION['user']['id'];
+            $cartItems = $this->cartModel->getCartItems($userId);
+            
             $subtotal = 0;
-            if (isset($_SESSION['cart'])) {
-                foreach ($_SESSION['cart'] as $item) {
-                    $subtotal += $item['price'] * $item['quantity'];
-                }
+            foreach ($cartItems as $item) {
+                $subtotal += $item['gia'] * $item['soluong'];
             }
 
             // Kiểm tra nếu số tiền giảm giá lớn hơn tổng tiền

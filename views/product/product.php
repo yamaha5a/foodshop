@@ -34,13 +34,31 @@
         z-index: 1000;
         text-align: center;
     }
+
+    .product-description {
+        display: -webkit-box;
+        -webkit-line-clamp: 2;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        height: 3em;
+    }
+    
+    .product-name {
+        display: -webkit-box;
+        -webkit-line-clamp: 1;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        height: 1.5em;
+    }
 </style>
 <!-- Thêm thư viện SweetAlert2 -->
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
 <div class="container-fluid fruite py-5">
     <div class="container py-5">
-        <h1 class="mb-4">Fresh fruits shop</h1>
+        <h1 class="mb-4"> Ăn nhanh, ngon chuẩn, no trọn vị!</h1>
         <div class="row g-4">
             <div class="col-lg-12">
                 <div class="row g-4">
@@ -59,11 +77,11 @@
                     <div class="col-xl-3">
                         <div class="bg-light ps-3 py-3 rounded d-flex justify-content-between mb-4">
                             <label for="fruits">Sắp xếp:</label>
-                            <select id="fruits" name="fruitlist" class="border-0 form-select-sm bg-light me-3" form="fruitform">
-                                <option value="volvo">Mặc định</option>
-                                <option value="saab">Phổ biến</option>
-                                <option value="opel">Giá tăng dần</option>
-                                <option value="audi">Giá giảm dần</option>
+                            <select id="fruits" name="fruitlist" class="border-0 form-select-sm bg-light me-3" form="fruitform" onchange="window.location.href=this.value">
+                                <option value="index.php?page=product">Mặc định</option>
+                                <option value="index.php?page=product&controller=sanpham&action=getAll">Hiển thị tất cả sản phẩm</option>
+                                <option value="index.php?page=product&controller=sanpham&action=getSanPhamByPriceAsc">Giá tăng dần</option>
+                                <option value="index.php?page=product&controller=sanpham&action=getSanPhamByPriceDesc">Giá giảm dần</option>
                             </select>
                         </div>
                         <?php if (!empty($searchParams['keyword']) || $searchParams['min_price'] > 0 || $searchParams['max_price'] < PHP_FLOAT_MAX): ?>
@@ -110,31 +128,6 @@
                                         </div>
                                         <button type="submit" class="btn btn-primary w-100">Lọc theo giá</button>
                                     </form>
-                                </div>
-                            </div>
-                            <div class="col-lg-12">
-                                <div class="mb-3">
-                                    <h4>Additional</h4>
-                                    <div class="mb-2">
-                                        <input type="radio" class="me-2" id="Categories-1" name="Categories-1" value="Beverages">
-                                        <label for="Categories-1"> Organic</label>
-                                    </div>
-                                    <div class="mb-2">
-                                        <input type="radio" class="me-2" id="Categories-2" name="Categories-1" value="Beverages">
-                                        <label for="Categories-2"> Fresh</label>
-                                    </div>
-                                    <div class="mb-2">
-                                        <input type="radio" class="me-2" id="Categories-3" name="Categories-1" value="Beverages">
-                                        <label for="Categories-3"> Sales</label>
-                                    </div>
-                                    <div class="mb-2">
-                                        <input type="radio" class="me-2" id="Categories-4" name="Categories-1" value="Beverages">
-                                        <label for="Categories-4"> Discount</label>
-                                    </div>
-                                    <div class="mb-2">
-                                        <input type="radio" class="me-2" id="Categories-5" name="Categories-1" value="Beverages">
-                                        <label for="Categories-5"> Expired</label>
-                                    </div>
                                 </div>
                             </div>
                             <div class="col-lg-12">
@@ -211,38 +204,46 @@
                         </div>
                     </div>
                     <div class="col-lg-9">
-                        <div class="row g-4 justify-content">
+                        <div class="row g-4">
                             <?php foreach ($sanphams as $sanpham): ?>
                                 <div class="col-md-6 col-lg-4 col-xl-3">
                                     <div class="rounded position-relative fruite-item">
                                         <div class="fruite-img">
-                                        <a href="index.php?page=detail&id=<?= $sanpham['id'] ?>">   
-                                        <img src="upload/<?= $sanpham['hinhanh1'] ?>" class="img-fluid w-100 rounded-top" alt="<?php echo htmlspecialchars($sanpham['tensanpham']); ?>">
-                                        </a>  
-                                    </div>
-                                        <div class="text-white bg-secondary px-3 py-1 rounded position-absolute" style="top: 10px; left: 10px;">Fruits</div>
+                                            <a href="index.php?page=detail&id=<?= $sanpham['id'] ?>">
+                                                <img src="upload/<?= $sanpham['hinhanh1'] ?>" class="img-fluid w-100 rounded-top" alt="<?php echo htmlspecialchars($sanpham['tensanpham']); ?>">
+                                            </a>
+                                        </div>
+                                        <div class="text-white bg-secondary px-3 py-1 rounded position-absolute" style="top: 10px; left: 10px;">Food</div>
                                         <div class="p-4 border border-secondary border-top-0 rounded-bottom">
                                             <a href="index.php?page=detail&id=<?= $sanpham['id'] ?>">
-                                            <h4><?php echo htmlspecialchars($sanpham['tensanpham']); ?></h4></a>
-                                            <p><?php echo htmlspecialchars($sanpham['mota']); ?></p>
-                                            <div class="d-flex justify-content-between flex-lg-wrap">
-                                                <p class="text-dark fs-5 fw-bold mb-0">$<?php echo number_format($sanpham['gia'], 2); ?></p>
-                                                <form method="post" action="index.php?page=addToCart" onsubmit="return addToCart(event)">
-                                                <input type="hidden" name="product_id" value="<?= $sanpham['id']; ?>">
-                                                <input type="hidden" name="quantity" value="1">
-                                                <button type="submit" class="btn border border-secondary rounded-pill px-3 text-primary">
-                                                    <i class="fa fa-shopping-bag me-2 text-primary"></i> Add to cart
-                                                </button>
-                                            </form>
+                                                <h4 class="mb-3 product-name"><?php echo htmlspecialchars($sanpham['tensanpham']); ?></h4>
+                                            </a>
+                                            <p class="mb-4 product-description"><?= htmlspecialchars($sanpham['chitiet']); ?></p>
+                                            <div class="d-flex flex-column align-items-center">
+                                                <div class="w-100 mb-3">
+                                                    <p class="text-dark fs-5 fw-bold mb-1">Giá: 
+                                                        <?= number_format($sanpham['gia'], 0, ',', '.') ?> VNĐ
+                                                    </p>
+                                                    <div class="d-flex align-items-center">
+                                                        <span class="badge bg-primary me-2">Số lượng:</span>
+                                                        <span class="fw-bold <?= $sanpham['soluong'] > 10 ? 'text-success' : ($sanpham['soluong'] > 0 ? 'text-warning' : 'text-danger') ?>">
+                                                            <?= htmlspecialchars($sanpham['soluong']); ?>
+                                                        </span>
+                                                    </div>
+                                                </div>
+                                                <form method="post" action="index.php?page=addToCart" onsubmit="return addToCart(event)" class="w-100 text-center">
+                                                    <input type="hidden" name="product_id" value="<?= $sanpham['id']; ?>">
+                                                    <input type="hidden" name="quantity" value="1">
+                                                    <button type="submit" class="btn border border-secondary rounded-pill px-4 py-2 text-primary w-100">
+                                                        <i class="fa fa-shopping-bag me-2 text-primary"></i> Add to cart
+                                                    </button>
+                                                </form>
                                             </div>
                                         </div>
                                     </div>
                                 </div>
                             <?php endforeach; ?>
-
                         </div>
-
-
 
                         <div class="col-12">
                             <div class="pagination d-flex justify-content-center mt-5">
@@ -291,10 +292,6 @@
                                 <?php endif; ?>
                             </div>
                         </div>
-
-
-
-
                     </div>
                 </div>
             </div>
