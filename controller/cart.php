@@ -22,6 +22,8 @@ class CartController {
 
         $productId = $_POST['product_id'] ?? null;
         $quantity = $_POST['quantity'] ?? 1;
+        $isDiscounted = isset($_POST['is_discounted']) && $_POST['is_discounted'] == '1';
+        $discountedPrice = $_POST['discounted_price'] ?? null;
 
         if (!$productId) {
             echo '<meta name="error_message" content="Không tìm thấy sản phẩm">';
@@ -30,7 +32,12 @@ class CartController {
 
         $userId = $_SESSION['user']['id'];
         try {
-            $this->cartModel->addToCart($userId, $productId, $quantity);
+            // Nếu sản phẩm có giảm giá và giá giảm được cung cấp, sử dụng giá giảm
+            if ($isDiscounted && $discountedPrice) {
+                $this->cartModel->addToCartWithPrice($userId, $productId, $quantity, $discountedPrice);
+            } else {
+                $this->cartModel->addToCart($userId, $productId, $quantity);
+            }
             
             // Lấy số lượng sản phẩm trong giỏ hàng
             $cartItems = $this->cartModel->getCartItems($userId);

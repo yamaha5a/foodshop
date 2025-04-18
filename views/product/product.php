@@ -52,6 +52,64 @@
         text-overflow: ellipsis;
         height: 1.5em;
     }
+    
+    /* CSS mới cho phần hiển thị giá sản phẩm giảm giá */
+    .price-display {
+        display: flex;
+        flex-direction: column;
+        width: 100%;
+    }
+    
+    .price-row {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        width: 100%;
+    }
+    
+    .original-price {
+        text-decoration: line-through !important;
+        color: #6c757d;
+        font-size: 0.9em;
+        white-space: nowrap;
+        position: relative;
+    }
+    
+    .original-price::after {
+        content: '';
+        position: absolute;
+        left: 0;
+        right: 0;
+        top: 50%;
+        height: 1px;
+        background-color: #6c757d;
+        transform: translateY(-50%);
+    }
+    
+    .discounted-price {
+        font-weight: bold;
+        color: #dc3545;
+        font-size: 1.1em;
+        white-space: nowrap;
+    }
+    
+    /* Đảm bảo container chứa giá không bị vỡ */
+    .price-wrapper {
+        width: 100%;
+        margin-bottom: 10px;
+    }
+    
+    /* Đảm bảo số tiền và đơn vị tiền tệ luôn nằm cùng dòng */
+    .price-amount {
+        display: inline-block;
+        white-space: nowrap;
+    }
+
+    .price-separator {
+        margin: 0 8px;
+        color: #6c757d;
+        font-weight: bold;
+    }
 </style>
 <!-- Thêm thư viện SweetAlert2 -->
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
@@ -132,65 +190,39 @@
                             </div>
                             <div class="col-lg-12">
                                 <h4 class="mb-3">Featured products</h4>
-                                <div class="d-flex align-items-center justify-content-start">
-                                    <div class="rounded me-4" style="width: 100px; height: 100px;">
-                                        <img src="img/featur-1.jpg" class="img-fluid rounded" alt="">
-                                    </div>
-                                    <div>
-                                        <h6 class="mb-2">Big Banana</h6>
-                                        <div class="d-flex mb-2">
-                                            <i class="fa fa-star text-secondary"></i>
-                                            <i class="fa fa-star text-secondary"></i>
-                                            <i class="fa fa-star text-secondary"></i>
-                                            <i class="fa fa-star text-secondary"></i>
-                                            <i class="fa fa-star"></i>
+                                <?php if (!empty($featuredDiscountedProducts)): ?>
+                                    <?php foreach ($featuredDiscountedProducts as $product): ?>
+                                    <div class="d-flex align-items-center justify-content-start">
+                                        <div class="rounded me-4" style="width: 100px; height: 100px;">
+                                            <img src="upload/<?= $product['hinhanh1'] ?>" class="img-fluid rounded" alt="<?= htmlspecialchars($product['tensanpham']) ?>">
                                         </div>
-                                        <div class="d-flex mb-2">
-                                            <h5 class="fw-bold me-2">2.99 $</h5>
-                                            <h5 class="text-danger text-decoration-line-through">4.11 $</h5>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="d-flex align-items-center justify-content-start">
-                                    <div class="rounded me-4" style="width: 100px; height: 100px;">
-                                        <img src="img/featur-2.jpg" class="img-fluid rounded" alt="">
-                                    </div>
-                                    <div>
-                                        <h6 class="mb-2">Big Banana</h6>
-                                        <div class="d-flex mb-2">
-                                            <i class="fa fa-star text-secondary"></i>
-                                            <i class="fa fa-star text-secondary"></i>
-                                            <i class="fa fa-star text-secondary"></i>
-                                            <i class="fa fa-star text-secondary"></i>
-                                            <i class="fa fa-star"></i>
-                                        </div>
-                                        <div class="d-flex mb-2">
-                                            <h5 class="fw-bold me-2">2.99 $</h5>
-                                            <h5 class="text-danger text-decoration-line-through">4.11 $</h5>
+                                        <div>
+                                            <h6 class="mb-2"><?= htmlspecialchars($product['tensanpham']) ?></h6>
+                                            <div class="d-flex mb-2">
+                                                <i class="fa fa-star text-secondary"></i>
+                                                <i class="fa fa-star text-secondary"></i>
+                                                <i class="fa fa-star text-secondary"></i>
+                                                <i class="fa fa-star text-secondary"></i>
+                                                <i class="fa fa-star"></i>
+                                            </div>
+                                            <div class="d-flex mb-2">
+                                                <div class="price-display">
+                                                    <div class="price-row">
+                                                        <span class="original-price"><span class="price-amount"><?= number_format($product['gia'], 0, ',', '.') ?> VNĐ</span></span>
+                                                        <span class="discounted-price"><span class="price-amount"><?= number_format($product['giagiam'], 0, ',', '.') ?> VNĐ</span></span>
+                                                    </div>
+                                                </div>
+                                            </div>
                                         </div>
                                     </div>
-                                </div>
-                                <div class="d-flex align-items-center justify-content-start">
-                                    <div class="rounded me-4" style="width: 100px; height: 100px;">
-                                        <img src="img/featur-3.jpg" class="img-fluid rounded" alt="">
+                                    <?php endforeach; ?>
+                                <?php else: ?>
+                                    <div class="text-center">
+                                        <p>Hiện không có sản phẩm giảm giá nào.</p>
                                     </div>
-                                    <div>
-                                        <h6 class="mb-2">Big Banana</h6>
-                                        <div class="d-flex mb-2">
-                                            <i class="fa fa-star text-secondary"></i>
-                                            <i class="fa fa-star text-secondary"></i>
-                                            <i class="fa fa-star text-secondary"></i>
-                                            <i class="fa fa-star text-secondary"></i>
-                                            <i class="fa fa-star"></i>
-                                        </div>
-                                        <div class="d-flex mb-2">
-                                            <h5 class="fw-bold me-2">2.99 $</h5>
-                                            <h5 class="text-danger text-decoration-line-through">4.11 $</h5>
-                                        </div>
-                                    </div>
-                                </div>
+                                <?php endif; ?>
                                 <div class="d-flex justify-content-center my-4">
-                                    <a href="#" class="btn border border-secondary px-4 py-3 rounded-pill text-primary w-100">Vew More</a>
+                                    <a href="#" class="btn border border-secondary px-4 py-3 rounded-pill text-primary w-100">Xem thêm</a>
                                 </div>
                             </div>
                             <div class="col-lg-12">
@@ -213,7 +245,11 @@
                                                 <img src="upload/<?= $sanpham['hinhanh1'] ?>" class="img-fluid w-100 rounded-top" alt="<?php echo htmlspecialchars($sanpham['tensanpham']); ?>">
                                             </a>
                                         </div>
+                                        <?php if (isset($sanpham['giagiam']) && $sanpham['giagiam'] > 0): ?>
+                                        <div class="text-white bg-danger px-3 py-1 rounded position-absolute" style="top: 10px; left: 10px;">Giảm giá</div>
+                                        <?php else: ?>
                                         <div class="text-white bg-secondary px-3 py-1 rounded position-absolute" style="top: 10px; left: 10px;">Food</div>
+                                        <?php endif; ?>
                                         <div class="p-4 border border-secondary border-top-0 rounded-bottom">
                                             <a href="index.php?page=detail&id=<?= $sanpham['id'] ?>">
                                                 <h4 class="mb-3 product-name"><?php echo htmlspecialchars($sanpham['tensanpham']); ?></h4>
@@ -221,9 +257,21 @@
                                             <p class="mb-4 product-description"><?= htmlspecialchars($sanpham['chitiet']); ?></p>
                                             <div class="d-flex flex-column align-items-center">
                                                 <div class="w-100 mb-3">
+                                                    <?php if (isset($sanpham['giagiam']) && $sanpham['giagiam'] > 0): ?>
+                                                    <div class="price-wrapper">
+                                                        <div class="price-display">
+                                                            <div class="price-row">
+                                                                <span class="original-price" style="text-decoration: line-through;"><span class="price-amount"><?= number_format($sanpham['gia'], 0, ',', '.') ?> VNĐ</span></span>
+                                                                <span class="price-separator">-</span>
+                                                                <span class="discounted-price"><span class="price-amount"><?= number_format($sanpham['giagiam'], 0, ',', '.') ?> VNĐ</span></span>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    <?php else: ?>
                                                     <p class="text-dark fs-5 fw-bold mb-1">Giá: 
                                                         <?= number_format($sanpham['gia'], 0, ',', '.') ?> VNĐ
                                                     </p>
+                                                    <?php endif; ?>
                                                     <div class="d-flex align-items-center">
                                                         <span class="badge bg-primary me-2">Số lượng:</span>
                                                         <span class="fw-bold <?= $sanpham['soluong'] > 10 ? 'text-success' : ($sanpham['soluong'] > 0 ? 'text-warning' : 'text-danger') ?>">

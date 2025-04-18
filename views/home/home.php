@@ -42,6 +42,65 @@
         text-overflow: ellipsis;
         height: 1.5em;
     }
+
+    .product-link {
+        color: inherit;
+        text-decoration: none;
+    }
+
+    .product-link:hover {
+        color: inherit;
+        text-decoration: none;
+    }
+
+    .position-relative {
+        position: relative;
+    }
+
+    .stretched-link::after {
+        position: absolute;
+        top: 0;
+        right: 0;
+        bottom: 0;
+        left: 0;
+        z-index: 0;
+        content: "";
+    }
+
+    /* Ensure the Add to Cart button remains clickable */
+    .position-relative [style*="z-index: 1"] {
+        position: relative;
+        z-index: 1;
+    }
+
+    /* Add hover effect to the product card */
+    .p-4.rounded.bg-light {
+        transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+
+    .p-4.rounded.bg-light:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+    }
+
+    /* Add hover effect to the regular product cards */
+    .fruite-item {
+        transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+
+    .fruite-item:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+    }
+
+    /* Ensure product name and description don't change color on hover */
+    .product-link .text-dark:hover {
+        color: inherit !important;
+    }
+
+    .product-link:hover .product-description {
+        color: inherit;
+    }
 </style>
 <!-- Thêm thư viện SweetAlert2 -->
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
@@ -73,40 +132,38 @@
                                 <?php foreach ($sanphams as $sanpham): ?>
                                     <div class="col-md-6 col-lg-4 col-xl-3">
                                         <div class="rounded position-relative fruite-item">
-                                            <div class="fruite-img">
-                                                <a href="index.php?page=detail&id=<?= $sanpham['id']; ?>">
+                                            <a href="index.php?page=detail&id=<?= $sanpham['id']; ?>" class="text-decoration-none stretched-link product-link">
+                                                <div class="fruite-img">
                                                     <img src="upload/<?= htmlspecialchars($sanpham['hinhanh1']); ?>" class="img-fluid w-100 rounded-top" alt="<?= htmlspecialchars($sanpham['tensanpham']); ?>">
-                                                </a>
-                                            </div>
-                                            <div class="text-white bg-secondary px-3 py-1 rounded position-absolute" style="top: 10px; left: 10px;">Food</div>
-                                            <div class="p-4 border border-secondary border-top-0 rounded-bottom">
-                                                <h4>
-                                                    <a href="index.php?page=detail&id=<?= $sanpham['id']; ?>" class="text-dark text-decoration-none product-name">
-                                                        <?= htmlspecialchars($sanpham['tensanpham']); ?>
-                                                    </a>
-                                                </h4>
-                                                <p class="mb-4 product-description"><?= htmlspecialchars($sanpham['chitiet']); ?></p>
-                                                <div class="d-flex flex-column align-items-center">
-                                                    <div class="w-100 mb-3">
-                                                        <p class="text-dark fs-5 fw-bold mb-1">Giá: 
-                                                            <?= number_format($sanpham['gia'], 0, ',', '.') ?> VNĐ
-                                                        </p>
-                                                        <div class="d-flex align-items-center">
-                                                            <span class="badge bg-primary me-2">Số lượng:</span>
-                                                            <span class="fw-bold <?= $sanpham['soluong'] > 10 ? 'text-success' : ($sanpham['soluong'] > 0 ? 'text-warning' : 'text-danger') ?>">
-                                                                <?= htmlspecialchars($sanpham['soluong']); ?>
-                                                            </span>
-                                                        </div>
-                                                    </div>
-                                                    <form method="post" action="index.php?page=addToCart" class="w-100 text-center">
-                                                        <input type="hidden" name="product_id" value="<?= $sanpham['id']; ?>">
-                                                        <input type="hidden" name="quantity" value="1">
-                                                        <button type="submit" class="btn border border-secondary rounded-pill px-4 py-2 text-primary w-100">
-                                                            <i class="fa fa-shopping-bag me-2 text-primary"></i> Add to cart
-                                                        </button>
-                                                    </form>
                                                 </div>
-                                            </div>
+                                                <div class="text-white bg-secondary px-3 py-1 rounded position-absolute" style="top: 10px; left: 10px;">Food</div>
+                                                <div class="p-4 border border-secondary border-top-0 rounded-bottom">
+                                                    <h4 class="text-dark product-name">
+                                                        <?= htmlspecialchars($sanpham['tensanpham']); ?>
+                                                    </h4>
+                                                    <p class="mb-4 product-description"><?= htmlspecialchars($sanpham['chitiet']); ?></p>
+                                                    <div class="d-flex flex-column align-items-center">
+                                                        <div class="w-100 mb-3">
+                                                            <p class="text-dark fs-5 fw-bold mb-1">Giá: 
+                                                                <?= number_format($sanpham['gia'], 0, ',', '.') ?> VNĐ
+                                                            </p>
+                                                            <div class="d-flex align-items-center">
+                                                                <span class="badge bg-primary me-2">Số lượng:</span>
+                                                                <span class="fw-bold <?= $sanpham['soluong'] > 10 ? 'text-success' : ($sanpham['soluong'] > 0 ? 'text-warning' : 'text-danger') ?>">
+                                                                    <?= htmlspecialchars($sanpham['soluong']); ?>
+                                                                </span>
+                                                            </div>
+                                                        </div>
+                                                        <form method="post" action="index.php?page=addToCart" class="w-100 text-center" onclick="event.stopPropagation();">
+                                                            <input type="hidden" name="product_id" value="<?= $sanpham['id']; ?>">
+                                                            <input type="hidden" name="quantity" value="1">
+                                                            <button type="submit" class="btn border border-secondary rounded-pill px-4 py-2 text-primary w-100">
+                                                                <i class="fa fa-shopping-bag me-2 text-primary"></i> Add to cart
+                                                            </button>
+                                                        </form>
+                                                    </div>
+                                                </div>
+                                            </a>
                                         </div>
                                     </div>
                                 <?php endforeach; ?>
@@ -142,8 +199,8 @@
                                 <img src="upload/anh4.jpg" class="img-fluid rounded-top w-100" alt="">
                                 <div class="px-4 rounded-bottom">
                                     <div class="service-content bg-light text-center p-4 rounded">
-                                        <h5 class="text-primary">Tasty Fruits</h5>
-                                        <h3 class="mb-0">Free delivery</h3>
+                                        <h5 class="text-primary">Dễ dàng </h5>
+                                        <h3 class="mb-0">Đặt món yêu thích</h3>
                                     </div>
                                 </div>
                             </div>
@@ -256,27 +313,33 @@
                         <?php foreach ($sanphamgiamgia as $spg): ?>
                             <div class="col-lg-6 col-xl-4">
                                 <div class="p-4 rounded bg-light">
-                                    <div class="row align-items-center">
-                                        <div class="col-6">
-                                            <img src="upload/<?= htmlspecialchars($spg['hinhanh1']); ?>" class="img-fluid rounded-circle w-100" alt="<?= htmlspecialchars($spg['tensanpham']); ?>">
-                                        </div>
-                                        <div class="col-6">
-                                            <a href="index.php?page=detail&id=<?= $spg['id']; ?>" class="h5"><?= htmlspecialchars($spg['tensanpham']); ?></a>
-                                            <div class="d-flex my-3">
-                                                <i class="fas fa-star text-primary"></i>
-                                                <i class="fas fa-star text-primary"></i>
-                                                <i class="fas fa-star text-primary"></i>
-                                                <i class="fas fa-star text-primary"></i>
-                                                <i class="fas fa-star"></i>
+                                    <div class="row align-items-center position-relative">
+                                        <a href="index.php?page=detail&id=<?= $spg['id'] ?>" class="text-decoration-none stretched-link product-link">
+                                            <div class="col-6">
+                                                <img src="upload/<?= htmlspecialchars($spg['hinhanh1']); ?>" class="img-fluid rounded-circle w-100" alt="<?= htmlspecialchars($spg['tensanpham']); ?>">
                                             </div>
-                                            <div class="d-flex align-items-center">
-                                                <h4 class="mb-0 text-danger"><?= number_format($spg['giagiam'], 0, ',', '.') ?> VNĐ</h4>
-                                                <h5 class="mb-0 text-muted text-decoration-line-through ms-2"><?= number_format($spg['gia'], 0, ',', '.') ?> VNĐ</h5>
+                                            <div class="col-6">
+                                                <h5 class="text-dark"><?= htmlspecialchars($spg['tensanpham']); ?></h5>
+                                                <div class="d-flex my-3">
+                                                    <i class="fas fa-star text-primary"></i>
+                                                    <i class="fas fa-star text-primary"></i>
+                                                    <i class="fas fa-star text-primary"></i>
+                                                    <i class="fas fa-star text-primary"></i>
+                                                    <i class="fas fa-star"></i>
+                                                </div>
+                                                <div class="d-flex align-items-center">
+                                                    <h4 class="mb-0 text-danger"><?= number_format($spg['giagiam'], 0, ',', '.') ?> VNĐ</h4>
+                                                    <h5 class="mb-0 text-muted text-decoration-line-through ms-2"><?= number_format($spg['gia'], 0, ',', '.') ?> VNĐ</h5>
+                                                </div>
                                             </div>
+                                        </a>
+                                        <div class="col-12 mt-3 position-relative" style="z-index: 1;">
                                             <form method="post" action="index.php?page=addToCart" onsubmit="return addToCart(event)">
                                                 <input type="hidden" name="product_id" value="<?= $spg['id']; ?>">
                                                 <input type="hidden" name="quantity" value="1">
-                                                <button type="submit" class="btn border border-secondary rounded-pill px-3 text-primary mt-2">
+                                                <input type="hidden" name="is_discounted" value="1">
+                                                <input type="hidden" name="discounted_price" value="<?= $spg['giagiam']; ?>">
+                                                <button type="submit" class="btn border border-secondary rounded-pill px-3 text-primary w-100">
                                                     <i class="fa fa-shopping-bag me-2 text-primary"></i> Add to cart
                                                 </button>
                                             </form>
@@ -304,29 +367,29 @@
                         <div class="col-md-6 col-lg-6 col-xl-3">
                             <div class="counter bg-white rounded p-5">
                                 <i class="fa fa-users text-secondary"></i>
-                                <h4>satisfied customers</h4>
+                                <h4>Khách hàng hài lòng</h4>
                                 <h1>1963</h1>
                             </div>
                         </div>
                         <div class="col-md-6 col-lg-6 col-xl-3">
                             <div class="counter bg-white rounded p-5">
                                 <i class="fa fa-users text-secondary"></i>
-                                <h4>quality of service</h4>
+                                <h4>Chất lượng dịch vụ</h4>
                                 <h1>99%</h1>
                             </div>
                         </div>
                         <div class="col-md-6 col-lg-6 col-xl-3">
                             <div class="counter bg-white rounded p-5">
                                 <i class="fa fa-users text-secondary"></i>
-                                <h4>quality certificates</h4>
+                                <h4>Chứng chỉ đảm bảo chất lượng</h4>
                                 <h1>33</h1>
                             </div>
                         </div>
                         <div class="col-md-6 col-lg-6 col-xl-3">
                             <div class="counter bg-white rounded p-5">
                                 <i class="fa fa-users text-secondary"></i>
-                                <h4>Available Products</h4>
-                                <h1>789</h1>
+                                <h4>Sản phẩm đang có sẵn</h4>
+                                <h1>89</h1>
                             </div>
                         </div>
                     </div>

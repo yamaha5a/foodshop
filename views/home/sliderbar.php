@@ -30,8 +30,8 @@
                         <i class="fas fa-exchange-alt fa-3x text-white"></i>
                     </div>
                     <div class="featurs-content text-center">
-                        <h5>Đổi Trả Trong 3 Ngày</h5>
-                        <p class="mb-0">Cam kết hoàn tiền trong 3 ngày</p>
+                        <h5>Giá rẻ bất ngờ</h5>
+                        <p class="mb-0">Không lo cháy ví</p>
                     </div>
                 </div>
             </div>

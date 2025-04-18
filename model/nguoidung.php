@@ -77,4 +77,19 @@ class NguoiDungModel {
             return [];
         }
     }
+
+    public function capNhatMatKhau($id, $matkhau) {
+        try {
+            $sql = "UPDATE nguoidung SET matkhau = ? WHERE id = ?";
+            $stmt = $this->conn->prepare($sql);
+            return $stmt->execute([password_hash($matkhau, PASSWORD_DEFAULT), $id]);
+        } catch (PDOException $e) {
+            return false;
+        }
+    }
+
+    public function updateAvatar($userId, $avatarPath) {
+        $sql = "UPDATE nguoidung SET hinhanh = ? WHERE id = ?";
+        return pdo_execute($sql, $avatarPath, $userId);
+    }
 }

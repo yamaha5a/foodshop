@@ -3,14 +3,38 @@ require_once __DIR__ . '/../models/NguoiDung.php'; // Sử dụng đường dẫ
 
 class NguoiDungController {
     private $nguoiDungModel;
+    private $itemsPerPage = 10; // Số item trên mỗi trang
 
     public function __construct() {
         $this->nguoiDungModel = new NguoiDung();
     }
 
     public function danhSach() {
-        $danhSachNguoiDung = $this->nguoiDungModel->layDanhSachNguoiDung();
-        include __DIR__ . '/../views/nguoidung/list.php'; 
+        // Lấy tham số tìm kiếm và trang hiện tại
+        $search = isset($_GET['search']) ? trim($_GET['search']) : '';
+        $currentPage = isset($_GET['page']) ? (int)$_GET['page'] : 1;
+        $currentPage = max(1, $currentPage); // Đảm bảo trang hiện tại không nhỏ hơn 1
+
+        // Lấy tổng số người dùng (có thể bao gồm điều kiện tìm kiếm)
+        $totalItems = $this->nguoiDungModel->layTongSoNguoiDung($search);
+        $totalPages = ceil($totalItems / $this->itemsPerPage);
+
+        // Đảm bảo trang hiện tại không vượt quá tổng số trang
+        $currentPage = min($currentPage, $totalPages);
+
+        // Tính offset cho truy vấn
+        $offset = ($currentPage - 1) * $this->itemsPerPage;
+
+        // Lấy danh sách người dùng với phân trang và tìm kiếm
+        $danhSachNguoiDung = $this->nguoiDungModel->layDanhSachNguoiDungPhanTrang($search, $offset, $this->itemsPerPage);
+
+        // Truyền các biến cần thiết cho view
+        $GLOBALS['danhSachNguoiDung'] = $danhSachNguoiDung;
+        $GLOBALS['currentPage'] = $currentPage;
+        $GLOBALS['totalPages'] = $totalPages;
+        $GLOBALS['search'] = $search;
+
+        include __DIR__ . '/../views/nguoidung/list.php';
     }
 
     public function layTenQuyen($id) {

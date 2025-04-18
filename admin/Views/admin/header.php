@@ -91,8 +91,6 @@ if (!isset($_SESSION['user_id']) || $_SESSION['tenquyen'] !== 'admin') {
 </style>
 <div class="header">
     <div class="search-bar">
-        <i class="fas fa-search"></i>
-        <input type="text" placeholder="Search..." />
     </div>
     <div class="header-actions">
         <div class="clock-card">
@@ -102,12 +100,8 @@ if (!isset($_SESSION['user_id']) || $_SESSION['tenquyen'] !== 'admin') {
             </div>
         </div>
         <div class="notification">
-            <i class="fas fa-bell"></i>
-            <div class="badge">3</div>
         </div>
-        <div class="notification">
-            <i class="fas fa-envelope"></i>
-            <div class="badge">5</div>
+        <div class="notification">       
         </div>
         <div class="user-profile" onclick="toggleDropdown()">
             <div class="profile-container">

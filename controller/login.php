@@ -105,4 +105,56 @@ class AuthController {
         echo '<script>window.location.href = "index.php?page=home";</script>';
         exit;
     }
+
+    public function changePassword() {
+        if (!isset($_SESSION['user']) || !is_array($_SESSION['user'])) {
+            echo '<script>alert("Vui lòng đăng nhập để thay đổi mật khẩu"); window.location.href = "index.php?page=home";</script>';
+            exit();
+        }
+
+        if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+            $currentPassword = $_POST['currentPassword'] ?? '';
+            $newPassword = $_POST['newPassword'] ?? '';
+            $confirmPassword = $_POST['confirmPassword'] ?? '';
+
+            // Validate input
+            if (empty($currentPassword) || empty($newPassword) || empty($confirmPassword)) {
+                echo '<script>alert("Vui lòng điền đầy đủ thông tin"); window.location.href = "index.php?page=profile";</script>';
+                exit();
+            }
+
+            if ($newPassword !== $confirmPassword) {
+                echo '<script>alert("Mật khẩu mới không khớp"); window.location.href = "index.php?page=profile";</script>';
+                exit();
+            }
+
+            if (strlen($newPassword) < 6) {
+                echo '<script>alert("Mật khẩu mới phải có ít nhất 6 ký tự"); window.location.href = "index.php?page=profile";</script>';
+                exit();
+            }
+
+            // Verify current password
+            $userModel = new NguoiDungModel();
+            $user = $userModel->getUserById($_SESSION['user']['id']);
+
+            if (!$user || !password_verify($currentPassword, $user['matkhau'])) {
+                echo '<script>alert("Mật khẩu hiện tại không đúng"); window.location.href = "index.php?page=profile";</script>';
+                exit();
+            }
+
+            // Update password
+            if ($userModel->capNhatMatKhau($user['id'], $newPassword)) {
+                // Clear all session data
+                session_unset();
+                session_destroy();
+                // Start new session for the success message
+                session_start();
+                echo '<script>alert("Cập nhật mật khẩu thành công. Vui lòng đăng nhập lại."); window.location.href = "index.php?page=login";</script>';
+                exit();
+            } else {
+                echo '<script>alert("Cập nhật mật khẩu thất bại"); window.location.href = "index.php?page=profile";</script>';
+                exit();
+            }
+        }
+    }
 }

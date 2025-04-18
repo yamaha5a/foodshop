@@ -24,6 +24,29 @@ class NguoiDung {
         $sql = "UPDATE nguoidung SET ten = ?, email = ?, sodienthoai = ?, id_phanquyen = ?, trangthai = ?, hinhanh = ? WHERE id = ?";
         return pdo_execute($sql, $ten, $email, $sodienthoai, $id_phanquyen, $trangthai, $hinhanh, $id);
     }
-        
+    
+    // Thêm phương thức để lấy tổng số người dùng (có thể bao gồm điều kiện tìm kiếm)
+    public function layTongSoNguoiDung($search = '') {
+        if (empty($search)) {
+            $sql = "SELECT COUNT(*) FROM nguoidung";
+            return pdo_query_value($sql);
+        } else {
+            $sql = "SELECT COUNT(*) FROM nguoidung WHERE ten LIKE ? OR email LIKE ?";
+            $searchTerm = "%$search%";
+            return pdo_query_value($sql, $searchTerm, $searchTerm);
+        }
+    }
+    
+    // Thêm phương thức để lấy danh sách người dùng với phân trang và tìm kiếm
+    public function layDanhSachNguoiDungPhanTrang($search = '', $offset = 0, $limit = 10) {
+        if (empty($search)) {
+            $sql = "SELECT * FROM nguoidung ORDER BY id DESC LIMIT ? OFFSET ?";
+            return pdo_query($sql, $limit, $offset);
+        } else {
+            $sql = "SELECT * FROM nguoidung WHERE ten LIKE ? OR email LIKE ? ORDER BY id DESC LIMIT ? OFFSET ?";
+            $searchTerm = "%$search%";
+            return pdo_query($sql, $searchTerm, $searchTerm, $limit, $offset);
+        }
+    }
 }
 ?>

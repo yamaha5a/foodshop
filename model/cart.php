@@ -15,11 +15,21 @@ class CartModel {
         if (!$cart) {
             return [];
         }
-        $sql = "SELECT gct.*, sp.tensanpham, sp.hinhanh1, sp.gia, sp.soluong as soluong_kho 
+        $sql = "SELECT gct.*, sp.tensanpham, sp.hinhanh1, sp.gia as gia_goc, sp.soluong as soluong_kho, 
+                CASE WHEN spg.giagiam > 0 THEN 1 ELSE 0 END as is_discounted,
+                CASE WHEN spg.giagiam > 0 THEN spg.giagiam ELSE sp.gia END as gia_hien_tai
                 FROM giohang_chitiet gct 
                 JOIN sanpham sp ON gct.id_sanpham = sp.id 
+                LEFT JOIN sanphamgiamgia spg ON sp.id = spg.id_sanpham
                 WHERE gct.id_giohang = ?";
-        return pdo_query($sql, $cart['id']);
+        $items = pdo_query($sql, $cart['id']);
+        
+        // Update the 'gia' field to use the current price
+        foreach ($items as &$item) {
+            $item['gia'] = $item['gia_hien_tai'];
+        }
+        
+        return $items;
     }
     public function addToCart($userId, $productId, $quantity = 1) {
         try {
@@ -34,14 +44,23 @@ class CartModel {
                 $sql = "UPDATE giohang_chitiet SET soluong = ? WHERE id = ?";
                 return pdo_execute($sql, $quantity, $existingItem['id']);
             } else {
-                $sql = "SELECT gia FROM sanpham WHERE id = ?";
-                $product = pdo_query_one($sql, $productId);  
+                // Check if the product is a discounted product
+                $sql = "SELECT sp.gia, spg.giagiam 
+                        FROM sanpham sp 
+                        LEFT JOIN sanphamgiamgia spg ON sp.id = spg.id_sanpham 
+                        WHERE sp.id = ?";
+                $product = pdo_query_one($sql, $productId);
+                
                 if (!$product) {
                     throw new Exception("Sản phẩm không tồn tại");
                 }
+                
+                // Use discounted price if available, otherwise use regular price
+                $price = isset($product['giagiam']) && $product['giagiam'] > 0 ? $product['giagiam'] : $product['gia'];
+                
                 $sql = "INSERT INTO giohang_chitiet (id_giohang, id_sanpham, soluong, gia) 
                         VALUES (?, ?, ?, ?)";
-                return pdo_execute($sql, $cart['id'], $productId, $quantity, $product['gia']);
+                return pdo_execute($sql, $cart['id'], $productId, $quantity, $price);
             }
         } catch (Exception $e) {
             error_log("Error in addToCart: " . $e->getMessage());

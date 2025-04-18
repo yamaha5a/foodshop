@@ -11,15 +11,26 @@ class CheckoutModel {
                     gc.id_topping,
                     sp.tensanpham,
                     sp.hinhanh1,
+                    sp.gia as gia_goc,
                     tp.tentopping,
-                    tp.gia as gia_topping
+                    tp.gia as gia_topping,
+                    CASE WHEN spg.giagiam > 0 THEN 1 ELSE 0 END as is_discounted,
+                    CASE WHEN spg.giagiam > 0 THEN spg.giagiam ELSE sp.gia END as gia_hien_tai
                 FROM giohang_chitiet gc
-                JOIN sanpham sp ON gc.id_sanpham = sp.id
+                JOIN sanpham sp ON gc.id_sanpham = sp.id 
                 LEFT JOIN topping tp ON gc.id_topping = tp.id
+                LEFT JOIN sanphamgiamgia spg ON sp.id = spg.id_sanpham
                 JOIN giohang gh ON gc.id_giohang = gh.id
                 WHERE gh.id_nguoidung = ? AND gh.trangthai = 'Chưa đặt'";
         
-        return pdo_query($sql, $userId);
+        $items = pdo_query($sql, $userId);
+        
+        // Update the 'gia' field to use the current price
+        foreach ($items as &$item) {
+            $item['gia'] = $item['gia_hien_tai'];
+        }
+        
+        return $items;
     }
 
     // Get user's shipping addresses

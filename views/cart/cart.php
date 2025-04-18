@@ -66,7 +66,20 @@
                                     <img src="upload/<?= htmlspecialchars($item['hinhanh1']) ?>" width="80" class="rounded-circle" />
                                 </td>
                                 <td><?= htmlspecialchars($item['tensanpham']) ?></td>
-                                <td><?= number_format($item['gia'], 0, ',', '.') ?> VNĐ</td>
+                                <td>
+                                    <?php if ($item['is_discounted']): ?>
+                                        <span class="text-decoration-line-through text-muted"><?= number_format($item['gia_goc'], 0, ',', '.') ?> VNĐ</span><br>
+                                        <span id="price-<?= $item['id_sanpham'] ?>" class="text-danger fw-bold discounted" 
+                                              data-original-price="<?= $item['gia_goc'] ?>" 
+                                              data-discounted-price="<?= $item['gia'] ?>">
+                                            <?= number_format($item['gia'], 0, ',', '.') ?> VNĐ
+                                        </span>
+                                    <?php else: ?>
+                                        <span id="price-<?= $item['id_sanpham'] ?>">
+                                            <?= number_format($item['gia'], 0, ',', '.') ?> VNĐ
+                                        </span>
+                                    <?php endif; ?>
+                                </td>
                                 <td>
                                     <div class="input-group">
                                         <button type="button" class="btn btn-sm btn-outline-secondary" onclick="updateQuantity(<?= $item['id_sanpham'] ?>, 'decrease')">-</button>
@@ -125,6 +138,26 @@
                             <h5 class="mb-0 me-4">Tạm tính:</h5>
                             <p class="mb-0" id="subtotal"><?= number_format($totalAll, 0, ',', '.') ?> VNĐ</p>
                         </div>
+                        <?php 
+                        // Calculate total savings from discounted products
+                        $totalSavings = 0;
+                        foreach ($cartItems as $item) {
+                            if ($item['is_discounted']) {
+                                $totalSavings += ($item['gia_goc'] - $item['gia']) * $item['soluong'];
+                            }
+                        }
+                        ?>
+                        <?php if ($totalSavings > 0): ?>
+                            <div class="d-flex justify-content-between mb-4" id="savings-row">
+                                <h5 class="mb-0 me-4">Tiết kiệm từ sản phẩm giảm giá:</h5>
+                                <p class="mb-0 text-success" id="savings">-<?= number_format($totalSavings, 0, ',', '.') ?> VNĐ</p>
+                            </div>
+                        <?php else: ?>
+                            <div class="d-flex justify-content-between mb-4" id="savings-row" style="display: none;">
+                                <h5 class="mb-0 me-4">Tiết kiệm từ sản phẩm giảm giá:</h5>
+                                <p class="mb-0 text-success" id="savings">-0 VNĐ</p>
+                            </div>
+                        <?php endif; ?>
                         <?php if (isset($_SESSION['discount'])): ?>
                             <div class="d-flex justify-content-between" id="discountRow">
                                 <h5 class="mb-0 me-4">Giảm giá:</h5>
@@ -234,14 +267,35 @@ function updateQuantity(productId, action, newValue = null) {
 
 function updateCartTotal() {
     let totalAll = 0;
+    let totalSavings = 0;
+    
     document.querySelectorAll('[id^="product-total-"]').forEach(element => {
         const total = parseFloat(element.textContent.replace(/[^\d]/g, ''));
         totalAll += total;
+        
+        // Check if this is a discounted product
+        const productId = element.id.split('-')[2];
+        const priceElement = document.querySelector(`#price-${productId}`);
+        if (priceElement && priceElement.classList.contains('discounted')) {
+            const originalPrice = parseFloat(priceElement.getAttribute('data-original-price'));
+            const discountedPrice = parseFloat(priceElement.getAttribute('data-discounted-price'));
+            const quantity = parseInt(document.getElementById(`quantity-${productId}`).value);
+            totalSavings += (originalPrice - discountedPrice) * quantity;
+        }
     });
     
     // Update subtotal
     document.getElementById('total-amount').textContent = `${totalAll.toLocaleString('vi-VN')} VNĐ`;
     document.getElementById('subtotal').textContent = `${totalAll.toLocaleString('vi-VN')} VNĐ`;
+    
+    // Update savings if any
+    const savingsElement = document.getElementById('savings');
+    if (savingsElement && totalSavings > 0) {
+        savingsElement.textContent = `-${totalSavings.toLocaleString('vi-VN')} VNĐ`;
+        document.getElementById('savings-row').style.display = 'flex';
+    } else if (savingsElement) {
+        document.getElementById('savings-row').style.display = 'none';
+    }
     
     // Update grand total (with discount if applicable)
     let grandTotal = totalAll;

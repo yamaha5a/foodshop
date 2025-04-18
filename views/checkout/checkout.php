@@ -74,9 +74,16 @@
                                                 </div>
                                             </th>
                                             <td class="py-5"><?= htmlspecialchars($item['tensanpham']) ?></td>
-                                            <td class="py-5">$<?= number_format($item['gia'], 2) ?></td>
+                                            <td class="py-5">
+                                                <?php if (isset($item['is_discounted']) && $item['is_discounted']): ?>
+                                                    <span class="text-decoration-line-through text-muted"><?= number_format($item['gia_goc'], 0, ',', '.') ?> VNĐ</span><br>
+                                                    <span class="text-danger"><?= number_format($item['gia'], 0, ',', '.') ?> VNĐ</span>
+                                                <?php else: ?>
+                                                    <?= number_format($item['gia'], 0, ',', '.') ?> VNĐ
+                                                <?php endif; ?>
+                                            </td>
                                             <td class="py-5"><?= $item['soluong'] ?></td>
-                                            <td class="py-5">$<?= number_format(($item['gia'] + ($item['gia_topping'] ?? 0)) * $item['soluong'], 2) ?></td>
+                                            <td class="py-5"><?= number_format(($item['gia'] + ($item['gia_topping'] ?? 0)) * $item['soluong'], 0, ',', '.') ?> VNĐ</td>
                                         </tr>
                                         <!-- Add hidden fields for each cart item -->
                                         <input type="hidden" name="cart_items[<?= $index ?>][id_sanpham]" value="<?= $item['id_sanpham'] ?>">
@@ -99,7 +106,7 @@
                                         </td>
                                         <td class="py-5">
                                             <div class="py-3 border-bottom border-top">
-                                            <p class="mb-0 text-dark">$<?= isset($total) ? number_format($total, 2) : '0.00' ?></p>
+                                            <p class="mb-0 text-dark"><?= isset($total) ? number_format($total, 0, ',', '.') : '0' ?> VNĐ</p>
                                             </div>
                                         </td>
                                     </tr>
@@ -112,7 +119,7 @@
                                         <td class="py-5"></td>
                                         <td class="py-5">
                                             <div class="py-3 border-bottom border-top">
-                                                <p class="mb-0 text-dark">$<?= isset($total) ? number_format($total, 2) : '0.00' ?></p>
+                                                <p class="mb-0 text-dark"><?= isset($total) ? number_format($total, 0, ',', '.') : '0' ?> VNĐ</p>
                                             </div>
                                         </td>
                                     </tr>

@@ -101,6 +101,22 @@ $comments = isset($GLOBALS['comments']) ? $GLOBALS['comments'] : [];
                     <h5 class="mb-0">Thay đổi mật khẩu</h5>
                 </div>
                 <div class="card-body">
+                    <?php if (isset($_SESSION['error_message'])): ?>
+                        <div class="alert alert-danger">
+                            <?php 
+                            echo $_SESSION['error_message'];
+                            unset($_SESSION['error_message']);
+                            ?>
+                        </div>
+                    <?php endif; ?>
+                    <?php if (isset($_SESSION['success_message'])): ?>
+                        <div class="alert alert-success">
+                            <?php 
+                            echo $_SESSION['success_message'];
+                            unset($_SESSION['success_message']);
+                            ?>
+                        </div>
+                    <?php endif; ?>
                     <form action="index.php?page=changePassword" method="POST">
                         <div class="mb-3">
                             <label for="currentPassword" class="form-label">Mật khẩu hiện tại</label>
@@ -182,16 +198,33 @@ $comments = isset($GLOBALS['comments']) ? $GLOBALS['comments'] : [];
             <div class="modal-body">
                 <form action="index.php?page=changeAvatar" method="POST" enctype="multipart/form-data">
                     <div class="mb-3">
-                        <label for="avatar" class="form-label">Chọn ảnh (không bắt buộc)</label>
-                        <input class="form-control" type="file" id="avatar" name="avatar" accept="image/*">
-                        <small class="text-muted">Chỉ chấp nhận file ảnh (JPEG, PNG, GIF)</small>
+                        <label for="avatar" class="form-label">Chọn ảnh</label>
+                        <input class="form-control" type="file" id="avatar" name="avatar" accept="image/*" required>
+                        <small class="text-muted">Chỉ chấp nhận file ảnh (JPEG, PNG, GIF), kích thước tối đa 5MB</small>
                     </div>
-                    <button type="submit" class="btn btn-primary">Tải lên</button>
+                    <div class="text-center">
+                        <button type="submit" class="btn btn-primary">Tải lên</button>
+                    </div>
                 </form>
             </div>
         </div>
     </div>
 </div>
+
+<script>
+// Preview ảnh trước khi tải lên
+document.getElementById('avatar').addEventListener('change', function(e) {
+    const file = e.target.files[0];
+    if (file) {
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            const preview = document.querySelector('.rounded-circle');
+            preview.src = e.target.result;
+        }
+        reader.readAsDataURL(file);
+    }
+});
+</script>
 
 <style>
     .card {

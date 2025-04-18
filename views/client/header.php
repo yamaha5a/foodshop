@@ -58,8 +58,6 @@ if (session_status() === PHP_SESSION_NONE) {
 
                     <a href="index.php?page=cart" class="position-relative me-4 my-auto">
                         <i class="fa fa-shopping-bag fa-2x"></i>
-                        <span id="cart-count" class="position-absolute bg-secondary rounded-circle d-flex align-items-center justify-content-center text-dark px-1"
-                            style="top: -5px; left: 15px; height: 20px; min-width: 20px;"><?php echo isset($_SESSION['cart_count']) ? $_SESSION['cart_count'] : 0; ?></span>
                     </a>
 
                     <div class="dropdown">
@@ -84,11 +82,48 @@ if (session_status() === PHP_SESSION_NONE) {
     </div>
 </div>
 <!-- Navbar End -->
+
+<!-- Search Modal Start -->
+<div class="modal fade" id="searchModal" tabindex="-1" aria-labelledby="searchModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="searchModalLabel">Tìm kiếm sản phẩm</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form action="index.php" method="get" id="searchForm">
+                    <input type="hidden" name="page" value="product">
+                    <div class="input-group">
+                        <input type="text" class="form-control" name="search" placeholder="Nhập tên sản phẩm cần tìm..." required>
+                        <button class="btn btn-primary" type="submit">
+                            <i class="fas fa-search"></i> Tìm kiếm
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- Search Modal End -->
+
 <script>
     // Khi trang load, đọc dữ liệu từ localStorage
     document.addEventListener('DOMContentLoaded', () => {
         const storedCartCount = localStorage.getItem('cartCount') || 0;
         document.getElementById('cart-count').textContent = storedCartCount;
+
+        // Xử lý form tìm kiếm
+        const searchForm = document.getElementById('searchForm');
+        if (searchForm) {
+            searchForm.addEventListener('submit', function(e) {
+                const searchInput = this.querySelector('input[name="search"]');
+                if (!searchInput.value.trim()) {
+                    e.preventDefault();
+                    alert('Vui lòng nhập từ khóa tìm kiếm');
+                }
+            });
+        }
     });
 </script>
 

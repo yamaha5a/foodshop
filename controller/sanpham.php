@@ -42,6 +42,7 @@ class sanPhamController
         $start = ($page - 1) * $limit;
     
         $danhMucs = $this->danhMucModel->getAllDanhMuc();
+        $featuredDiscountedProducts = $this->sanphamModel->getDiscountedProducts(4);
     
         // Get search parameters
         $keyword = isset($_GET['search']) ? trim($_GET['search']) : '';

@@ -10,7 +10,7 @@ error_reporting(E_ALL);
 <head>
     <meta charset="utf-8">
     <title>SHOP FOOD - LONGBEO</title>
-    <link rel="icon" type="" href="upload/z6502563846378_7a36bf7f53b765a9cbe480e8bea06d86.jpg">
+    <link rel="icon" type="" href="upload/logo.jpg">
     <meta content="width=device-width, initial-scale=1.0" name="viewport">
     <meta content="" name="keywords">
     <meta content="" name="description">
@@ -100,7 +100,7 @@ switch ($page) {
     case 'removeCart':
         require_once 'controller/cart.php';
         $cartController = new CartController();
-        $cartController->removeCart();
+        $cartController->removeFromCart();
         break;
                     
     case 'checkout':
@@ -147,9 +147,7 @@ switch ($page) {
         $login->logout();   
         break;
     case 'profile':
-        require_once 'controller/profile.php';
-        $profileController = new ProfileController();
-        $profileController->viewProfile();
+        include 'views/profile/profile.php';
         break;
     case 'changeAvatar':
         require_once 'controller/profile.php';
@@ -191,6 +189,12 @@ switch ($page) {
         require_once 'controller/sanphamgiamgia.php';
         $sanphamGiamGiaController = new SanPhamGiamGiaController();
         $sanphamGiamGiaController->listAllDiscountProducts();
+        break;
+
+    case 'changePassword':
+        require_once 'controller/login.php';
+        $authController = new AuthController();
+        $authController->changePassword();
         break;
 
     default:

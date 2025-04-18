@@ -47,7 +47,14 @@
                     <div class="col-lg-6">
                         <h4 class="fw-bold mb-3">Tên sản phẩm: <?= htmlspecialchars($product['tensanpham']) ?></h4>
                         <p class="mb-3">Danh mục: <?= htmlspecialchars($product['tendanhmuc']) ?></p>
-                        <h5 class="fw-bold mb-3">Số tiền: <?= number_format($product['gia'], 0, ',', '.') ?> VNĐ</h5>
+                        <h5 class="fw-bold mb-3">
+                            <?php if (isset($product['is_discounted']) && $product['is_discounted']): ?>
+                                <span class="text-decoration-line-through text-muted"><?= number_format($product['gia'], 0, ',', '.') ?> VNĐ</span><br>
+                                <span class="text-danger"><?= number_format($product['giagiam'], 0, ',', '.') ?> VNĐ</span>
+                            <?php else: ?>
+                                <?= number_format($product['gia'], 0, ',', '.') ?> VNĐ
+                            <?php endif; ?>
+                        </h5>
                         <div class="d-flex mb-4">Đánh giá:    
                             <i class="fa fa-star text-secondary"></i>
                             <i class="fa fa-star text-secondary"></i>
@@ -262,7 +269,22 @@
                                         <h4 class="product-name" style="cursor: pointer;" onclick="loadProductDetail(<?= $related['id'] ?>)"><?= htmlspecialchars($related['tensanpham']) ?></h4>
                                         <p class="product-description"><?= htmlspecialchars($related['mota']) ?></p>
                                         <div class="d-flex justify-content-between flex-lg-wrap">
-                                            <p class="text-dark fs-5 fw-bold"><?= number_format($related['gia'], 0, ',', '.') ?> VNĐ</p>
+                                            <?php if (isset($related['is_discounted']) && $related['is_discounted']): ?>
+                                                <p class="text-dark fs-5 fw-bold">
+                                                    <span class="text-decoration-line-through text-muted"><?= number_format($related['gia'], 0, ',', '.') ?> VNĐ</span><br>
+                                                    <span id="related-price-<?= $related['id'] ?>" class="text-danger discounted" 
+                                                          data-original-price="<?= $related['gia'] ?>" 
+                                                          data-discounted-price="<?= $related['giagiam'] ?>">
+                                                        <?= number_format($related['giagiam'], 0, ',', '.') ?> VNĐ
+                                                    </span>
+                                                </p>
+                                            <?php else: ?>
+                                                <p class="text-dark fs-5 fw-bold">
+                                                    <span id="related-price-<?= $related['id'] ?>">
+                                                        <?= number_format($related['gia'], 0, ',', '.') ?> VNĐ
+                                                    </span>
+                                                </p>
+                                            <?php endif; ?>
                                         </div>
                                     </div>
                                     <div class="p-4 pt-0">
@@ -452,6 +474,13 @@ function addRelatedToCart(event, productId) {
     // Lấy dữ liệu từ form
     const formData = new FormData(form);
     
+    // Thêm thông tin về sản phẩm giảm giá nếu có
+    const priceElement = document.querySelector(`#related-price-${productId}`);
+    if (priceElement && priceElement.classList.contains('discounted')) {
+        formData.append('is_discounted', '1');
+        formData.append('discounted_price', priceElement.getAttribute('data-discounted-price'));
+    }
+    
     // Gửi request AJAX
     fetch('index.php?page=addToCart', {
         method: 'POST',
@@ -635,6 +664,12 @@ function addToCart(event) {
     
     // Lấy dữ liệu từ form
     const formData = new FormData(form);
+    
+    // Thêm thông tin về sản phẩm giảm giá nếu có
+    <?php if ($product['is_discounted']): ?>
+    formData.append('is_discounted', '1');
+    formData.append('discounted_price', '<?= $product['giagiam'] ?>');
+    <?php endif; ?>
     
     // Gửi request AJAX
     fetch('index.php?page=addToCart', {

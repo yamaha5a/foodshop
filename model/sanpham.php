@@ -41,10 +41,14 @@ class SanPham
 public function getSanPhamByPage($start, $limit)
 {
     $stmt = $this->conn->prepare("
-        SELECT sp.* 
+        SELECT sp.*, 
+               CASE 
+                   WHEN spg.id_sanpham IS NOT NULL THEN spg.giagiam 
+                   ELSE 0 
+               END as giagiam
         FROM sanpham sp 
+        LEFT JOIN sanphamgiamgia spg ON sp.id = spg.id_sanpham
         WHERE sp.trangthai = 'Còn hàng' 
-        AND sp.id NOT IN (SELECT id_sanpham FROM sanphamgiamgia)
         ORDER BY sp.id DESC 
         LIMIT :start, :limit
     ");
@@ -61,7 +65,6 @@ public function countAllSanPham()
         SELECT COUNT(*) 
         FROM sanpham sp 
         WHERE sp.trangthai = 'Còn hàng'
-        AND sp.id NOT IN (SELECT id_sanpham FROM sanphamgiamgia)
     ");
     $stmt->execute();
     return $stmt->fetchColumn();
@@ -69,11 +72,15 @@ public function countAllSanPham()
 public function getSanPhamByDanhMuc($idDanhMuc, $start, $limit)
 {
     $stmt = $this->conn->prepare("
-        SELECT sp.* 
+        SELECT sp.*, 
+               CASE 
+                   WHEN spg.id_sanpham IS NOT NULL THEN spg.giagiam 
+                   ELSE 0 
+               END as giagiam
         FROM sanpham sp 
+        LEFT JOIN sanphamgiamgia spg ON sp.id = spg.id_sanpham
         WHERE sp.trangthai = 'Còn hàng' 
         AND sp.id_danhmuc = :id_danhmuc
-        AND sp.id NOT IN (SELECT id_sanpham FROM sanphamgiamgia)
         ORDER BY sp.id DESC 
         LIMIT :start, :limit
     ");
@@ -91,7 +98,6 @@ public function countSanPhamByDanhMuc($idDanhMuc)
         FROM sanpham sp 
         WHERE sp.trangthai = 'Còn hàng' 
         AND sp.id_danhmuc = :id_danhmuc
-        AND sp.id NOT IN (SELECT id_sanpham FROM sanphamgiamgia)
     ");
     $stmt->bindValue(':id_danhmuc', (int)$idDanhMuc, PDO::PARAM_INT);
     $stmt->execute();
@@ -100,7 +106,19 @@ public function countSanPhamByDanhMuc($idDanhMuc)
 
 public function searchSanPham($keyword, $start, $limit)
 {
-    $stmt = $this->conn->prepare("SELECT * FROM sanpham WHERE trangthai = 'Còn hàng' AND (tensanpham LIKE :keyword OR mota LIKE :keyword) ORDER BY id DESC LIMIT :start, :limit");
+    $stmt = $this->conn->prepare("
+        SELECT sp.*, 
+               CASE 
+                   WHEN spg.id_sanpham IS NOT NULL THEN spg.giagiam 
+                   ELSE 0 
+               END as giagiam
+        FROM sanpham sp 
+        LEFT JOIN sanphamgiamgia spg ON sp.id = spg.id_sanpham
+        WHERE sp.trangthai = 'Còn hàng' 
+        AND (sp.tensanpham LIKE :keyword OR sp.mota LIKE :keyword) 
+        ORDER BY sp.id DESC 
+        LIMIT :start, :limit
+    ");
     $stmt->bindValue(':keyword', '%' . $keyword . '%', PDO::PARAM_STR);
     $stmt->bindValue(':start', (int)$start, PDO::PARAM_INT);
     $stmt->bindValue(':limit', (int)$limit, PDO::PARAM_INT);
@@ -218,6 +236,36 @@ public function searchSanPhamByPriceDesc($keyword, $start, $limit)
     $stmt->bindValue(':keyword', '%' . $keyword . '%', PDO::PARAM_STR);
     $stmt->bindValue(':start', (int)$start, PDO::PARAM_INT);
     $stmt->bindValue(':limit', (int)$limit, PDO::PARAM_INT);
+    $stmt->execute();
+    return $stmt->fetchAll(PDO::FETCH_ASSOC);
+}
+
+public function getDiscountedProducts($limit = 4)
+{
+    $stmt = $this->conn->prepare("
+        SELECT sp.*, spg.giagiam 
+        FROM sanpham sp 
+        JOIN sanphamgiamgia spg ON sp.id = spg.id_sanpham 
+        WHERE sp.trangthai = 'Còn hàng' 
+        AND spg.giagiam > 0 
+        ORDER BY spg.giagiam DESC 
+        LIMIT :limit
+    ");
+    $stmt->bindValue(':limit', (int)$limit, PDO::PARAM_INT);
+    $stmt->execute();
+    return $stmt->fetchAll(PDO::FETCH_ASSOC);
+}
+
+public function getAllDiscountedProducts()
+{
+    $stmt = $this->conn->prepare("
+        SELECT sp.*, spg.giagiam 
+        FROM sanpham sp 
+        JOIN sanphamgiamgia spg ON sp.id = spg.id_sanpham 
+        WHERE sp.trangthai = 'Còn hàng' 
+        AND spg.giagiam > 0 
+        ORDER BY spg.giagiam DESC
+    ");
     $stmt->execute();
     return $stmt->fetchAll(PDO::FETCH_ASSOC);
 }
