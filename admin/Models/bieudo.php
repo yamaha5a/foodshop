@@ -17,7 +17,7 @@ class BieuDo {
                     DATE_FORMAT(ngaytao, '%Y-%m') as thang,
                     SUM(tongtien) as tongdoanhthu
                 FROM hoadon 
-                WHERE trangthai = 'Đã giao'
+                WHERE trangthai = 'Khách hàng đã nhận'
                 AND ngaytao >= DATE_SUB(CURDATE(), INTERVAL 12 MONTH)
                 GROUP BY DATE_FORMAT(ngaytao, '%Y-%m')
                 ORDER BY thang ASC";

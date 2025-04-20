@@ -1,4 +1,5 @@
 <?php
+require_once __DIR__ . '/../check_auth.php';
 require_once 'Models/sanpham.php'; // Đảm bảo model đã được bao gồm
 require_once 'Models/danhmuc.php';
 

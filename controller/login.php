@@ -94,21 +94,28 @@ class AuthController {
     }
 
     public function logout() {
+        // Set success message before destroying session
+        $_SESSION['success_message'] = "Đăng xuất thành công!";
+        
         // Unset all session variables
         $_SESSION = array();
 
         // Destroy the session
         session_destroy();
 
-        // Redirect to home page
-        $_SESSION['success_message'] = "Đăng xuất thành công!";
-        echo '<script>window.location.href = "index.php?page=home";</script>';
+        // Redirect to home page with localStorage message
+        echo '<script>
+            localStorage.setItem("message", "Đăng xuất thành công!");
+            localStorage.setItem("messageType", "success");
+            window.location.href = "index.php?page=home";
+        </script>';
         exit;
     }
 
     public function changePassword() {
         if (!isset($_SESSION['user']) || !is_array($_SESSION['user'])) {
-            echo '<script>alert("Vui lòng đăng nhập để thay đổi mật khẩu"); window.location.href = "index.php?page=home";</script>';
+            $_SESSION['error_message'] = "Vui lòng đăng nhập để thay đổi mật khẩu";
+            echo '<script>window.location.href = "index.php?page=home";</script>';
             exit();
         }
 
@@ -119,17 +126,20 @@ class AuthController {
 
             // Validate input
             if (empty($currentPassword) || empty($newPassword) || empty($confirmPassword)) {
-                echo '<script>alert("Vui lòng điền đầy đủ thông tin"); window.location.href = "index.php?page=profile";</script>';
+                $_SESSION['error_message'] = "Vui lòng điền đầy đủ thông tin";
+                echo '<script>window.location.href = "index.php?page=profile";</script>';
                 exit();
             }
 
             if ($newPassword !== $confirmPassword) {
-                echo '<script>alert("Mật khẩu mới không khớp"); window.location.href = "index.php?page=profile";</script>';
+                $_SESSION['error_message'] = "Mật khẩu mới không khớp";
+                echo '<script>window.location.href = "index.php?page=profile";</script>';
                 exit();
             }
 
             if (strlen($newPassword) < 6) {
-                echo '<script>alert("Mật khẩu mới phải có ít nhất 6 ký tự"); window.location.href = "index.php?page=profile";</script>';
+                $_SESSION['error_message'] = "Mật khẩu mới phải có ít nhất 6 ký tự";
+                echo '<script>window.location.href = "index.php?page=profile";</script>';
                 exit();
             }
 
@@ -138,7 +148,8 @@ class AuthController {
             $user = $userModel->getUserById($_SESSION['user']['id']);
 
             if (!$user || !password_verify($currentPassword, $user['matkhau'])) {
-                echo '<script>alert("Mật khẩu hiện tại không đúng"); window.location.href = "index.php?page=profile";</script>';
+                $_SESSION['error_message'] = "Mật khẩu hiện tại không đúng";
+                echo '<script>window.location.href = "index.php?page=profile";</script>';
                 exit();
             }
 
@@ -149,10 +160,12 @@ class AuthController {
                 session_destroy();
                 // Start new session for the success message
                 session_start();
-                echo '<script>alert("Cập nhật mật khẩu thành công. Vui lòng đăng nhập lại."); window.location.href = "index.php?page=login";</script>';
+                $_SESSION['success_message'] = "Cập nhật mật khẩu thành công. Vui lòng đăng nhập lại.";
+                echo '<script>window.location.href = "index.php?page=login";</script>';
                 exit();
             } else {
-                echo '<script>alert("Cập nhật mật khẩu thất bại"); window.location.href = "index.php?page=profile";</script>';
+                $_SESSION['error_message'] = "Cập nhật mật khẩu thất bại";
+                echo '<script>window.location.href = "index.php?page=profile";</script>';
                 exit();
             }
         }

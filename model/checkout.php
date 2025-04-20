@@ -70,8 +70,8 @@ class CheckoutModel {
             error_log("Transaction started");
 
             // Prepare the SQL statement
-            $sql = "INSERT INTO hoadon (id_nguoidung, tongtien, diachigiaohang, trangthai, ghichu) 
-                    VALUES (?, ?, ?, ?, ?)";
+            $sql = "INSERT INTO hoadon (id_nguoidung, tongtien, diachigiaohang, trangthai, ghichu, id_phuongthucthanhtoan) 
+                    VALUES (?, ?, ?, ?, ?, ?)";
             
             // Calculate total from cart items
             $total = 0;
@@ -93,7 +93,8 @@ class CheckoutModel {
                 $total,
                 $data['address'],
                 'Chờ xác nhận',
-                $data['note'] ?? ''
+                $data['note'] ?? '',
+                $data['payment_method']
             ];
             
             error_log("SQL: " . $sql);

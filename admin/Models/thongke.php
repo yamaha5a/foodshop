@@ -21,7 +21,7 @@ class ThongKe {
     }
     
     public function tinhTongDoanhThu() {
-        $sql = "SELECT SUM(tongtien) AS total_revenue FROM hoadon WHERE trangthai = 'Đã giao'";
+        $sql = "SELECT SUM(tongtien) AS total_revenue FROM hoadon WHERE trangthai = 'Khách hàng đã nhận'";
         $result = pdo_query_one($sql);
         return $result['total_revenue'] ?? 0;
     }
@@ -34,6 +34,12 @@ class ThongKe {
                 ORDER BY hd.ngaytao DESC 
                 LIMIT 5";
         return pdo_query($sql);
+    }
+    
+    public function demTongSanPham() {
+        $sql = "SELECT COUNT(*) AS total_products FROM sanpham";
+        $result = pdo_query_one($sql);
+        return $result['total_products'];
     }
 }
 ?>

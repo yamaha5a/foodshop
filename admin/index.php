@@ -66,7 +66,6 @@ include 'Models/sanpham.php';
                             $controller = new DanhMucController();
                             $controller->delete();
                             break;                    
-                        case 'nguoidung':
                         case 'listnguoidung':
                             require_once 'controllers/nguoidung.php'; 
                             $nguoiDungController = new NguoiDungController(); 
@@ -181,81 +180,25 @@ include 'Models/sanpham.php';
                             $controller = new BinhluanController();
                             $controller->detail();
                             break;
-                        case 'khuyenmai':
-                            require_once 'controllers/khuyenmai.php';
-                            $controller = new KhuyenMaiController();
-                            $controller->index();
-                            break;
-                        case 'addkhuyenmai':
-                            require_once 'controllers/khuyenmai.php';
-                            $controller = new KhuyenMaiController();
-                            $controller->add();
-                            break;
-                        case 'editkhuyenmai':
-                            require_once 'controllers/khuyenmai.php';
-                            $controller = new KhuyenMaiController();
-                            $controller->edit();
-                            break;
-                        case 'deletekhuyenmai':
-                            require_once 'controllers/khuyenmai.php';
-                            $controller = new KhuyenMaiController();
-                            $controller->delete();
+                        case 'lienhe':
+                            require_once 'controllers/lienhe.php';
+                            index();
                             break;
 
-                        case 'topping':
-                            require_once 'controllers/topping.php';
-                            $controller = new ToppingController();
-                            $controller->index();
+                        case 'detailLienHe':
+                            require_once 'controllers/lienhe.php';
+                            detail();
                             break;
 
-                        case 'addtopping':
-                            require_once 'controllers/topping.php';
-                            $controller = new ToppingController();
-                            $controller->add();
+                        case 'updateLienHe':
+                            require_once 'controllers/lienhe.php';
+                            update();
                             break;
 
-                        case 'edittopping':
-                            require_once 'controllers/topping.php';
-                            $controller = new ToppingController();
-                            $controller->edit();
+                        case 'deleteLienHe':
+                            require_once 'controllers/lienhe.php';
+                            delete();
                             break;
-
-                        case 'deletetopping':
-                            require_once 'controllers/topping.php';
-                            $controller = new ToppingController();
-                            $controller->delete();
-                            break;
-
-                        case 'detailtopping':
-                            require_once 'controllers/topping.php';
-                            $controller = new ToppingController();
-                            $controller->detail();
-                            break;
-
-                        case 'sanpham_topping':
-                            require_once 'controllers/sanpham_topping.php';
-                            $controller = new SanPhamToppingController();
-                            $controller->index();
-                            break;
-
-                        case 'addsanpham_topping':
-                            require_once 'controllers/sanpham_topping.php';
-                            $controller = new SanPhamToppingController();
-                            $controller->add();
-                            break;
-
-                        case 'editsanpham_topping':
-                            require_once 'controllers/sanpham_topping.php';
-                            $controller = new SanPhamToppingController();
-                            $controller->edit();
-                            break;
-
-                        case 'deletesanpham_topping':
-                            require_once 'controllers/sanpham_topping.php';
-                            $controller = new SanPhamToppingController();
-                            $controller->delete();
-                            break;
-                            
                         case 'sanphamgiamgia':
                             require_once 'controllers/sanphamgiamgia.php';
                             $controller = new SanPhamGiamGiaController();

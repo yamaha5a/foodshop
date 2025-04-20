@@ -1,4 +1,5 @@
 <?php
+require_once __DIR__ . '/../check_auth.php';
 require_once __DIR__ . '/../Models/chitiethoadon.php';
 
 class OrderDetailController {
@@ -50,6 +51,11 @@ class OrderDetailController {
             $status = $_POST['trangthai'];
     
             $this->orderDetailModel->updateOrderStatus($orderId, $status);
+            
+            // Nếu trạng thái là "Khách hàng đã nhận", cập nhật ngày nhận
+            if ($status === 'Khách hàng đã nhận') {
+                $this->orderDetailModel->updateOrderReceivedDate($orderId);
+            }
             
             // Redirect back to detail page with success parameter using echo
             echo "<script>

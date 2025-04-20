@@ -1,9 +1,18 @@
 <?php
+require_once __DIR__ . '/../check_auth.php';
 require_once __DIR__ . '/../Models/binhluan.php';
 
 class BinhluanController {
     public function index() {
-        $comments = get_all_comments();
+        // Xử lý phân trang và tìm kiếm
+        $page = isset($_GET['page']) ? (int)$_GET['page'] : 1;
+        $kyw = isset($_GET['kyw']) ? $_GET['kyw'] : '';
+        $limit = 10;
+
+        $comments = get_all_comments($page, $limit, $kyw);
+        $totalItems = get_total_comments($kyw);
+        $soTrang = ceil($totalItems / $limit);
+
         include 'Views/binhluan/list.php';
     }
 

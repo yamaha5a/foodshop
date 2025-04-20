@@ -105,13 +105,12 @@
                         </div>
                         <?php endif; ?>
 
-                        <form method="post" action="index.php?page=addToCart" onsubmit="return addToCart(event)" class="add-to-cart-form">
-                            <input type="hidden" name="product_id" value="<?= $product['id'] ?>">
-                            <input type="hidden" name="quantity" id="quantity-hidden" value="1">
-                            <button type="submit" class="btn border border-secondary rounded-pill px-4 py-2 mb-4 text-primary">
-                                <i class="fa fa-shopping-bag me-2 text-primary"></i> Thêm vào giỏ hàng
+                        <div class="w-100 text-center">
+                            <button type="button" class="btn border border-secondary rounded-pill px-4 py-2 text-primary w-100 add-to-cart-btn" 
+                                    data-product-id="<?= $product['id']; ?>">
+                                <i class="fa fa-shopping-bag me-2 text-primary"></i> Add to cart
                             </button>
-                        </form>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -166,28 +165,70 @@
                 </div>
                 <div class="tab-pane" id="nav-mission" role="tabpanel" aria-labelledby="nav-mission-tab">
                     <?php if (isset($comments) && count($comments) > 0): ?>
-                        <?php foreach ($comments as $comment): ?>
-                        <div class="d-flex mb-4">
-                            <img src="upload/<?= htmlspecialchars($comment['hinhanh']) ?>" 
-                                 class="img-fluid rounded-circle p-3" 
-                                 style="width: 100px; height: 100px;" 
-                                 alt="<?= htmlspecialchars($comment['ten']) ?>">
-                            <div class="ms-3">
-                                <p class="mb-2" style="font-size: 14px;">
-                                    <?= date('d/m/Y H:i', strtotime($comment['ngaydang'])) ?>
-                                </p>
-                                <div class="d-flex justify-content-between">
-                                    <h5><?= htmlspecialchars($comment['ten']) ?></h5>
-                                    <div class="d-flex mb-3">
-                                        <?php for ($i = 1; $i <= 5; $i++): ?>
-                                            <i class="fa fa-star <?= $i <= $comment['danhgia'] ? 'text-secondary' : '' ?>"></i>
-                                        <?php endfor; ?>
+                        <div id="comments-container">
+                            <?php 
+                            $total_comments = count($comments);
+                            $initial_display = 3; // Số bình luận hiển thị ban đầu
+                            $display_comments = array_slice($comments, 0, $initial_display);
+                            $has_more = $total_comments > $initial_display;
+                            
+                            foreach ($display_comments as $comment): 
+                            ?>
+                            <div class="d-flex mb-4 comment-item">
+                                <img src="http://localhost/shopfood/admin/public/<?= htmlspecialchars($comment['hinhanh']) ?>" 
+                                     class="img-fluid rounded-circle p-3" 
+                                     style="width: 100px; height: 100px;" 
+                                     alt="<?= htmlspecialchars($comment['ten']) ?>">
+                                <div class="ms-3">
+                                    <p class="mb-2" style="font-size: 14px;">
+                                        <?= date('d/m/Y H:i', strtotime($comment['ngaydang'])) ?>
+                                    </p>
+                                    <div class="d-flex justify-content-between">
+                                        <h5><?= htmlspecialchars($comment['ten']) ?></h5>
+                                        <div class="d-flex mb-3">
+                                            <?php for ($i = 1; $i <= 5; $i++): ?>
+                                                <i class="fa fa-star <?= $i <= $comment['danhgia'] ? 'text-secondary' : '' ?>"></i>
+                                            <?php endfor; ?>
+                                        </div>
+                                    </div>
+                                    <p><?= nl2br(htmlspecialchars($comment['noidung'])) ?></p>
+                                </div>
+                            </div>
+                            <?php endforeach; ?>
+                            
+                            <?php if ($has_more): ?>
+                            <div id="more-comments" style="display: none;">
+                                <?php 
+                                $remaining_comments = array_slice($comments, $initial_display);
+                                foreach ($remaining_comments as $comment): 
+                                ?>
+                                <div class="d-flex mb-4 comment-item">
+                                    <img src="http://localhost/shopfood/admin/public/<?= htmlspecialchars($comment['hinhanh']) ?>" 
+                                         class="img-fluid rounded-circle p-3" 
+                                         style="width: 100px; height: 100px;" 
+                                         alt="<?= htmlspecialchars($comment['ten']) ?>">
+                                    <div class="ms-3">
+                                        <p class="mb-2" style="font-size: 14px;">
+                                            <?= date('d/m/Y H:i', strtotime($comment['ngaydang'])) ?>
+                                        </p>
+                                        <div class="d-flex justify-content-between">
+                                            <h5><?= htmlspecialchars($comment['ten']) ?></h5>
+                                            <div class="d-flex mb-3">
+                                                <?php for ($i = 1; $i <= 5; $i++): ?>
+                                                    <i class="fa fa-star <?= $i <= $comment['danhgia'] ? 'text-secondary' : '' ?>"></i>
+                                                <?php endfor; ?>
+                                            </div>
+                                        </div>
+                                        <p><?= nl2br(htmlspecialchars($comment['noidung'])) ?></p>
                                     </div>
                                 </div>
-                                <p><?= nl2br(htmlspecialchars($comment['noidung'])) ?></p>
+                                <?php endforeach; ?>
                             </div>
+                            <div class="text-center mt-3">
+                                <button id="show-all-comments" class="btn btn-outline-primary">Xem tất cả bình luận (<?= $total_comments ?>)</button>
+                            </div>
+                            <?php endif; ?>
                         </div>
-                        <?php endforeach; ?>
                     <?php else: ?>
                         <p class="text-center">Chưa có đánh giá nào cho sản phẩm này.</p>
                     <?php endif; ?>
@@ -637,6 +678,18 @@ document.addEventListener('DOMContentLoaded', function() {
     forms.forEach(form => {
         form.addEventListener('submit', addToCart);
     });
+    
+    // Xử lý sự kiện cho nút "Show all comments"
+    const showAllCommentsBtn = document.getElementById('show-all-comments');
+    if (showAllCommentsBtn) {
+        showAllCommentsBtn.addEventListener('click', function() {
+            const moreComments = document.getElementById('more-comments');
+            if (moreComments) {
+                moreComments.style.display = 'block';
+                this.style.display = 'none';
+            }
+        });
+    }
 });
 
 function addToCart(event) {
@@ -860,4 +913,121 @@ function initializeScripts() {
         }
     });
 }
+
+document.addEventListener('DOMContentLoaded', function() {
+    // Add to cart button click handler
+    const addToCartButtons = document.querySelectorAll('.add-to-cart-btn');
+    addToCartButtons.forEach(button => {
+        button.addEventListener('click', function(event) {
+            event.preventDefault();
+            event.stopPropagation();
+            
+            const productId = this.getAttribute('data-product-id');
+            const quantityInput = document.getElementById('quantity-input');
+            const quantity = quantityInput ? parseInt(quantityInput.value) : 1;
+            
+            // Kiểm tra số lượng hợp lệ
+            if (isNaN(quantity) || quantity < 1) {
+                Swal.fire({
+                    title: 'Lỗi!',
+                    text: 'Số lượng không hợp lệ',
+                    icon: 'error',
+                    confirmButtonText: 'OK'
+                });
+                return;
+            }
+            
+            // Kiểm tra số lượng tối đa
+            const availableQuantity = parseInt(quantityInput.getAttribute('data-available'));
+            if (quantity > availableQuantity) {
+                Swal.fire({
+                    title: 'Lỗi!',
+                    text: `Số lượng vượt quá số lượng có sẵn (${availableQuantity})`,
+                    icon: 'error',
+                    confirmButtonText: 'OK'
+                });
+                return;
+            }
+            
+            // Kiểm tra đăng nhập trước khi gửi request
+            <?php if (!isset($_SESSION['user'])): ?>
+                Swal.fire({
+                    title: 'Thông báo!',
+                    text: 'Vui lòng đăng nhập để thêm sản phẩm vào giỏ hàng',
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonColor: '#3085d6',
+                    cancelButtonColor: '#d33',
+                    confirmButtonText: 'Đăng nhập',
+                    cancelButtonText: 'Hủy'
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        window.location.href = "index.php?page=login";
+                    }
+                });
+                return false;
+            <?php endif; ?>
+            
+            // Tạo FormData
+            const formData = new FormData();
+            formData.append('product_id', productId);
+            formData.append('quantity', quantity);
+            
+            // Gửi request AJAX
+            fetch('index.php?page=addToCart', {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Network response was not ok');
+                }
+                return response.text();
+            })
+            .then(html => {
+                // Tạo một div ẩn để chứa response
+                const tempDiv = document.createElement('div');
+                tempDiv.innerHTML = html;
+                
+                // Lấy thông báo từ session
+                const successMessage = tempDiv.querySelector('meta[name="success_message"]')?.content;
+                const errorMessage = tempDiv.querySelector('meta[name="error_message"]')?.content;
+                const cartCount = tempDiv.querySelector('meta[name="cart_count"]')?.content;
+                
+                if (successMessage) {
+                    // Cập nhật số lượng giỏ hàng từ session
+                    const cartCountElement = document.getElementById('cart-count');
+                    if (cartCountElement) {
+                        cartCountElement.textContent = cartCount;
+                    }
+                    
+                    Swal.fire({
+                        title: 'Thành công!',
+                        text: successMessage,
+                        icon: 'success',
+                        confirmButtonText: 'OK',
+                        timer: 1500,
+                        showConfirmButton: false
+                    });
+                } else if (errorMessage) {
+                    Swal.fire({
+                        title: 'Lỗi!',
+                        text: errorMessage,
+                        icon: 'error',
+                        confirmButtonText: 'OK'
+                    });
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                Swal.fire({
+                    title: 'Lỗi!',
+                    text: 'Có lỗi xảy ra khi thêm sản phẩm vào giỏ hàng',
+                    icon: 'error',
+                    confirmButtonText: 'OK'
+                });
+            });
+        });
+    });
+});
 </script>

@@ -1,4 +1,5 @@
 <?php
+require_once __DIR__ . '/../check_auth.php';
 require_once __DIR__ . '/../models/NguoiDung.php'; // Sử dụng đường dẫn tuyệt đối
 
 class NguoiDungController {
@@ -13,7 +14,9 @@ class NguoiDungController {
         // Lấy tham số tìm kiếm và trang hiện tại
         $search = isset($_GET['search']) ? trim($_GET['search']) : '';
         $currentPage = isset($_GET['page']) ? (int)$_GET['page'] : 1;
-        $currentPage = max(1, $currentPage); // Đảm bảo trang hiện tại không nhỏ hơn 1
+        
+        // Đảm bảo trang hiện tại không nhỏ hơn 1
+        $currentPage = max(1, $currentPage);
 
         // Lấy tổng số người dùng (có thể bao gồm điều kiện tìm kiếm)
         $totalItems = $this->nguoiDungModel->layTongSoNguoiDung($search);
@@ -22,8 +25,8 @@ class NguoiDungController {
         // Đảm bảo trang hiện tại không vượt quá tổng số trang
         $currentPage = min($currentPage, $totalPages);
 
-        // Tính offset cho truy vấn
-        $offset = ($currentPage - 1) * $this->itemsPerPage;
+        // Tính offset cho truy vấn, đảm bảo không âm
+        $offset = max(0, ($currentPage - 1) * $this->itemsPerPage);
 
         // Lấy danh sách người dùng với phân trang và tìm kiếm
         $danhSachNguoiDung = $this->nguoiDungModel->layDanhSachNguoiDungPhanTrang($search, $offset, $this->itemsPerPage);
@@ -36,44 +39,6 @@ class NguoiDungController {
 
         include __DIR__ . '/../views/nguoidung/list.php';
     }
-
-    public function layTenQuyen($id) {
-        $sql = "SELECT tenquyen FROM phanquyen WHERE id = ?";
-        return pdo_query_value($sql, $id); // Hàm này cần được định nghĩa trong pdo_functions
-    }
-
-    public function addUser() {
-        if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-            $ten = trim($_POST['ten']);
-            $email = trim($_POST['email']);
-            $matkhau = trim($_POST['matkhau']);
-            $id_phanquyen = $_POST['id_phanquyen'];
-
-            if (empty($ten) || empty($email) || empty($matkhau) || empty($id_phanquyen)) {
-                error_log("Một trong các trường nhập không hợp lệ.");
-                return;
-            }
-            $hinhanh = '';
-            if (isset($_FILES['hinhanh']) && $_FILES['hinhanh']['error'] == 0) {
-                $uploadDir = __DIR__ . '/../public/img/nguoidung/';
-                $tenHinh = basename($_FILES['hinhanh']['name']);
-                $hinhanh = "img/nguoidung/" . $tenHinh;
-                $target_file = $uploadDir . $tenHinh;
-
-                if (!move_uploaded_file($_FILES['hinhanh']['tmp_name'], $target_file)) {
-                    error_log("Lỗi upload hình ảnh.");
-                }
-            }
-            $this->nguoiDungModel->themNguoiDung($ten, $email, $matkhau, $hinhanh, $id_phanquyen);
-            if (ob_get_length()) {
-                ob_clean(); 
-            }
-            echo '<meta http-equiv="refresh" content="0;url=index.php?act=nguoidung">';
-            exit();
-        }
-        include __DIR__ . '/../views/nguoidung/add.php';
-    }
-
     public function chiTietNguoiDung() {
         $id = $_GET['id'] ?? null;
     
@@ -95,7 +60,7 @@ class NguoiDungController {
     
         if (!$id) {
             // Nếu không có id thì quay lại danh sách
-            header("Location: index.php?act=nguoidung");
+            echo '<meta http-equiv="refresh" content="0;url=index.php?act=nguoidung">';
             exit();
         }
     
@@ -110,13 +75,52 @@ class NguoiDungController {
             $hinhanh = $_POST['hinhanh'] ?? $nguoiDung['hinhanh'];
             $id_phanquyen = $_POST['id_phanquyen'] ?? $nguoiDung['id_phanquyen'];
             $trangthai = $_POST['trangthai'] ?? $nguoiDung['trangthai'];
+            
+            // Xử lý upload file ảnh mới nếu có
+            if (isset($_FILES['fileInput']) && $_FILES['fileInput']['error'] == 0) {
+                $uploadDir = __DIR__ . '/../public/img/nguoidung/';
+                
+                // Tạo thư mục nếu chưa tồn tại
+                if (!file_exists($uploadDir)) {
+                    mkdir($uploadDir, 0777, true);
+                }
+                
+                // Lấy tên file và tạo tên file mới
+                $tenHinh = basename($_FILES['fileInput']['name']);
+                $timestamp = time();
+                $tenHinhMoi = $timestamp . '_' . $tenHinh;
+                
+                // Đường dẫn đầy đủ để lưu file
+                $target_file = $uploadDir . $tenHinhMoi;
+                
+                // Đường dẫn tương đối để lưu vào database
+                $hinhanh = "img/nguoidung/" . $tenHinhMoi;
+                
+                // Upload file
+                if (move_uploaded_file($_FILES['fileInput']['tmp_name'], $target_file)) {
+                    // Xóa file ảnh cũ nếu có
+                    if (!empty($nguoiDung['hinhanh'])) {
+                        $oldFile = __DIR__ . '/../public/' . $nguoiDung['hinhanh'];
+                        if (file_exists($oldFile)) {
+                            unlink($oldFile);
+                        }
+                    }
+                } else {
+                    error_log("Lỗi upload hình ảnh: " . $_FILES['fileInput']['error']);
+                }
+            }
     
             // Gọi hàm cập nhật người dùng trong model
             $this->nguoiDungModel->capNhatNguoiDung($id, $ten, $email, $sodienthoai, $hinhanh, $id_phanquyen, $trangthai);
     
-            // Thông báo và chuyển trang
+            // Thông báo thành công
             $_SESSION['thongbao'] = "Cập nhật thành công!";
-            header("Location: index.php?act=nguoidung");
+            
+            // Lấy lại dữ liệu người dùng đã cập nhật
+            $nguoiDung = $this->nguoiDungModel->layNguoiDungTheoId($id);
+            
+            // Hiển thị form cập nhật với thông báo
+            include 'views/nguoidung/update.php';
             exit();
         }
     
@@ -124,6 +128,8 @@ class NguoiDungController {
         include 'views/nguoidung/update.php';
     }
     
-  
+    public function layTenQuyen($id) {
+        return $this->nguoiDungModel->layTenQuyen($id);
+    }
 }
 ?>

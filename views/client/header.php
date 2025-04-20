@@ -8,6 +8,8 @@ if (session_status() === PHP_SESSION_NONE) {
     <div class="spinner-grow text-primary" role="status"></div>
 </div>
 <!-- Spinner End -->
+<!-- Thêm thư viện SweetAlert2 -->
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <!-- Navbar start -->
 <div class="container-fluid fixed-top">
     <div class="container topbar bg-primary d-none d-lg-block">
@@ -44,19 +46,19 @@ if (session_status() === PHP_SESSION_NONE) {
                     <div class="nav-item dropdown">
                         <a href="#" class="nav-link dropdown-toggle" data-bs-toggle="dropdown">Pages</a>
                         <div class="dropdown-menu m-0 bg-secondary rounded-0">
-                            <a href="index.php?page=cart" class="dropdown-item">Giỏ hàng</a>
+                            <a href="javascript:void(0)" onclick="checkLoginBeforeCart()" class="dropdown-item">Giỏ hàng</a>
                             <a href="index.php?page=checkout" class="dropdown-item">Thanh toán</a>
                         </div>
                     </div>
                     <a href="index.php?page=contact" class="nav-item nav-link">Liên Hệ</a>
-                    <a href="index.php?page=contact" class="nav-item nav-link">Về chúng tôi</a>
+                    <a href="index.php?page=about" class="nav-item nav-link">Về chúng tôi</a>
                 </div>
                 <div class="d-flex m-3 me-0">
                     <button class="btn-search btn border border-secondary btn-md-square rounded-circle bg-white me-4" data-bs-toggle="modal" data-bs-target="#searchModal">
                         <i class="fas fa-search text-primary"></i>
                     </button>
 
-                    <a href="index.php?page=cart" class="position-relative me-4 my-auto">
+                    <a href="javascript:void(0)" onclick="checkLoginBeforeCart()" class="position-relative me-4 my-auto">
                         <i class="fa fa-shopping-bag fa-2x"></i>
                     </a>
 
@@ -125,5 +127,27 @@ if (session_status() === PHP_SESSION_NONE) {
             });
         }
     });
+
+    // Hàm kiểm tra đăng nhập trước khi vào giỏ hàng
+    function checkLoginBeforeCart() {
+        <?php if (!isset($_SESSION['user'])): ?>
+            Swal.fire({
+                title: 'Thông báo!',
+                text: 'Bạn phải đăng nhập mới xem được giỏ hàng',
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#3085d6',
+                cancelButtonColor: '#d33',
+                confirmButtonText: 'Đăng nhập',
+                cancelButtonText: 'Hủy'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    window.location.href = "index.php?page=login";
+                }
+            });
+        <?php else: ?>
+            window.location.href = "index.php?page=cart";
+        <?php endif; ?>
+    }
 </script>
 

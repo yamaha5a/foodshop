@@ -32,7 +32,7 @@ class CheckoutController {
         // Get user addresses
         $addresses = $this->model->getUserAddresses($userId);
         
-        // Get payment methods
+        // Get active payment methods from database
         $paymentMethods = $this->model->getPaymentMethods();
         
         // Get active promotions
@@ -46,7 +46,7 @@ class CheckoutController {
     public function processCheckout() {
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             // Validate required fields
-            $requiredFields = ['first_name', 'address', 'sodienthoai', 'email'];
+            $requiredFields = ['first_name', 'address', 'sodienthoai', 'email', 'payment_method'];
             foreach ($requiredFields as $field) {
                 if (empty($_POST[$field])) {
                     $_SESSION['error'] = "Vui lòng điền đầy đủ thông tin";
@@ -75,12 +75,30 @@ class CheckoutController {
                 echo '<script>setTimeout(function() { window.location.href = "index.php?page=checkout"; }, 2000);</script>';
                 exit;
             }
+
+            // Validate payment method
+            $paymentMethods = $this->model->getPaymentMethods();
+            $validPaymentMethod = false;
+            foreach ($paymentMethods as $method) {
+                if ($method['id'] == $_POST['payment_method']) {
+                    $validPaymentMethod = true;
+                    break;
+                }
+            }
+
+            if (!$validPaymentMethod) {
+                $_SESSION['error'] = "Phương thức thanh toán không hợp lệ";
+                include 'views/checkout/redirect.php';
+                echo '<script>setTimeout(function() { window.location.href = "index.php?page=checkout"; }, 2000);</script>';
+                exit;
+            }
             
             // Prepare data for order creation
             $orderData = [
                 'userId' => $userId,
                 'address' => $_POST['address'],
                 'note' => $_POST['note'] ?? '',
+                'payment_method' => $_POST['payment_method'],
                 'cart_items' => $cartItems
             ];
             

@@ -35,8 +35,13 @@ if (isset($_SESSION['error_message'])) {
                                 </tr>
                             </thead>
                             <tbody>
-                                <?php if (!empty($orderItems)): ?>
-                                    <?php foreach ($orderItems as $item): ?>
+                                <?php 
+                                $total = 0;
+                                if (!empty($orderItems)): 
+                                    foreach ($orderItems as $item): 
+                                        $subtotal = $item['gia'] * $item['soluong'];
+                                        $total += $subtotal;
+                                ?>
                                         <tr>
                                             <td>
                                                 <div class="d-flex align-items-center">
@@ -45,14 +50,28 @@ if (isset($_SESSION['error_message'])) {
                                                          class="img-thumbnail" style="width: 50px; height: 50px;">
                                                     <div class="ms-3">
                                                         <?php echo htmlspecialchars($item['tensanpham']); ?>
+                                                        <?php if ($item['is_discounted']): ?>
+                                                            <span class="badge bg-danger">Giảm giá</span>
+                                                        <?php endif; ?>
                                                     </div>
                                                 </div>
                                             </td>
-                                            <td><?php echo number_format($item['gia'], 0, ',', '.') . ' VNĐ'; ?></td>
+                                            <td>
+                                                <?php if ($item['is_discounted']): ?>
+                                                    <span class="text-decoration-line-through text-muted"><?= number_format($item['gia_goc'], 0, ',', '.') ?> VNĐ</span><br>
+                                                    <span class="text-danger fw-bold"><?= number_format($item['gia'], 0, ',', '.') ?> VNĐ</span>
+                                                <?php else: ?>
+                                                    <?= number_format($item['gia'], 0, ',', '.') ?> VNĐ
+                                                <?php endif; ?>
+                                            </td>
                                             <td><?php echo htmlspecialchars($item['soluong']); ?></td>
-                                            <td><?php echo number_format($item['gia'] * $item['soluong'], 0, ',', '.') . ' VNĐ'; ?></td>
+                                            <td><?php echo number_format($subtotal, 0, ',', '.') . ' VNĐ'; ?></td>
                                         </tr>
                                     <?php endforeach; ?>
+                                    <tr>
+                                        <td colspan="3" class="text-end"><strong>Tổng cộng:</strong></td>
+                                        <td><strong><?php echo number_format($total, 0, ',', '.') . ' VNĐ'; ?></strong></td>
+                                    </tr>
                                 <?php else: ?>
                                     <tr>
                                         <td colspan="4" class="text-center">Không có sản phẩm nào trong đơn hàng</td>
@@ -75,16 +94,24 @@ if (isset($_SESSION['error_message'])) {
                         <strong>Trạng thái:</strong>
                         <span class="badge bg-<?php 
                             echo $order['trangthai'] === 'Chờ xác nhận' ? 'warning' : 
-                                ($order['trangthai'] === 'Đã giao' ? 'success' : 
-                                ($order['trangthai'] === 'Đã hủy' ? 'danger' : 'info')); 
+                                ($order['trangthai'] === 'Đang xử lý' ? 'info' :
+                                ($order['trangthai'] === 'Đang vận chuyển' ? 'primary' :
+                                ($order['trangthai'] === 'Khách hàng đã nhận' ? 'success' :
+                                ($order['trangthai'] === 'Đã hủy' ? 'danger' : 'secondary')))); 
                         ?>">
                             <?php echo htmlspecialchars($order['trangthai']); ?>
                         </span>
                     </div>
                     <div class="mb-3">
                         <strong>Ngày đặt:</strong>
-                        <?php echo htmlspecialchars($order['ngaytao']); ?>
+                        <?php echo date('d/m/Y H:i', strtotime($order['ngaytao'])); ?>
                     </div>
+                    <?php if ($order['trangthai'] === 'Khách hàng đã nhận' && isset($order['ngaynhan'])): ?>
+                    <div class="mb-3">
+                        <strong>Ngày giờ nhận hàng:</strong>
+                        <?php echo date('d/m/Y H:i', strtotime($order['ngaynhan'])); ?>
+                    </div>
+                    <?php endif; ?>
                     <div class="mb-3">
                         <strong>Phương thức thanh toán:</strong>
                         <?php echo htmlspecialchars($order['tenphuongthuc']); ?>
@@ -105,16 +132,41 @@ if (isset($_SESSION['error_message'])) {
                     </div>
                     <?php endif; ?>
                     
-                    <?php if ($order['trangthai'] === 'Chờ xác nhận'): ?>
                     <div class="mt-4">
-                        <form action="index.php?page=cancelOrder" method="POST" onsubmit="return confirm('Bạn có chắc chắn muốn hủy đơn hàng này?');">
-                            <input type="hidden" name="order_id" value="<?php echo $order['id']; ?>">
-                            <button type="submit" class="btn btn-danger w-100">
-                                <i class="fas fa-times-circle me-2"></i>Hủy đơn hàng
-                            </button>
-                        </form>
+                        <?php if ($order['trangthai'] === 'Chờ xác nhận'): ?>
+                            <form action="index.php?page=cancelOrder" method="POST" onsubmit="return confirm('Bạn có chắc chắn muốn hủy đơn hàng này?');" class="mb-3">
+                                <input type="hidden" name="order_id" value="<?php echo $order['id']; ?>">
+                                <button type="submit" class="btn btn-danger w-100">
+                                    <i class="fas fa-times-circle me-2"></i>Hủy đơn hàng
+                                </button>
+                            </form>
+                        <?php elseif ($order['trangthai'] === 'Đã hủy'): ?>
+                            <form action="index.php?page=cancelOrder" method="POST" onsubmit="return confirm('Bạn có chắc chắn muốn tiếp tục xử lý đơn hàng này?');" class="mb-3">
+                                <input type="hidden" name="order_id" value="<?php echo $order['id']; ?>">
+                                <button type="submit" class="btn btn-success w-100">
+                                    <i class="fas fa-play-circle me-2"></i>Tiếp tục xử lý
+                                </button>
+                            </form>
+                        <?php endif; ?>
+
+                        <?php if ($order['trangthai'] === 'Đang xử lý'): ?>
+                            <form action="index.php?page=continueOrder" method="POST" class="mb-3">
+                                <input type="hidden" name="order_id" value="<?php echo $order['id']; ?>">
+                                <button type="submit" class="btn btn-primary w-100">
+                                    <i class="fas fa-check-circle me-2"></i>Xác nhận đã xử lý xong
+                                </button>
+                            </form>
+                        <?php endif; ?>
+
+                        <?php if ($order['trangthai'] === 'Đang vận chuyển'): ?>
+                            <form action="index.php?page=completeOrder" method="POST" class="mb-3">
+                                <input type="hidden" name="order_id" value="<?php echo $order['id']; ?>">
+                                <button type="submit" class="btn btn-success w-100">
+                                    <i class="fas fa-box me-2"></i>Xác nhận đã nhận hàng
+                                </button>
+                            </form>
+                        <?php endif; ?>
                     </div>
-                    <?php endif; ?>
                 </div>
             </div>
         </div>

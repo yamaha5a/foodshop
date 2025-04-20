@@ -49,22 +49,16 @@ CREATE TABLE sanpham (
     FOREIGN KEY (id_loaisanpham) REFERENCES loaisanpham(id) ON DELETE CASCADE
 ) ENGINE=InnoDB;
 
--- 6. Bảng topping
-CREATE TABLE topping (
+CREATE TABLE lienhe (
     id INT AUTO_INCREMENT PRIMARY KEY,
-    tentopping VARCHAR(100) NOT NULL,
-    gia DECIMAL(10,2) NOT NULL
-) ENGINE=InnoDB;
-
--- 7. Bảng sản phẩm - topping
-CREATE TABLE sanpham_topping (
-    id INT AUTO_INCREMENT PRIMARY KEY,
-    id_sanpham INT,
-    id_topping INT,
-    gia_topping DECIMAL(10,2) NOT NULL DEFAULT 0, -- Thêm cột giá topping
-    FOREIGN KEY (id_sanpham) REFERENCES sanpham(id) ON DELETE CASCADE,
-    FOREIGN KEY (id_topping) REFERENCES topping(id) ON DELETE CASCADE
-) ENGINE=InnoDB;
+    nguoidung_id INT NOT NULL,          -- Ai gửi liên hệ
+    tieude VARCHAR(255) NOT NULL,       -- Chủ đề liên hệ
+    noidung TEXT NOT NULL,              -- Nội dung liên hệ
+    traloi TEXT,                        -- Admin trả lời (NULL nếu chưa trả lời)
+    ngaygui TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    ngaytraloi TIMESTAMP NULL,
+    FOREIGN KEY (nguoidung_id) REFERENCES nguoidung(id)
+);
 
 -- 8. Bảng khuyến mãi
 CREATE TABLE khuyenmai (
@@ -90,7 +84,7 @@ CREATE TABLE hoadon (
     ngaytao TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     tongtien DECIMAL(10,2),
     diachigiaohang TEXT,
-    trangthai ENUM('Chờ xác nhận', 'Đang giao', 'Đã giao', 'Đã hủy') NOT NULL,
+    trangthai ENUM('Chờ xác nhận', 'Đang xử lý', 'Đang vận chuyển', 'Khách hàng đã nhận') NOT NULL,
     ghichu TEXT NOT NULL,
     id_khuyenmai INT, 
     id_phuongthucthanhtoan INT,

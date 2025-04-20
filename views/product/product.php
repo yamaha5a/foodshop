@@ -1,9 +1,9 @@
 <div class="container-fluid page-header py-5">
-    <h1 class="text-center text-white display-6">Shop</h1>
+    <h1 class="text-center text-white display-6">Cửa hàng</h1>
     <ol class="breadcrumb justify-content-center mb-0">
         <li class="breadcrumb-item"><a href="index.php?page=home">Home</a></li>
-        <li class="breadcrumb-item"><a href="#">Pages</a></li>
-        <li class="breadcrumb-item active text-white">Shop</li>
+        <li class="breadcrumb-item"><a href="#">Trang</a></li>
+        <li class="breadcrumb-item active text-white">Cửa hàng</li>
     </ol>
 </div>
 <!-- Single Page Header End -->
@@ -189,15 +189,19 @@
                                 </div>
                             </div>
                             <div class="col-lg-12">
-                                <h4 class="mb-3">Featured products</h4>
+                                <h4 class="mb-3">Sản phẩm giảm giá</h4>
                                 <?php if (!empty($featuredDiscountedProducts)): ?>
                                     <?php foreach ($featuredDiscountedProducts as $product): ?>
                                     <div class="d-flex align-items-center justify-content-start">
                                         <div class="rounded me-4" style="width: 100px; height: 100px;">
-                                            <img src="upload/<?= $product['hinhanh1'] ?>" class="img-fluid rounded" alt="<?= htmlspecialchars($product['tensanpham']) ?>">
+                                            <a href="index.php?page=detail&id=<?= $product['id'] ?>">
+                                                <img src="upload/<?= $product['hinhanh1'] ?>" class="img-fluid rounded" alt="<?= htmlspecialchars($product['tensanpham']) ?>">
+                                            </a>
                                         </div>
                                         <div>
-                                            <h6 class="mb-2"><?= htmlspecialchars($product['tensanpham']) ?></h6>
+                                            <a href="index.php?page=detail&id=<?= $product['id'] ?>" class="text-decoration-none">
+                                                <h6 class="mb-2"><?= htmlspecialchars($product['tensanpham']) ?></h6>
+                                            </a>
                                             <div class="d-flex mb-2">
                                                 <i class="fa fa-star text-secondary"></i>
                                                 <i class="fa fa-star text-secondary"></i>
@@ -279,13 +283,12 @@
                                                         </span>
                                                     </div>
                                                 </div>
-                                                <form method="post" action="index.php?page=addToCart" onsubmit="return addToCart(event)" class="w-100 text-center">
-                                                    <input type="hidden" name="product_id" value="<?= $sanpham['id']; ?>">
-                                                    <input type="hidden" name="quantity" value="1">
-                                                    <button type="submit" class="btn border border-secondary rounded-pill px-4 py-2 text-primary w-100">
+                                                <div class="w-100 text-center">
+                                                    <button type="button" class="btn border border-secondary rounded-pill px-4 py-2 text-primary w-100 add-to-cart-btn" 
+                                                            data-product-id="<?= $sanpham['id']; ?>">
                                                         <i class="fa fa-shopping-bag me-2 text-primary"></i> Add to cart
                                                     </button>
-                                                </form>
+                                                </div>
                                             </div>
                                         </div>
                                     </div>
@@ -465,5 +468,97 @@ document.addEventListener('DOMContentLoaded', function() {
             });
         }
     }
+});
+
+document.addEventListener('DOMContentLoaded', function() {
+    // Add to cart button click handler
+    const addToCartButtons = document.querySelectorAll('.add-to-cart-btn');
+    addToCartButtons.forEach(button => {
+        button.addEventListener('click', function(event) {
+            event.preventDefault();
+            event.stopPropagation();
+            
+            const productId = this.getAttribute('data-product-id');
+            
+            // Kiểm tra đăng nhập trước khi gửi request
+            <?php if (!isset($_SESSION['user'])): ?>
+                Swal.fire({
+                    title: 'Thông báo!',
+                    text: 'Vui lòng đăng nhập để thêm sản phẩm vào giỏ hàng',
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonColor: '#3085d6',
+                    cancelButtonColor: '#d33',
+                    confirmButtonText: 'Đăng nhập',
+                    cancelButtonText: 'Hủy'
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        window.location.href = "index.php?page=login";
+                    }
+                });
+                return false;
+            <?php endif; ?>
+            
+            // Tạo FormData
+            const formData = new FormData();
+            formData.append('product_id', productId);
+            formData.append('quantity', 1);
+            
+            // Gửi request AJAX
+            fetch('index.php?page=addToCart', {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Network response was not ok');
+                }
+                return response.text();
+            })
+            .then(html => {
+                // Tạo một div ẩn để chứa response
+                const tempDiv = document.createElement('div');
+                tempDiv.innerHTML = html;
+                
+                // Lấy thông báo từ session
+                const successMessage = tempDiv.querySelector('meta[name="success_message"]')?.content;
+                const errorMessage = tempDiv.querySelector('meta[name="error_message"]')?.content;
+                const cartCount = tempDiv.querySelector('meta[name="cart_count"]')?.content;
+                
+                if (successMessage) {
+                    // Cập nhật số lượng giỏ hàng từ session
+                    const cartCountElement = document.getElementById('cart-count');
+                    if (cartCountElement) {
+                        cartCountElement.textContent = cartCount;
+                    }
+                    
+                    Swal.fire({
+                        title: 'Thành công!',
+                        text: successMessage,
+                        icon: 'success',
+                        confirmButtonText: 'OK',
+                        timer: 1500,
+                        showConfirmButton: false
+                    });
+                } else if (errorMessage) {
+                    Swal.fire({
+                        title: 'Lỗi!',
+                        text: errorMessage,
+                        icon: 'error',
+                        confirmButtonText: 'OK'
+                    });
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                Swal.fire({
+                    title: 'Lỗi!',
+                    text: 'Có lỗi xảy ra khi thêm sản phẩm vào giỏ hàng',
+                    icon: 'error',
+                    confirmButtonText: 'OK'
+                });
+            });
+        });
+    });
 });
 </script>

@@ -73,16 +73,22 @@ class OrderDetailModel {
     }
     
     public function getOrderItems($orderId) {
-        $sql = "SELECT cthd.*, sp.tensanpham, sp.hinhanh1 
+        $sql = "SELECT cthd.*, sp.tensanpham, sp.hinhanh1, sp.gia
                 FROM chitiethoadon cthd 
                 JOIN sanpham sp ON cthd.id_sanpham = sp.id 
-                WHERE cthd.id_hoadon = ?";
+                WHERE cthd.id_hoadon = ?
+                GROUP BY cthd.id_sanpham";
         return pdo_query($sql, $orderId);
     }
     
     public function updateOrderStatus($orderId, $status) {
         $sql = "UPDATE hoadon SET trangthai = ? WHERE id = ?";
         return pdo_execute($sql, $status, $orderId);
+    }
+
+    public function updateOrderReceivedDate($orderId) {
+        $sql = "UPDATE hoadon SET ngaynhan = NOW() WHERE id = ?";
+        return pdo_execute($sql, $orderId);
     }
     
 } 

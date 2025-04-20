@@ -10,7 +10,7 @@ class CommentController {
         
         if (!isset($_SESSION['user'])) {
             $_SESSION['error_message'] = "Vui lòng đăng nhập để bình luận";
-            header("Location: index.php?page=login");
+            echo '<script>window.location.href = "index.php?page=login";</script>';
             exit();
         }
 
@@ -19,7 +19,7 @@ class CommentController {
                 // Validate required fields
                 if (!isset($_POST['product_id']) || !isset($_POST['comment']) || !isset($_POST['rating'])) {
                     $_SESSION['error_message'] = "Vui lòng điền đầy đủ thông tin bình luận";
-                    header("Location: index.php?page=detail&id=" . $_POST['product_id']);
+                    echo '<script>window.location.href = "index.php?page=detail&id=' . $_POST['product_id'] . '";</script>';
                     exit();
                 }
                 
@@ -38,7 +38,7 @@ class CommentController {
                 
                 if ($comment_count >= 5) {
                     $_SESSION['error_message'] = "Bạn đã đạt giới hạn 5 bình luận cho sản phẩm này";
-                    header("Location: index.php?page=detail&id=" . $product_id);
+                    echo '<script>window.location.href = "index.php?page=detail&id=' . $product_id . '";</script>';
                     exit();
                 }
 
@@ -58,11 +58,11 @@ class CommentController {
             }
 
             // Chuyển hướng về trang chi tiết sản phẩm
-            header("Location: index.php?page=detail&id=" . $product_id);
+            echo '<script>window.location.href = "index.php?page=detail&id=' . $product_id . '";</script>';
             exit();
         } else {
             // If not POST request, redirect to home
-            header("Location: index.php");
+            echo '<script>window.location.href = "index.php";</script>';
             exit();
         }
     }

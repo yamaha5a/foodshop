@@ -74,11 +74,7 @@
             background-color: #fff3cd;
             color: #856404;
         }
-        .status.confirmed {
-            background-color: #d1ecf1;
-            color: #0c5460;
-        }
-        .status.preparing {
+        .status.processing {
             background-color: #cce5ff;
             color: #004085;
         }
@@ -183,9 +179,9 @@
                                 <td>
                                     <span class="status <?php 
                                         echo $order['trangthai'] === 'Chờ xác nhận' ? 'pending' : 
-                                            ($order['trangthai'] === 'Đang giao' ? 'shipping' :
-                                            ($order['trangthai'] === 'Đã giao' ? 'delivered' :
-                                            ($order['trangthai'] === 'Đã hủy' ? 'cancelled' : 'processing'))); 
+                                            ($order['trangthai'] === 'Đang xử lý' ? 'processing' :
+                                            ($order['trangthai'] === 'Đang vận chuyển' ? 'shipping' :
+                                            ($order['trangthai'] === 'Khách hàng đã nhận' ? 'delivered' : ''))); 
                                     ?>">
                                         <?php echo htmlspecialchars($order['trangthai']); ?>
                                     </span>

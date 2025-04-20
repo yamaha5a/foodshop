@@ -13,12 +13,21 @@ class OrderModel {
     
 
    public function getOrderItems($orderId) {
-    $sql = "SELECT cthd.*, sp.tensanpham, sp.hinhanh1, sp.gia 
+    $sql = "SELECT DISTINCT cthd.*, sp.tensanpham, sp.hinhanh1, sp.gia as gia_goc, 
+            CASE WHEN spg.giagiam > 0 THEN 1 ELSE 0 END as is_discounted,
+            CASE WHEN spg.giagiam > 0 THEN spg.giagiam ELSE sp.gia END as gia_hien_tai
             FROM chitiethoadon cthd 
             JOIN sanpham sp ON cthd.id_sanpham = sp.id 
-            WHERE cthd.id_hoadon = ?";
+            LEFT JOIN sanphamgiamgia spg ON sp.id = spg.id_sanpham
+            WHERE cthd.id_hoadon = ?
+            GROUP BY cthd.id_sanpham";
     
     $items = pdo_query($sql, $orderId);
+    
+    // Update the 'gia' field to use the current price
+    foreach ($items as &$item) {
+        $item['gia'] = $item['gia_hien_tai'];
+    }
     
     return $items;
 }
@@ -32,7 +41,7 @@ class OrderModel {
     }
 
     public function getPaymentMethods() {
-        $sql = "SELECT * FROM phuongthucthanhtoan";
+        $sql = "SELECT * FROM phuongthucthanhtoan WHERE trangthai = 1";
         return pdo_query($sql);
     }
 
@@ -163,6 +172,40 @@ class OrderModel {
             // Update the order status to "Đã hủy"
             $sql = "UPDATE hoadon SET trangthai = 'Đã hủy' WHERE id = ? AND id_nguoidung = ?";
             $result = pdo_execute($sql, $orderId, $userId);
+            
+            // Commit transaction
+            pdo_execute("COMMIT");
+            
+            return $result;
+        } catch (Exception $e) {
+            // Rollback transaction on error
+            pdo_execute("ROLLBACK");
+            return false;
+        }
+    }
+
+    public function updateOrderStatus($orderId, $userId, $status, $deliveryDate = null) {
+        try {
+            // Start transaction
+            pdo_execute("START TRANSACTION");
+            
+            // Check if the order exists and belongs to the user
+            $sql = "SELECT id, trangthai FROM hoadon WHERE id = ? AND id_nguoidung = ?";
+            $order = pdo_query_one($sql, $orderId, $userId);
+            
+            if (!$order) {
+                pdo_execute("ROLLBACK");
+                return false;
+            }
+            
+            // Update the order status and delivery date if provided
+            if ($deliveryDate) {
+                $sql = "UPDATE hoadon SET trangthai = ?, ngaynhan = ? WHERE id = ? AND id_nguoidung = ?";
+                $result = pdo_execute($sql, $status, date('Y-m-d H:i:s', strtotime($deliveryDate)), $orderId, $userId);
+            } else {
+                $sql = "UPDATE hoadon SET trangthai = ? WHERE id = ? AND id_nguoidung = ?";
+                $result = pdo_execute($sql, $status, $orderId, $userId);
+            }
             
             // Commit transaction
             pdo_execute("COMMIT");

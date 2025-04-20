@@ -48,31 +48,34 @@ switch ($page) {
         require_once 'controller/banner.php';
         require_once 'controller/sanpham.php';
         require_once 'controller/sanphamgiamgia.php';
-        
-        // Load banner first
         $bannerController = new BannerController();
         $bannerController->showBanners();
-        
-        // Load sliderbar
         include 'views/home/sliderbar.php'; 
-        
-        // Load regular products
         $sanphamController = new SanPhamController();
         $sanphams = $sanphamController->getProducts();
-        
-        // Load discount products
         $sanphamGiamGiaController = new SanPhamGiamGiaController();
         $sanphamgiamgia = $sanphamGiamGiaController->getDiscountProducts();
-        
-        // Include the home view only once
         include 'views/home/home.php';
         break;
     case 'about':
-        include 'views/about.php';
+        include 'views/about/about.php';
         break;
-
     case 'contact':
-        include 'views/contact/contact.php';
+        require_once 'controller/contact.php';
+        $contactController = new ContactController();
+        $contactController->viewContact();
+        break;
+        
+    case 'sendContact':
+        require_once 'controller/contact.php';
+        $contactController = new ContactController();
+        $contactController->sendContact();
+        break;
+        
+    case 'contactDetail':
+        require_once 'controller/contact.php';
+        $contactController = new ContactController();
+        $contactController->viewContactDetail();
         break;
 
     case 'product':
@@ -100,7 +103,7 @@ switch ($page) {
     case 'removeCart':
         require_once 'controller/cart.php';
         $cartController = new CartController();
-        $cartController->removeFromCart();
+        $cartController->removeCart();
         break;
                     
     case 'checkout':
@@ -171,19 +174,14 @@ switch ($page) {
         $orderController->viewOrderDetails();
         break;
     case 'cancelOrder':
-        if (!isset($_SESSION['user'])) {
-            $_SESSION['error_message'] = "Vui lòng đăng nhập để hủy đơn hàng";
-            echo '<script>window.location.href = "index.php?page=login";</script>';
-            exit;
-        }
         require_once 'controller/order.php';
         $orderController = new OrderController();
         $orderController->cancelOrder();
         break;
     case 'applyDiscount':
-        require_once 'controller/discount.php';
-        $discountController = new DiscountController();
-        $discountController->applyDiscount();
+        require_once 'controller/khuyenmai.php';
+        $khuyenMaiController = new KhuyenMaiController();
+        $khuyenMaiController->applyDiscount();
         break;
     case 'discount':
         require_once 'controller/sanphamgiamgia.php';
@@ -213,6 +211,30 @@ switch ($page) {
 
 <!-- Toastify JS -->
 <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/toastify-js"></script>
+
+<script>
+    // Kiểm tra và hiển thị thông báo từ localStorage
+    document.addEventListener('DOMContentLoaded', function() {
+        const message = localStorage.getItem('message');
+        const messageType = localStorage.getItem('messageType');
+        
+        if (message) {
+            Toastify({
+                text: message,
+                duration: 3000,
+                gravity: "top",
+                position: "center",
+                backgroundColor: messageType === 'success' ? "#28a745" : "#dc3545",
+                stopOnFocus: true,
+                onClick: function(){}
+            }).showToast();
+            
+            // Xóa thông báo sau khi hiển thị
+            localStorage.removeItem('message');
+            localStorage.removeItem('messageType');
+        }
+    });
+</script>
 
 <?php if (isset($_SESSION['success_message'])): ?>
 <script>

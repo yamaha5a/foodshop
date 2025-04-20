@@ -115,19 +115,6 @@
             </table>
         </div>
 
-        <div class="mt-5">
-            <form id="discountForm" onsubmit="applyDiscount(event)">
-                <input type="text" id="discountCode" class="border-0 border-bottom rounded me-5 py-3 mb-4" 
-                       placeholder="Nhập mã giảm giá" 
-                       value="<?php echo isset($_SESSION['discount']['code']) ? $_SESSION['discount']['code'] : ''; ?>">
-                <button class="btn border-secondary rounded-pill px-4 py-3 text-primary" type="submit">Áp dụng mã giảm giá</button>
-                <?php if (isset($_SESSION['discount'])): ?>
-                    <a href="index.php?page=removeDiscount" class="btn border-secondary rounded-pill px-4 py-3 text-danger ms-2">Xóa mã giảm giá</a>
-                <?php endif; ?>
-            </form>
-            <div id="discountMessage" class="mt-2"></div>
-        </div>
-
         <div class="row g-4 justify-content-end">
             <div class="col-8"></div>
             <div class="col-sm-8 col-md-7 col-lg-6 col-xl-4">
@@ -311,26 +298,62 @@ function proceedToCheckout() {
     window.location.href = 'index.php?page=checkout';
 }
 
-function applyDiscount(event) {
-    event.preventDefault();
-    const code = document.getElementById('discountCode').value;
-    
-    fetch('index.php?page=applyDiscount', {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/x-www-form-urlencoded',
+function applyDiscount() {
+    var code = $('#discount-code').val();
+    if (!code) {
+        Swal.fire({
+            icon: 'error',
+            title: 'Lỗi',
+            text: 'Vui lòng nhập mã giảm giá'
+        });
+        return;
+    }
+
+    $.ajax({
+        url: 'index.php?page=applyDiscount',
+        type: 'POST',
+        data: { code: code },
+        dataType: 'json',
+        success: function(response) {
+            if (response.success) {
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Thành công',
+                    text: response.message
+                });
+                
+                // Cập nhật hiển thị giảm giá
+                var discount = response.discount;
+                $('#discount-amount').text(formatMoney(discount.amount));
+                $('#final-total').text(formatMoney(discount.finalTotal));
+                $('#discount-percent').text(discount.percent + '%');
+                
+                // Hiển thị thông tin giảm giá
+                $('.discount-info').show();
+                $('.discount-code').text(discount.code);
+            } else {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Lỗi',
+                    text: response.message
+                });
+            }
         },
-        body: `code=${code}`
-    })
-    .then(response => response.json())
-    .then(data => {
-        if (data.success) {
-            window.location.reload();
-        } else {
-            document.getElementById('discountMessage').innerHTML = 
-                `<div class="alert alert-danger">${data.message}</div>`;
+        error: function() {
+            Swal.fire({
+                icon: 'error',
+                title: 'Lỗi',
+                text: 'Có lỗi xảy ra, vui lòng thử lại sau'
+            });
         }
     });
+}
+
+function formatMoney(amount) {
+    return new Intl.NumberFormat('vi-VN', {
+        style: 'currency',
+        currency: 'VND'
+    }).format(amount);
 }
 
 function removeFromCart(productId) {

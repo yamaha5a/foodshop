@@ -10,8 +10,23 @@ class CartController {
 
     public function addToCart() {
         if (!isset($_SESSION['user'])) {
-            echo '<meta name="error_message" content="Vui lòng đăng nhập để thêm sản phẩm vào giỏ hàng">';
-            echo '<meta http-equiv="refresh" content="0;url=index.php?page=login">';
+            echo '<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>';
+            echo '<script>
+                Swal.fire({
+                    title: "Thông báo!",
+                    text: "Vui lòng đăng nhập để thêm sản phẩm vào giỏ hàng",
+                    icon: "warning",
+                    showCancelButton: true,
+                    confirmButtonColor: "#3085d6",
+                    cancelButtonColor: "#d33",
+                    confirmButtonText: "Đăng nhập",
+                    cancelButtonText: "Hủy"
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        window.location.href = "index.php?page=login";
+                    }
+                });
+            </script>';
             exit();
         }
 
@@ -53,9 +68,28 @@ class CartController {
 
     public function viewCart() {
         if (!isset($_SESSION['user'])) {
-            $_SESSION['error_message'] = "Vui lòng đăng nhập để xem giỏ hàng";
-            header("Location: index.php?page=login");
-            exit;
+            // Instead of redirecting, we'll return a response with a message
+            echo '<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>';
+            echo '<script>
+                Swal.fire({
+                    title: "Thông báo!",
+                    text: "Vui lòng đăng nhập để xem giỏ hàng",
+                    icon: "warning",
+                    showCancelButton: true,
+                    confirmButtonColor: "#3085d6",
+                    cancelButtonColor: "#d33",
+                    confirmButtonText: "Đăng nhập",
+                    cancelButtonText: "Hủy"
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        window.location.href = "index.php?page=login";
+                    } else {
+                        window.location.href = "index.php?page=home";
+                    }
+                });
+            </script>';
+            // Return early to prevent loading the cart view
+            return;
         }
 
         $userId = $_SESSION['user']['id'];
@@ -111,7 +145,7 @@ class CartController {
             if ($quantity > $product['soluong']) {
                 echo json_encode([
                     'success' => false, 
-                    'message' => 'Số lượng sản phẩm trong kho không đủ. Số lượng tối đa có thể đặt: ' . $product['soluong']
+                    'message' => 'Sản lượng trong kho không đủ: ' . $product['soluong']
                 ]);
                 exit;
             }
@@ -158,14 +192,21 @@ class CartController {
 
         $productId = $_GET['id'] ?? null;
         if (!$productId) {
+            $_SESSION['error_message'] = 'Không tìm thấy sản phẩm cần xóa';
             echo '<meta http-equiv="refresh" content="0;url=index.php?page=cart">';
             exit();
         }
 
         $userId = $_SESSION['user']['id'];
         try {
-            $this->cartModel->removeCartItem($userId, $productId);
-            $_SESSION['success_message'] = 'Đã xóa sản phẩm khỏi giỏ hàng';
+            $result = $this->cartModel->removeCartItem($userId, $productId);
+            
+            if ($result) {
+                $_SESSION['success_message'] = 'Đã xóa sản phẩm khỏi giỏ hàng';
+            } else {
+                $_SESSION['error_message'] = 'Không thể xóa sản phẩm khỏi giỏ hàng. Vui lòng thử lại sau.';
+            }
+            
             echo '<meta http-equiv="refresh" content="0;url=index.php?page=cart">';
             exit();
         } catch (Exception $e) {

@@ -33,36 +33,75 @@ class CartModel {
     }
     public function addToCart($userId, $productId, $quantity = 1) {
         try {
+            // Bắt đầu transaction
+            pdo_execute("START TRANSACTION");
+            
             $cart = $this->getCart($userId);
             if (!$cart) {
                 $this->createCart($userId);
                 $cart = $this->getCart($userId);
             }
-            $sql = "SELECT * FROM giohang_chitiet WHERE id_giohang = ? AND id_sanpham = ?";
-            $existingItem = pdo_query_one($sql, $cart['id'], $productId);
+            
+            // Lấy thông tin sản phẩm và giá
+            $sql = "SELECT sp.gia, sp.soluong, spg.giagiam 
+                    FROM sanpham sp 
+                    LEFT JOIN sanphamgiamgia spg ON sp.id = spg.id_sanpham 
+                    WHERE sp.id = ?";
+            $product = pdo_query_one($sql, $productId);
+            
+            if (!$product) {
+                pdo_execute("ROLLBACK");
+                throw new Exception("Sản phẩm không tồn tại");
+            }
+            
+            // Xác định giá hiện tại của sản phẩm
+            $currentPrice = isset($product['giagiam']) && $product['giagiam'] > 0 ? $product['giagiam'] : $product['gia'];
+            
+            // Kiểm tra sản phẩm đã có trong giỏ hàng chưa với cùng giá
+            $sql = "SELECT * FROM giohang_chitiet 
+                    WHERE id_giohang = ? AND id_sanpham = ? AND gia = ?";
+            $existingItem = pdo_query_one($sql, $cart['id'], $productId, $currentPrice);
+            
             if ($existingItem) {
-                $sql = "UPDATE giohang_chitiet SET soluong = ? WHERE id = ?";
-                return pdo_execute($sql, $quantity, $existingItem['id']);
-            } else {
-                // Check if the product is a discounted product
-                $sql = "SELECT sp.gia, spg.giagiam 
-                        FROM sanpham sp 
-                        LEFT JOIN sanphamgiamgia spg ON sp.id = spg.id_sanpham 
-                        WHERE sp.id = ?";
-                $product = pdo_query_one($sql, $productId);
-                
-                if (!$product) {
-                    throw new Exception("Sản phẩm không tồn tại");
+                // Kiểm tra nếu số lượng vượt quá số lượng có sẵn
+                $newQuantity = $existingItem['soluong'] + $quantity;
+                if ($newQuantity > $product['soluong']) {
+                    pdo_execute("ROLLBACK");
+                    throw new Exception("Số lượng sản phẩm trong kho không đủ. Số lượng tối đa có thể đặt: " . $product['soluong']);
                 }
                 
-                // Use discounted price if available, otherwise use regular price
-                $price = isset($product['giagiam']) && $product['giagiam'] > 0 ? $product['giagiam'] : $product['gia'];
+                // Tăng số lượng hiện tại lên quantity
+                $sql = "UPDATE giohang_chitiet SET soluong = ? WHERE id = ?";
+                $result = pdo_execute($sql, $newQuantity, $existingItem['id']);
                 
+                if ($result === false) {
+                    pdo_execute("ROLLBACK");
+                    throw new Exception("Không thể cập nhật số lượng sản phẩm");
+                }
+            } else {
+                // Kiểm tra nếu số lượng vượt quá số lượng có sẵn
+                if ($quantity > $product['soluong']) {
+                    pdo_execute("ROLLBACK");
+                    throw new Exception("Số lượng sản phẩm trong kho không đủ. Số lượng tối đa có thể đặt: " . $product['soluong']);
+                }
+                
+                // Thêm sản phẩm mới vào giỏ hàng
                 $sql = "INSERT INTO giohang_chitiet (id_giohang, id_sanpham, soluong, gia) 
                         VALUES (?, ?, ?, ?)";
-                return pdo_execute($sql, $cart['id'], $productId, $quantity, $price);
+                $result = pdo_execute($sql, $cart['id'], $productId, $quantity, $currentPrice);
+                
+                if ($result === false) {
+                    pdo_execute("ROLLBACK");
+                    throw new Exception("Không thể thêm sản phẩm vào giỏ hàng");
+                }
             }
+            
+            // Commit transaction nếu mọi thứ thành công
+            pdo_execute("COMMIT");
+            return true;
         } catch (Exception $e) {
+            // Rollback nếu có lỗi
+            pdo_execute("ROLLBACK");
             error_log("Error in addToCart: " . $e->getMessage());
             throw $e;
         }
@@ -102,13 +141,27 @@ class CartModel {
         }
     }
     public function removeCartItem($userId, $productId) {
-        $cart = $this->getCart($userId);
-        if (!$cart) {
+        try {
+            $cart = $this->getCart($userId);
+            if (!$cart) {
+                error_log("Không tìm thấy giỏ hàng cho người dùng ID: " . $userId);
+                return false;
+            }
+            
+            $sql = "DELETE FROM giohang_chitiet 
+                    WHERE id_giohang = ? AND id_sanpham = ?";
+            $result = pdo_execute($sql, $cart['id'], $productId);
+            
+            if ($result === false) {
+                error_log("Lỗi khi xóa sản phẩm ID: " . $productId . " khỏi giỏ hàng ID: " . $cart['id']);
+                return false;
+            }
+            
+            return true;
+        } catch (Exception $e) {
+            error_log("Lỗi trong removeCartItem: " . $e->getMessage());
             return false;
         }
-        $sql = "DELETE FROM giohang_chitiet 
-                WHERE id_giohang = ? AND id_sanpham = ?";
-        return pdo_execute($sql, $cart['id'], $productId);
     }
     public function clearCart($userId) {
         try {
@@ -141,6 +194,75 @@ class CartModel {
             echo "Transaction rolled back<br>";
             echo "</div>";
             return false;
+        }
+    }
+    public function addToCartWithPrice($userId, $productId, $quantity = 1, $price) {
+        try {
+            // Bắt đầu transaction
+            pdo_execute("START TRANSACTION");
+            
+            $cart = $this->getCart($userId);
+            if (!$cart) {
+                $this->createCart($userId);
+                $cart = $this->getCart($userId);
+            }
+            
+            // Lấy thông tin sản phẩm
+            $sql = "SELECT soluong FROM sanpham WHERE id = ?";
+            $product = pdo_query_one($sql, $productId);
+            
+            if (!$product) {
+                pdo_execute("ROLLBACK");
+                throw new Exception("Sản phẩm không tồn tại");
+            }
+            
+            // Kiểm tra sản phẩm đã có trong giỏ hàng chưa với cùng giá
+            $sql = "SELECT * FROM giohang_chitiet 
+                    WHERE id_giohang = ? AND id_sanpham = ? AND gia = ?";
+            $existingItem = pdo_query_one($sql, $cart['id'], $productId, $price);
+            
+            if ($existingItem) {
+                // Kiểm tra nếu số lượng vượt quá số lượng có sẵn
+                $newQuantity = $existingItem['soluong'] + $quantity;
+                if ($newQuantity > $product['soluong']) {
+                    pdo_execute("ROLLBACK");
+                    throw new Exception("Số lượng sản phẩm trong kho không đủ. Số lượng tối đa có thể đặt: " . $product['soluong']);
+                }
+                
+                // Tăng số lượng hiện tại lên quantity
+                $sql = "UPDATE giohang_chitiet SET soluong = ? WHERE id = ?";
+                $result = pdo_execute($sql, $newQuantity, $existingItem['id']);
+                
+                if ($result === false) {
+                    pdo_execute("ROLLBACK");
+                    throw new Exception("Không thể cập nhật số lượng sản phẩm");
+                }
+            } else {
+                // Kiểm tra nếu số lượng vượt quá số lượng có sẵn
+                if ($quantity > $product['soluong']) {
+                    pdo_execute("ROLLBACK");
+                    throw new Exception("Số lượng sản phẩm trong kho không đủ. Số lượng tối đa có thể đặt: " . $product['soluong']);
+                }
+                
+                // Thêm sản phẩm mới vào giỏ hàng với giá được chỉ định
+                $sql = "INSERT INTO giohang_chitiet (id_giohang, id_sanpham, soluong, gia) 
+                        VALUES (?, ?, ?, ?)";
+                $result = pdo_execute($sql, $cart['id'], $productId, $quantity, $price);
+                
+                if ($result === false) {
+                    pdo_execute("ROLLBACK");
+                    throw new Exception("Không thể thêm sản phẩm vào giỏ hàng");
+                }
+            }
+            
+            // Commit transaction nếu mọi thứ thành công
+            pdo_execute("COMMIT");
+            return true;
+        } catch (Exception $e) {
+            // Rollback nếu có lỗi
+            pdo_execute("ROLLBACK");
+            error_log("Error in addToCartWithPrice: " . $e->getMessage());
+            throw $e;
         }
     }
 }

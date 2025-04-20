@@ -106,11 +106,11 @@
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
         <div class="container-fluid fruite py-5">
-            <div class="container py-5">
+            <div class="container py-5">                                   
                 <div class="tab-class text-center">
                     <div class="row g-4">
                         <div class="col-lg-4 text-start">
-                            <h1>Sản phẩm của chúng tôi</h1>
+                            <h1>Sản phẩm mới nhất</h1>
                         </div>
                         <div class="col-lg-8 text-end">
                             <ul class="nav nav-pills d-inline-flex text-center mb-5">
@@ -132,38 +132,39 @@
                                 <?php foreach ($sanphams as $sanpham): ?>
                                     <div class="col-md-6 col-lg-4 col-xl-3">
                                         <div class="rounded position-relative fruite-item">
-                                            <a href="index.php?page=detail&id=<?= $sanpham['id']; ?>" class="text-decoration-none stretched-link product-link">
-                                                <div class="fruite-img">
+                                            <div class="fruite-img">
+                                                <a href="index.php?page=detail&id=<?= $sanpham['id']; ?>" class="text-decoration-none">
                                                     <img src="upload/<?= htmlspecialchars($sanpham['hinhanh1']); ?>" class="img-fluid w-100 rounded-top" alt="<?= htmlspecialchars($sanpham['tensanpham']); ?>">
-                                                </div>
-                                                <div class="text-white bg-secondary px-3 py-1 rounded position-absolute" style="top: 10px; left: 10px;">Food</div>
-                                                <div class="p-4 border border-secondary border-top-0 rounded-bottom">
+                                                </a>
+                                            </div>
+                                            <div class="text-white bg-secondary px-3 py-1 rounded position-absolute" style="top: 10px; left: 10px;">Food</div>
+                                            <div class="p-4 border border-secondary border-top-0 rounded-bottom">
+                                                <a href="index.php?page=detail&id=<?= $sanpham['id']; ?>" class="text-decoration-none">
                                                     <h4 class="text-dark product-name">
                                                         <?= htmlspecialchars($sanpham['tensanpham']); ?>
                                                     </h4>
                                                     <p class="mb-4 product-description"><?= htmlspecialchars($sanpham['chitiet']); ?></p>
-                                                    <div class="d-flex flex-column align-items-center">
-                                                        <div class="w-100 mb-3">
-                                                            <p class="text-dark fs-5 fw-bold mb-1">Giá: 
-                                                                <?= number_format($sanpham['gia'], 0, ',', '.') ?> VNĐ
-                                                            </p>
-                                                            <div class="d-flex align-items-center">
-                                                                <span class="badge bg-primary me-2">Số lượng:</span>
-                                                                <span class="fw-bold <?= $sanpham['soluong'] > 10 ? 'text-success' : ($sanpham['soluong'] > 0 ? 'text-warning' : 'text-danger') ?>">
-                                                                    <?= htmlspecialchars($sanpham['soluong']); ?>
-                                                                </span>
-                                                            </div>
+                                                </a>
+                                                <div class="d-flex flex-column align-items-center">
+                                                    <div class="w-100 mb-3">
+                                                        <p class="text-dark fs-5 fw-bold mb-1">Giá: 
+                                                            <?= number_format($sanpham['gia'], 0, ',', '.') ?> VNĐ
+                                                        </p>
+                                                        <div class="d-flex align-items-center">
+                                                            <span class="badge bg-primary me-2">Số lượng:</span>
+                                                            <span class="fw-bold <?= $sanpham['soluong'] > 10 ? 'text-success' : ($sanpham['soluong'] > 0 ? 'text-warning' : 'text-danger') ?>">
+                                                                <?= htmlspecialchars($sanpham['soluong']); ?>
+                                                            </span>
                                                         </div>
-                                                        <form method="post" action="index.php?page=addToCart" class="w-100 text-center" onclick="event.stopPropagation();">
-                                                            <input type="hidden" name="product_id" value="<?= $sanpham['id']; ?>">
-                                                            <input type="hidden" name="quantity" value="1">
-                                                            <button type="submit" class="btn border border-secondary rounded-pill px-4 py-2 text-primary w-100">
-                                                                <i class="fa fa-shopping-bag me-2 text-primary"></i> Add to cart
-                                                            </button>
-                                                        </form>
+                                                    </div>
+                                                    <div class="w-100 text-center">
+                                                        <button type="button" class="btn border border-secondary rounded-pill px-4 py-2 text-primary w-100 add-to-cart-btn" 
+                                                                data-product-id="<?= $sanpham['id']; ?>">
+                                                            <i class="fa fa-shopping-bag me-2 text-primary"></i> Add to cart
+                                                        </button>
                                                     </div>
                                                 </div>
-                                            </a>
+                                            </div>
                                         </div>
                                     </div>
                                 <?php endforeach; ?>
@@ -235,12 +236,16 @@
                     <?php foreach ($sanphams as $sanpham): ?>
                         <div class="border border-primary rounded position-relative vesitable-item shadow-sm">
                             <div class="vesitable-img">
-                                <img src="upload/<?= htmlspecialchars($sanpham['hinhanh1']); ?>" class="img-fluid w-100 rounded-top" alt="<?= htmlspecialchars($sanpham['tensanpham']); ?>">
+                                <a href="index.php?page=detail&id=<?= $sanpham['id']; ?>" class="text-decoration-none">
+                                    <img src="upload/<?= htmlspecialchars($sanpham['hinhanh1']); ?>" class="img-fluid w-100 rounded-top" alt="<?= htmlspecialchars($sanpham['tensanpham']); ?>">
+                                </a>
                             </div>
                             <div class="text-white bg-primary px-3 py-1 rounded position-absolute" style="top: 10px; right: 10px;">Thức ăn nhanh</div>
                             <div class="p-4 rounded-bottom">
-                                <h4 class="mb-3 product-name"><?= htmlspecialchars($sanpham['tensanpham']); ?></h4>
-                                <p class="text-muted mb-3 product-description"><?= htmlspecialchars($sanpham['chitiet']); ?></p>
+                                <a href="index.php?page=detail&id=<?= $sanpham['id']; ?>" class="text-decoration-none">
+                                    <h4 class="mb-3 product-name"><?= htmlspecialchars($sanpham['tensanpham']); ?></h4>
+                                    <p class="text-muted mb-3 product-description"><?= htmlspecialchars($sanpham['chitiet']); ?></p>
+                                </a>
                                 <div class="d-flex flex-column">
                                     <div class="mb-3">
                                         <p class="text-dark fs-5 fw-bold mb-1"><?= number_format($sanpham['gia'], 0, ',', '.') ?> VNĐ</p>
@@ -251,13 +256,12 @@
                                             </span>
                                         </div>
                                     </div>
-                                    <form method="post" action="index.php?page=addToCart" onsubmit="return addToCart(event)" class="text-center">
-                                        <input type="hidden" name="product_id" value="<?= $sanpham['id']; ?>">
-                                        <input type="hidden" name="quantity" value="1">
-                                        <button type="submit" class="btn border border-secondary rounded-pill px-4 py-2 w-100 text-primary">
+                                    <div class="w-100 text-center">
+                                        <button type="button" class="btn border border-secondary rounded-pill px-4 py-2 w-100 text-primary add-to-cart-btn" 
+                                                data-product-id="<?= $sanpham['id']; ?>">
                                             <i class="fa fa-shopping-bag me-2 text-primary"></i> Thêm vào giỏ hàng
                                         </button>
-                                    </form>
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -400,6 +404,8 @@
 <script>
 function addToCart(event) {
     event.preventDefault();
+    event.stopPropagation();
+    
     const form = event.target;
     
     // Kiểm tra đăng nhập trước khi gửi request
@@ -447,7 +453,12 @@ function addToCart(event) {
         
         if (successMessage) {
             // Cập nhật số lượng giỏ hàng từ session
-            document.getElementById('cart-count').textContent = cartCount;
+            const cartCountElement = document.getElementById('cart-count');
+            if (cartCountElement) {
+                cartCountElement.textContent = cartCount;
+            } else {
+                console.log('Element with ID "cart-count" not found');
+            }
             
             Swal.fire({
                 title: 'Thành công!',
@@ -479,11 +490,97 @@ function addToCart(event) {
     return false;
 }
 
-// Update all add to cart forms to use the new function
+// Add this new function to handle the "Add to cart" button clicks
 document.addEventListener('DOMContentLoaded', function() {
-    const forms = document.querySelectorAll('form[action="index.php?page=addToCart"]');
-    forms.forEach(form => {
-        form.addEventListener('submit', addToCart);
+    // Handle the new button-based approach
+    const addToCartButtons = document.querySelectorAll('.add-to-cart-btn');
+    addToCartButtons.forEach(button => {
+        button.addEventListener('click', function(event) {
+            event.preventDefault();
+            event.stopPropagation();
+            
+            const productId = this.getAttribute('data-product-id');
+            
+            // Kiểm tra đăng nhập trước khi gửi request
+            <?php if (!isset($_SESSION['user'])): ?>
+                Swal.fire({
+                    title: 'Thông báo!',
+                    text: 'Vui lòng đăng nhập để thêm sản phẩm vào giỏ hàng',
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonColor: '#3085d6',
+                    cancelButtonColor: '#d33',
+                    confirmButtonText: 'Đăng nhập',
+                    cancelButtonText: 'Hủy'
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        window.location.href = "index.php?page=login";
+                    }
+                });
+                return false;
+            <?php endif; ?>
+            
+            // Tạo FormData
+            const formData = new FormData();
+            formData.append('product_id', productId);
+            
+            // Gửi request AJAX
+            fetch('index.php?page=addToCart', {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Network response was not ok');
+                }
+                return response.text();
+            })
+            .then(html => {
+                // Tạo một div ẩn để chứa response
+                const tempDiv = document.createElement('div');
+                tempDiv.innerHTML = html;
+                
+                // Lấy thông báo từ session
+                const successMessage = tempDiv.querySelector('meta[name="success_message"]')?.content;
+                const errorMessage = tempDiv.querySelector('meta[name="error_message"]')?.content;
+                const cartCount = tempDiv.querySelector('meta[name="cart_count"]')?.content;
+                
+                if (successMessage) {
+                    // Cập nhật số lượng giỏ hàng từ session
+                    const cartCountElement = document.getElementById('cart-count');
+                    if (cartCountElement) {
+                        cartCountElement.textContent = cartCount;
+                    } else {
+                        console.log('Element with ID "cart-count" not found');
+                    }
+                    
+                    Swal.fire({
+                        title: 'Thành công!',
+                        text: successMessage,
+                        icon: 'success',
+                        confirmButtonText: 'OK',
+                        timer: 1500,
+                        showConfirmButton: false
+                    });
+                } else if (errorMessage) {
+                    Swal.fire({
+                        title: 'Lỗi!',
+                        text: errorMessage,
+                        icon: 'error',
+                        confirmButtonText: 'OK'
+                    });
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                Swal.fire({
+                    title: 'Lỗi!',
+                    text: 'Có lỗi xảy ra khi thêm sản phẩm vào giỏ hàng',
+                    icon: 'error',
+                    confirmButtonText: 'OK'
+                });
+            });
+        });
     });
 });
 </script>

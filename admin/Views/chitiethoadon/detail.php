@@ -104,6 +104,27 @@
             background-color: #d4edda;
             border-color: #c3e6cb;
         }
+        .status-controls {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .btn-status {
+            background: #f8f9fa;
+            border: 1px solid #dee2e6;
+            border-radius: 4px;
+            padding: 5px 10px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        .btn-status:hover {
+            background: #e9ecef;
+        }
+        .status-text {
+            min-width: 120px;
+            text-align: center;
+            display: inline-block;
+        }
     </style>
 </head>
 <body>
@@ -159,23 +180,33 @@
                     <div class="info-value"><?php echo htmlspecialchars($order['tenphuongthuc'] ?? 'Chưa cập nhật'); ?></div>
                 </div>
                 <div class="info-row">
-                <div class="info-label">Trạng thái:</div>
-                <div class="info-value">
-                    <form action="index.php?act=detailchitiethoadon" method="POST">
-                        <input type="hidden" name="order_id" value="<?php echo $order['id']; ?>">
-                        <select name="trangthai" onchange="this.form.submit()">
-                            <?php
-                                $statuses = ['Chờ xác nhận', 'Đang giao', 'Đã giao', 'Đã hủy'];
-                                foreach ($statuses as $status) {
-                                    $selected = ($order['trangthai'] === $status) ? 'selected' : '';
-                                    echo "<option value='$status' $selected>$status</option>";
-                                }
-                            ?>
-                        </select>
-                    </form>
+                    <div class="info-label">Trạng thái:</div>
+                    <div class="info-value">
+                        <form action="index.php?act=detailchitiethoadon" method="POST" class="status-form">
+                            <input type="hidden" name="order_id" value="<?php echo $order['id']; ?>">
+                            <input type="hidden" name="trangthai" id="status-value" value="<?php echo $order['trangthai']; ?>">
+                            <div class="status-controls">
+                                <button type="button" class="btn-status prev" onclick="changeStatus('prev')">
+                                    <i class="fas fa-chevron-left"></i>
+                                </button>
+                                <span class="status-text"><?php echo $order['trangthai']; ?></span>
+                                <button type="button" class="btn-status next" onclick="changeStatus('next')">
+                                    <i class="fas fa-chevron-right"></i>
+                                </button>
+                            </div>
+                        </form>
+                    </div>
                 </div>
-            </div>
-
+                <div class="info-row">
+                    <div class="info-label">Ngày đặt hàng:</div>
+                    <div class="info-value"><?php echo date('d/m/Y H:i', strtotime($order['ngaytao'])); ?></div>
+                </div>
+                <?php if ($order['trangthai'] === 'Khách hàng đã nhận' && !empty($order['ngaynhan'])): ?>
+                <div class="info-row">
+                    <div class="info-label">Ngày nhận hàng:</div>
+                    <div class="info-value"><?php echo date('d/m/Y H:i', strtotime($order['ngaynhan'])); ?></div>
+                </div>
+                <?php endif; ?>
             </div>
 
             <!-- Chi tiết sản phẩm -->
@@ -186,6 +217,7 @@
                 <table class="data-table">
                     <thead>
                         <tr>
+                            <th>STT</th>
                             <th>Sản phẩm</th>
                             <th>Giá</th>
                             <th>Số lượng</th>
@@ -195,11 +227,13 @@
                     <tbody>
                         <?php 
                         $total = 0;
+                        $stt = 1;
                         foreach ($orderItems as $item): 
                             $subtotal = $item['gia'] * $item['soluong'];
                             $total += $subtotal;
                         ?>
                             <tr>
+                                <td><?php echo $stt++; ?></td>
                                 <td>
                                     <div class="d-flex align-items-center">
                                         <img src="http://localhost/shopfood/upload/<?php echo htmlspecialchars($item['hinhanh1']); ?>" 
@@ -216,7 +250,7 @@
                             </tr>
                         <?php endforeach; ?>
                         <tr>
-                            <td colspan="3" class="text-end"><strong>Tổng cộng:</strong></td>
+                            <td colspan="4" class="text-end"><strong>Tổng cộng:</strong></td>
                             <td><strong><?php echo number_format($total, 0, ',', '.') . ' VNĐ'; ?></strong></td>
                         </tr>
                     </tbody>
@@ -224,5 +258,30 @@
             </div>
         </div>
     </main>
+
+    <script>
+        const statuses = ['Chờ xác nhận', 'Đang xử lý', 'Đang vận chuyển', 'Khách hàng đã nhận'];
+        
+        function changeStatus(direction) {
+            const currentStatus = document.getElementById('status-value').value;
+            const currentIndex = statuses.indexOf(currentStatus);
+            let newIndex;
+            
+            if (direction === 'prev' && currentIndex > 0) {
+                newIndex = currentIndex - 1;
+            } else if (direction === 'next' && currentIndex < statuses.length - 1) {
+                newIndex = currentIndex + 1;
+            } else {
+                return;
+            }
+            
+            const newStatus = statuses[newIndex];
+            document.getElementById('status-value').value = newStatus;
+            document.querySelector('.status-text').textContent = newStatus;
+            
+            // Submit form
+            document.querySelector('.status-form').submit();
+        }
+    </script>
 </body>
 </html> 

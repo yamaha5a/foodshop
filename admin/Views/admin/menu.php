@@ -18,7 +18,7 @@
     </div>
         <div class="nav-item">
             <i class="fas fa-users"></i>
-            <a href="index.php?act=nguoidung"><span>Người dùng</span></a>
+            <a href="index.php?act=listnguoidung"><span>Người dùng</span></a>
         </div>
         <div class="nav-item">
             <i class="fas fa-box"></i>
@@ -29,10 +29,6 @@
             <a href="index.php?act=danhmuc"><span>Danh mục</span></a>
         </div>
         <div class="nav-item">
-            <i class="fas fa-tags"></i>
-            <a href="index.php?act=khuyenmai"><span>Mã giảm giá</span></a>
-        </div>
-        <div class="nav-item">
             <i class="fas fa-file-invoice"></i>
             <a href="index.php?act=chitiethoadon"><span>Hóa đơn</span></a>
         </div>
@@ -41,22 +37,13 @@
             <a href="index.php?act=phuongthucthanhtoan"><span>Quản lý thanh toán</span></a>
         </div>
         <div class="nav-item">
-            <i class="fas fa-shipping-fast"></i>
+            <i class="fas fa-file-invoice"></i>
             <a href="index.php?act=sanphamgiamgia"><span>Sản phẩm giảm giá</span></a>
         </div>
-        <div class="nav-item">
-            <i class="fas fa-utensils"></i>
-            <a href="index.php?act=topping"><span>Quản lý Topping</span></a>
-        </div>
-        <div class="nav-item">
-    <i class="fas fa-hamburger"></i>
-    <a href="index.php?act=sanpham_topping"><span>Sản phẩm - Topping</span></a>
-</div>
-
         <div class="menu-heading">Hỗ trợ</div>
         <div class="nav-item">
             <i class="fas fa-star"></i>
-            <a href="index.php?act=binhluan"><span>Đánh giá</span></a>
+            <a href="index.php?act=binhluan"><span>Bình luận</span></a>
         </div>
         <div class="nav-item">
             <i class="fas fa-envelope"></i>

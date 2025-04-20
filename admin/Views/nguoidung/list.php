@@ -106,16 +106,6 @@
 }
 </style>
 <body>
-
-    <!-- Nội dung chính -->
-    <main class="main-content">
-        <div class="page-title">
-            <h2 class="title">Danh sách người dùng</h2>
-            <a href="index.php?act=addnguoidung" class="btn btn-primary">
-                <i class="fas fa-folder-plus"></i> Thêm mới
-            </a>
-        </div>
-
         <!-- Thanh tìm kiếm -->
         <div class="search-container">
             <form action="index.php" method="GET" class="search-form">
@@ -175,9 +165,8 @@
                                     ?>
                                 </td>
                                 <td>
-                                    <span class="status <?php echo ($nguoiDung['trangthai'] === 'Hoạt động') ? 'active' : 'cancelled'; ?>">
-                                        <i class="fas <?php echo ($nguoiDung['trangthai'] === 'Hoạt động') ? 'fa-check-circle' : 'fa-times-circle'; ?>"></i> 
-                                        <?php echo htmlspecialchars($nguoiDung['trangthai']); ?>
+                                    <span class="status active">
+                                        <i class="fas fa-check-circle"></i> Hoạt động
                                     </span>
                                 </td>
                                 <td>

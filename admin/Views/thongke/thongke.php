@@ -50,11 +50,11 @@
   <div class="stat-card">
     <div class="card-header">
       <div>
-        <div class="card-value">85%</div>
-        <div class="card-label">Tỷ lệ chuyển đổi</div>
+        <div class="card-value"><?= $data['total_products'] ?></div>
+        <div class="card-label">Tổng sản phẩm</div>
       </div>
       <div class="card-icon orange">
-        <i class="fas fa-chart-line"></i>
+        <i class="fas fa-box"></i>
       </div>
     </div>
     <div class="card-change positive">
@@ -92,17 +92,21 @@
             <td><?= date('d/m/Y', strtotime($order['ngaytao'])) ?></td>
             <td><?= number_format($order['tongtien'], 0, ',', '.') ?>đ</td>
             <td>
-              <?php if ($order['trangthai'] == 'Hoàn thành'): ?>
-                <span class="status active">
-                  <i class="fas fa-check-circle"></i> Hoàn thành
+              <?php if ($order['trangthai'] == 'Khách hàng đã nhận'): ?>
+                <span class="status completed">
+                  <i class="fas fa-check-circle"></i> Đã hoàn thành
                 </span>
-              <?php elseif ($order['trangthai'] == 'Đang chờ xử lý'): ?>
+              <?php elseif ($order['trangthai'] == 'Chờ xác nhận'): ?>
                 <span class="status pending">
-                  <i class="fas fa-clock"></i> Đang chờ xử lý
+                  <i class="fas fa-clock"></i> Chờ xác nhận
                 </span>
-              <?php else: ?>
-                <span class="status cancelled">
-                  <i class="fas fa-times-circle"></i> <?= $order['trangthai'] ?>
+              <?php elseif ($order['trangthai'] == 'Đang xử lý'): ?>
+                <span class="status processing">
+                  <i class="fas fa-cog fa-spin"></i> Đang xử lý
+                </span>
+              <?php elseif ($order['trangthai'] == 'Đang vận chuyển'): ?>
+                <span class="status shipping">
+                  <i class="fas fa-truck"></i> Đang vận chuyển
                 </span>
               <?php endif; ?>
             </td>
@@ -121,3 +125,42 @@
     </tbody>
   </table>
 </div>
+
+<style>
+.status {
+  display: inline-flex;
+  align-items: center;
+  padding: 4px 8px;
+  border-radius: 4px;
+  font-size: 12px;
+  font-weight: 500;
+}
+
+.status i {
+  margin-right: 4px;
+}
+
+.status.completed {
+  background-color: #e6f4ea;
+  color: #1e7e34;
+}
+
+.status.pending {
+  background-color: #fff3cd;
+  color: #856404;
+}
+
+.status.processing {
+  background-color: #cce5ff;
+  color: #004085;
+}
+
+.status.shipping {
+  background-color: #d1ecf1;
+  color: #0c5460;
+}
+
+.fa-cog.fa-spin {
+  animation: fa-spin 2s infinite linear;
+}
+</style>

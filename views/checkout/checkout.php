@@ -128,15 +128,24 @@
                         </div>
                         <div class="row g-4 text-center align-items-center justify-content-center border-bottom py-3">
                             <div class="col-12">
-                                <h5 class="mb-3">Phương thức thanh toán</h5>
-                                <div class="form-check form-check-inline">
-                                    <input class="form-check-input" type="radio" name="payment_method" id="payment_cod" value="1" checked>
-                                    <label class="form-check-label" for="payment_cod">Thanh toán khi nhận hàng (COD)</label>
-                                </div>
-                                <div class="form-check form-check-inline">
-                                    <input class="form-check-input" type="radio" name="payment_method" id="payment_bank" value="2">
-                                    <label class="form-check-label" for="payment_bank">Chuyển khoản ngân hàng</label>
-                                </div>
+                                <h5 class="mb-3">Phương thức thanh toán <span class="text-danger">*</span></h5>
+                                <?php if (!empty($paymentMethods)): ?>
+                                    <?php foreach ($paymentMethods as $method): ?>
+                                        <div class="form-check form-check-inline">
+                                            <input class="form-check-input" type="radio" name="payment_method" 
+                                                   id="payment_<?php echo $method['id']; ?>" 
+                                                   value="<?php echo $method['id']; ?>"
+                                                   <?php echo $method['id'] == 1 ? 'checked' : ''; ?>
+                                                   required>
+                                            <label class="form-check-label" for="payment_<?php echo $method['id']; ?>">
+                                                <?php echo htmlspecialchars($method['tenphuongthuc']); ?>
+                                            </label>
+                                        </div>
+                                    <?php endforeach; ?>
+                                    <div class="invalid-feedback" id="payment_method_error"></div>
+                                <?php else: ?>
+                                    <p class="text-danger">Không có phương thức thanh toán nào khả dụng</p>
+                                <?php endif; ?>
                             </div>
                         </div>
                         <div class="row g-4 text-center align-items-center justify-content-center pt-4">
@@ -186,6 +195,13 @@ document.getElementById('checkoutForm').addEventListener('submit', function(e) {
     if (!email.value.endsWith('@gmail.com')) {
         document.getElementById('email_error').textContent = 'Email phải kết thúc bằng @gmail.com';
         email.classList.add('is-invalid');
+        isValid = false;
+    }
+
+    // Validate payment method
+    const paymentMethod = document.querySelector('input[name="payment_method"]:checked');
+    if (!paymentMethod) {
+        document.getElementById('payment_method_error').textContent = 'Vui lòng chọn phương thức thanh toán';
         isValid = false;
     }
     

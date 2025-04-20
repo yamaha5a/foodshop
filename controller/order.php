@@ -19,7 +19,13 @@ class OrderController {
         }
 
         $userId = $_SESSION['user']['id'];
+        // Debug: Kiểm tra user ID
+        error_log("User ID: " . $userId);
+        
         $orders = $this->orderModel->getOrders($userId);
+        
+        // Debug: Kiểm tra số lượng đơn hàng
+        error_log("Number of orders: " . count($orders));
         
         // Kiểm tra dữ liệu trước khi truyền sang view
         if (!empty($orders)) {
@@ -27,6 +33,8 @@ class OrderController {
                 if (!isset($order['phuongthucthanhtoan'])) {
                     $order['phuongthucthanhtoan'] = 'Chưa xác định';
                 }
+                // Debug: Kiểm tra từng đơn hàng
+                error_log("Order ID: " . $order['id'] . ", Status: " . $order['trangthai']);
             }
         }
 
@@ -157,16 +165,103 @@ class OrderController {
         $orderId = $_POST['order_id'];
         $userId = $_SESSION['user']['id'];
         
-        // Attempt to cancel the order
-        $result = $this->orderModel->cancelOrder($orderId, $userId);
-        
-        if ($result) {
-            $_SESSION['success_message'] = "Đã hủy đơn hàng #" . $orderId . " thành công";
+        // Check current status
+        $currentOrder = $this->orderModel->getOrderById($orderId, $userId);
+        if (!$currentOrder) {
+            $_SESSION['error_message'] = "Không tìm thấy đơn hàng";
+            echo '<script>window.location.href = "index.php?page=orders";</script>';
+            exit;
+        }
+
+        // If order is already cancelled, continue processing
+        if ($currentOrder['trangthai'] === 'Đã hủy') {
+            $result = $this->orderModel->updateOrderStatus($orderId, $userId, 'Đang xử lý');
+            if ($result) {
+                $_SESSION['success_message'] = "Đã tiếp tục xử lý đơn hàng #" . $orderId;
+            } else {
+                $_SESSION['error_message'] = "Không thể tiếp tục xử lý đơn hàng";
+            }
         } else {
-            $_SESSION['error_message'] = "Không thể hủy đơn hàng. Đơn hàng có thể không tồn tại hoặc không ở trạng thái có thể hủy.";
+            // Cancel the order
+            $result = $this->orderModel->updateOrderStatus($orderId, $userId, 'Đã hủy');
+            if ($result) {
+                $_SESSION['success_message'] = "Đã hủy đơn hàng #" . $orderId . " thành công";
+            } else {
+                $_SESSION['error_message'] = "Không thể hủy đơn hàng";
+            }
         }
         
         // Redirect back to order details page using JavaScript
+        echo '<script>window.location.href = "index.php?page=orderDetails&id=' . $orderId . '";</script>';
+        exit;
+    }
+
+    public function continueOrder() {
+        if (!isset($_SESSION['user'])) {
+            $_SESSION['error_message'] = "Vui lòng đăng nhập để tiếp tục xử lý đơn hàng";
+            echo '<script>window.location.href = "index.php?page=login";</script>';
+            exit;
+        }
+        
+        if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+            $_SESSION['error_message'] = "Phương thức không hợp lệ";
+            echo '<script>window.location.href = "index.php?page=orders";</script>';
+            exit;
+        }
+        
+        if (!isset($_POST['order_id']) || empty($_POST['order_id'])) {
+            $_SESSION['error_message'] = "Không tìm thấy đơn hàng";
+            echo '<script>window.location.href = "index.php?page=orders";</script>';
+            exit;
+        }
+        
+        $orderId = $_POST['order_id'];
+        $userId = $_SESSION['user']['id'];
+        
+        // Update order status to "Đang vận chuyển"
+        $result = $this->orderModel->updateOrderStatus($orderId, $userId, 'Đang vận chuyển');
+        
+        if ($result) {
+            $_SESSION['success_message'] = "Đã cập nhật trạng thái đơn hàng #" . $orderId . " thành công";
+        } else {
+            $_SESSION['error_message'] = "Không thể cập nhật trạng thái đơn hàng";
+        }
+        
+        echo '<script>window.location.href = "index.php?page=orderDetails&id=' . $orderId . '";</script>';
+        exit;
+    }
+
+    public function completeOrder() {
+        if (!isset($_SESSION['user'])) {
+            $_SESSION['error_message'] = "Vui lòng đăng nhập để xác nhận đơn hàng";
+            echo '<script>window.location.href = "index.php?page=login";</script>';
+            exit;
+        }
+        
+        if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+            $_SESSION['error_message'] = "Phương thức không hợp lệ";
+            echo '<script>window.location.href = "index.php?page=orders";</script>';
+            exit;
+        }
+        
+        if (!isset($_POST['order_id']) || empty($_POST['order_id'])) {
+            $_SESSION['error_message'] = "Không tìm thấy đơn hàng";
+            echo '<script>window.location.href = "index.php?page=orders";</script>';
+            exit;
+        }
+        
+        $orderId = $_POST['order_id'];
+        $userId = $_SESSION['user']['id'];
+        
+        // Update order status to "Khách hàng đã nhận" and set delivery date with time
+        $result = $this->orderModel->updateOrderStatus($orderId, $userId, 'Khách hàng đã nhận', date('Y-m-d H:i:s'));
+        
+        if ($result) {
+            $_SESSION['success_message'] = "Đã xác nhận nhận hàng thành công cho đơn hàng #" . $orderId;
+        } else {
+            $_SESSION['error_message'] = "Không thể xác nhận nhận hàng";
+        }
+        
         echo '<script>window.location.href = "index.php?page=orderDetails&id=' . $orderId . '";</script>';
         exit;
     }

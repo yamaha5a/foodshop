@@ -42,6 +42,14 @@
             background: #0056b3;
         }
 
+        .product-image {
+            width: 80px;
+            height: 80px;
+            object-fit: cover;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
         @media (max-width: 200px) {
             .search-box {
                 flex-direction: column;
@@ -68,6 +76,14 @@
                 <?php unset($_SESSION['thongbaoxoa']); ?>
             <?php endif; ?>
 
+            <form action="index.php" method="get" enctype="multipart/form-data">
+                <input type="hidden" name="act" value="sanphamgiamgia">
+                <div class="search-box">
+                    <input type="text" name="kyw" value="<?= $_GET['kyw'] ?? '' ?>" placeholder="Tìm kiếm tên sản phẩm..." class="search-input">
+                    <input type="submit" name="listok" value="Tìm kiếm" class="search-button">
+                </div>
+            </form>
+
             <div class="card-title">
                 <h3><i class="fas fa-tags"></i> Danh sách sản phẩm giảm giá</h3>
                 <a href="index.php?act=addSanPhamGiamGia" class="btn btn-primary">
@@ -79,6 +95,7 @@
                 <thead>
                     <tr>
                         <th scope="col">ID</th>
+                        <th scope="col">Hình ảnh</th>
                         <th scope="col">Tên sản phẩm</th>
                         <th scope="col">Giá gốc</th>
                         <th scope="col">Giá giảm</th>
@@ -89,25 +106,45 @@
                 <tbody>
                     <?php if (empty($danhSachGiamGia)): ?>
                         <tr>
-                            <td colspan="6" style="text-align: center;">Không có sản phẩm giảm giá nào</td>
+                            <td colspan="7" style="text-align: center;">Không có sản phẩm giảm giá nào</td>
                         </tr>
                     <?php else: ?>
                         <?php foreach ($danhSachGiamGia as $giamgia): ?>
+                            <?php 
+                                $coTheXoa = !$this->sanPhamGiamGiaModel->kiemTraSanPhamGiamGiaCoDonHang($giamgia['id']);
+                                $trangThaiClass = $coTheXoa ? '' : 'text-warning';
+                            ?>
                             <tr>
                                 <td><?= htmlspecialchars($giamgia['id']) ?></td>
+                                <td>
+                                    <?php
+                                    $adress_hinh = "../upload/" . $giamgia['hinhanh1'];
+                                    if (is_file($adress_hinh)) {
+                                        echo '<img src="' . $adress_hinh . '" width="58" />';
+                                    } else {
+                                        echo "No image!";
+                                    }
+                                    ?>
+                                </td>
                                 <td><?= htmlspecialchars($giamgia['tensanpham']) ?></td>
                                 <td><?= number_format($giamgia['gia_goc'], 0, ',', '.') ?> đ</td>
                                 <td><?= number_format($giamgia['giagiam'], 0, ',', '.') ?> đ</td>
                                 <td><?= date("d-m-Y", strtotime($giamgia['ngay_giamgia'])) ?></td>
                                 <td>
-                                    <a href="index.php?act=suaSanPhamGiamGia&id=<?= $giamgia['id'] ?>" class="btn btn-warning">
-                                        <i class="fas fa-edit"></i> Sửa
-                                    </a>
-                                    <a href="index.php?act=xoaSanPhamGiamGia&id=<?= $giamgia['id'] ?>" 
-                                       class="btn btn-danger"
-                                       onclick="return confirm('Bạn có chắc muốn xóa sản phẩm giảm giá này?');">
-                                        <i class="fas fa-trash"></i> Xóa
-                                    </a>
+                                    <?php if ($coTheXoa): ?>
+                                        <a href="index.php?act=suaSanPhamGiamGia&id=<?= $giamgia['id'] ?>" class="btn btn-warning">
+                                            <i class="fas fa-edit"></i> Sửa
+                                        </a>
+                                        <a href="index.php?act=xoaSanPhamGiamGia&id=<?= $giamgia['id'] ?>" 
+                                           class="btn btn-danger"
+                                           onclick="return confirm('Bạn có chắc muốn xóa sản phẩm giảm giá này?');">
+                                            <i class="fas fa-trash"></i> Xóa
+                                        </a>
+                                    <?php else: ?>
+                                        <span class="<?= $trangThaiClass ?>">
+                                            <i class="fas fa-exclamation-circle"></i> Đang trong đơn hàng
+                                        </span>
+                                    <?php endif; ?>
                                 </td>
                             </tr>
                         <?php endforeach; ?>
@@ -119,7 +156,7 @@
             <?php if ($soTrang > 1): ?>
                 <div class="pagination">
                     <?php for ($i = 1; $i <= $soTrang; $i++): ?>
-                        <a href="index.php?act=sanphamgiamgia&page=<?= $i ?>" 
+                        <a href="index.php?act=sanphamgiamgia&kyw=<?= urlencode($kyw) ?>&page=<?= $i ?>" 
                            class="btn btn-light <?= ($i == $page) ? 'active' : '' ?>">
                             <?= $i ?>
                         </a>

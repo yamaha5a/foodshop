@@ -77,11 +77,12 @@ class SanPhamModel {
     
     // Kiểm tra xem sản phẩm có đơn hàng không
     public function kiemTraSanPhamCoDonHang($id) {
-        // Check if the product has any orders with status other than "Đã giao"
+        // Check if the product has any active orders (not completed or cancelled)
         $sql = "SELECT COUNT(*) as count 
                 FROM chitiethoadon cth 
                 JOIN hoadon hd ON cth.id_hoadon = hd.id 
-                WHERE cth.id_sanpham = ? AND hd.trangthai != 'Đã giao'";
+                WHERE cth.id_sanpham = ? 
+                AND hd.trangthai NOT IN ('Khách hàng đã nhận', 'Đã giao', 'Đã hủy')";
         $result = pdo_query_one($sql, $id);
         return $result['count'] > 0;
     }

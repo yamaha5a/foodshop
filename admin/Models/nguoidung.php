@@ -36,6 +36,10 @@ class NguoiDung {
             return pdo_query_value($sql, $searchTerm, $searchTerm);
         }
     }
+    public function layTenQuyen($id) {
+        $sql = "SELECT tenquyen FROM phanquyen WHERE id = ?";
+        return pdo_query_value($sql, $id); // Hàm này cần được định nghĩa trong pdo_functions
+    }
     
     // Thêm phương thức để lấy danh sách người dùng với phân trang và tìm kiếm
     public function layDanhSachNguoiDungPhanTrang($search = '', $offset = 0, $limit = 10) {

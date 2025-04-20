@@ -13,11 +13,13 @@
             <h2 class="title">Quản lý bình luận</h2>
         </div>
 
-        <div class="search-bar">
-            <i class="fas fa-search"></i>
-            <input type="text" id="searchInput" placeholder="Tìm kiếm bình luận..." onkeyup="showResults()" />
-        </div>
-        <div id="searchResults" class="search-results"></div>
+        <form action="index.php" method="get" enctype="multipart/form-data">
+            <input type="hidden" name="act" value="binhluan">
+            <div class="search-box">
+                <input type="text" name="kyw" value="<?= $_GET['kyw'] ?? '' ?>" placeholder="Tìm kiếm theo tên người dùng, sản phẩm hoặc nội dung..." class="search-input">
+                <input type="submit" name="listok" value="Tìm kiếm" class="search-button">
+            </div>
+        </form>
 
         <div class="table-card">
             <div class="card-title">
@@ -66,31 +68,73 @@
                     <?php endforeach; ?>
                 </tbody>
             </table>
+
+            <!-- Phân trang -->
+            <?php if ($soTrang > 1): ?>
+                <div class="pagination">
+                    <?php for ($i = 1; $i <= $soTrang; $i++): ?>
+                        <a href="index.php?act=binhluan&kyw=<?= urlencode($kyw) ?>&page=<?= $i ?>" 
+                           class="btn btn-light <?= ($i == $page) ? 'active' : '' ?>">
+                            <?= $i ?>
+                        </a>
+                    <?php endfor; ?>
+                </div>
+            <?php endif; ?>
         </div>
     </main>
 
-    <script>
-    function showResults() {
-        let input = document.getElementById('searchInput').value.toLowerCase();
-        let table = document.querySelector('.data-table');
-        let rows = table.getElementsByTagName('tr');
-
-        for (let i = 1; i < rows.length; i++) {
-            let row = rows[i];
-            let cells = row.getElementsByTagName('td');
-            let found = false;
-
-            for (let j = 0; j < cells.length; j++) {
-                let cell = cells[j];
-                if (cell.textContent.toLowerCase().indexOf(input) > -1) {
-                    found = true;
-                    break;
-                }
-            }
-
-            row.style.display = found ? '' : 'none';
+    <style>
+        .search-box {
+            display: flex;
+            gap: 10px;
+            background: #f8f9fa;
+            padding: 12px;
+            border-radius: 15px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+            max-width: 800px;
+            margin: 20px auto;
         }
-    }
-    </script>
+
+        .search-input {
+            flex: 1;
+            padding: 8px 12px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 16px;
+        }
+
+        .search-button {
+            background: #007bff;
+            color: white;
+            padding: 8px 16px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            transition: 0.3s;
+        }
+
+        .search-button:hover {
+            background: #0056b3;
+        }
+
+        .pagination {
+            display: flex;
+            justify-content: center;
+            gap: 5px;
+            margin-top: 20px;
+        }
+
+        .pagination .btn-light {
+            padding: 5px 10px;
+            border: 1px solid #ddd;
+        }
+
+        .pagination .btn-light.active {
+            background: #007bff;
+            color: white;
+            border-color: #007bff;
+        }
+    </style>
 </body>
 </html> 

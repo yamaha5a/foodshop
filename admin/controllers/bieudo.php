@@ -1,4 +1,5 @@
 <?php
+require_once __DIR__ . '/../check_auth.php';
 require_once __DIR__ . '/../Models/bieudo.php';
 
 class BieuDoController {
